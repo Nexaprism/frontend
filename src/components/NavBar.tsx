@@ -13,11 +13,17 @@ import {
 } from "@mui/material";
 import { FC, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import BedtimeIcon from "@mui/icons-material/Bedtime";
 import { Link } from "react-router-dom";
+import { selectTheme, setTheme } from '../store/theme/themeReducer';
+import { useAppSelector, useAppDispatch } from "../store/hooks";
 
 const NavBar: FC = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const theme = useAppSelector(selectTheme);
+  const dispatch = useAppDispatch();
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -32,6 +38,14 @@ const NavBar: FC = () => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleThemeClick = () => {
+    if (theme == "light") {
+      dispatch(setTheme("dark"));
+    } else {
+      dispatch(setTheme("light"));
+    }
   };
 
   const pages = ["Metaverses", "News", "Crypto"];
@@ -127,8 +141,12 @@ const NavBar: FC = () => {
               </Button>
             ))}
           </Box>
-
           <Box sx={{ flexGrow: 0 }}>
+            <IconButton onClick={handleThemeClick} sx={{ p: 0 }}>
+              {theme == "dark" ? <Brightness7Icon /> : <BedtimeIcon />}
+            </IconButton>
+          </Box>
+          <Box sx={{ flexGrow: 0, pl: 2 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="" src="" />
