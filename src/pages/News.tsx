@@ -3,7 +3,7 @@ import {FC} from 'react';
 
 
 
-const Review: FC = () => {
+const News: FC = () => {
 
     return (
         <Box>
@@ -12,4 +12,4 @@ const Review: FC = () => {
     )
 }
 
-export default Review;
+export default News;
