@@ -1,4 +1,4 @@
-import { Box, Grid, Link, Stack, Typography } from "@mui/material";
+import { Box, Divider, Grid, Link, Stack, Typography } from "@mui/material";
 import { FC } from "react";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import CopyrightIcon from "@mui/icons-material/Copyright";
@@ -25,28 +25,44 @@ const Footer: FC = () => {
     >
       <Stack direction="column" justifyContent="center" spacing={5}>
         <Stack direction="row" spacing={5} justifyContent="center">
-        <Link href="" color="inherit">
-          <FacebookIcon />
+          <Link href="https://www.facebook.com/nexaprism" rel="noopener" target="_blank" color="inherit">
+            <FacebookIcon />
           </Link>
-          <TwitterIcon />
-          <RedditIcon />
+          <Link href="https://twitter.com/nexaprism" rel="noopener" target="_blank" color="inherit">
+            <TwitterIcon />
+          </Link>
+          <Link href="https://www.reddit.com/r/nexaprism/" rel="noopener" target="_blank" color="inherit">
+            <RedditIcon />
+          </Link>
+
           <img
             src={theme == "light" ? discordLogoLight : discordLogoDark}
             height={25}
             width={25}
           />
         </Stack>
+        <Stack direction="row" spacing={4} justifyContent="center">
+          <Link href="" underline="hover" color="inherit">
+            About
+          </Link>
+          <Divider orientation='vertical' />
+          <Link href="mailto:nexaprism@gmail.com" underline="hover" color="inherit">
+          Contact Us
+          </Link>
+
+        </Stack>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography sx={{pr: 2}}>Site by Josh Kroslowitz</Typography>
-          <Link href="https://github.com/citizensnipz" color="inherit">
+          <Typography sx={{ pr: 2 }}>Site by CitizenSnipz</Typography>
+          <Link href="https://github.com/citizensnipz" target="_blank" color="inherit">
             <GitHubIcon />
-            </Link>
+          </Link>
         </Box>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: 'center' }}>
           <CopyrightIcon />
-          <Typography variant='caption'>2022 nexaprism, All rights reserved</Typography>
+          <Typography variant="caption">
+            2022 nexaprism, All rights reserved
+          </Typography>
         </Box>
-        
       </Stack>
     </Box>
   );

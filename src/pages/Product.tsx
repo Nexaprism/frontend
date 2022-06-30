@@ -1,10 +1,11 @@
-import { alpha, Box, Grid, Stack, Typography } from "@mui/material";
-import { FC } from "react";
+import { alpha, Box, Grid, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { FC, useEffect, useState } from "react";
 import DescriptionBox from "../components/DescriptionBox";
 import DetailBox from "../components/DetailBox";
 import NewsCard from "../components/NewsCard";
 import RatingBig from "../components/RatingBig";
 import ReviewCard from "../components/ReviewCard";
+import Carousel from "react-material-ui-carousel";
 
 /**
  * jumbo image
@@ -31,6 +32,29 @@ import ReviewCard from "../components/ReviewCard";
 const reviews = [20, 58, 99, 74, 88, 84, 71, 15, 100, 48];
 
 const Product: FC = () => {
+  const [items, setItems] = useState<any[]>();
+  const theme = useTheme();
+  const isLG = useMediaQuery(theme.breakpoints.up('lg'));
+
+  const addItems = () => {
+    const newsItems: Array<any> = [];
+    for (let i = 0; i < 3; i++) {
+      newsItems.push(
+        <Stack direction="row" spacing={3}>
+          <NewsCard />
+          <NewsCard />
+          <NewsCard />
+          <NewsCard />
+        </Stack>
+      );
+    }
+    setItems(newsItems);
+  };
+
+  useEffect(() => {
+    addItems();
+  });
+
   return (
     <Box sx={{ backgroundColor: "inherit" }}>
       <Box
@@ -55,21 +79,22 @@ const Product: FC = () => {
           <DetailBox />
         </Box>
       </Box>
-      <Box sx={{ ml: 15, mr: 15 }}>
+      <Stack direction='column' sx={{ display: 'flex', alignItems: 'center'}}>
+        <Box sx={{width: {xl: 1500, lg: 1200, md: 800, sm: 600} }}>
         <Stack
           direction={{ xs: "column", md: "row" }}
           sx={{
             backgroundColor: "gray",
             height: "auto",
             display: "flex",
-            justifyContent: 'center'
+            justifyContent: "center",
           }}
         >
           <Box>
             <DescriptionBox />
           </Box>
 
-          <Box sx={{display: 'flex', justifyContent: 'center'}}>
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
             <RatingBig value={84} />
           </Box>
         </Stack>
@@ -98,20 +123,19 @@ const Product: FC = () => {
         <Box
           sx={{
             backgroundColor: "gray",
-            height: "60vh",
+            height: "575px",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            p: 2
           }}
         >
-          <Stack direction="row" spacing={3}>
-            <NewsCard />
-            <NewsCard />
-            <NewsCard />
-            <NewsCard />
-          </Stack>
+            <Carousel sx={{ width: "100%" }} index={4} animation="slide">
+              {items}
+            </Carousel>
         </Box>
-      </Box>
+        </Box>
+      </Stack>
     </Box>
   );
 };
