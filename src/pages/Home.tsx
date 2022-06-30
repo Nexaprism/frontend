@@ -1,7 +1,9 @@
 import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
+import Carousel from "react-material-ui-carousel";
 import Glance from "../components/Glance";
 import JumboNews from "../components/JumboNews";
+import ProductCard from "../components/ProductCard";
 
 /**
  * big jumbo carousel of news w/ featured articles on the side (hidden on mobile)
@@ -17,6 +19,27 @@ import JumboNews from "../components/JumboNews";
  */
 
 const Home: FC = () => {
+  const [items, setItems] = useState<any[]>();
+
+  const addItems = () => {
+    const newsItems: Array<any> = [];
+    for (let i = 0; i < 3; i++) {
+      newsItems.push(
+        <Stack direction="row" spacing={3} display='flex' justifyContent='center'>
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+        </Stack>
+      );
+    }
+    setItems(newsItems);
+  };
+
+  useEffect(() => {
+    addItems();
+  });
+
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Stack
@@ -51,25 +74,30 @@ const Home: FC = () => {
             <Glance />
           </Box>
         </Stack>
-        <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-        <Typography variant="h3">Most Recent</Typography>
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Typography variant="h3">Most Recent</Typography>
         </Box>
-        
-        <Box sx={{ backgroundColor: "purple", height: "275px", width: "auto" }}>
-          Most recently added carousel
+        <Box sx={{ height: "275px", width: "auto"}}>
+          <Carousel sx={{ width: "100%" }} index={4} animation="slide" navButtonsAlwaysVisible={true}>
+            {items}
+          </Carousel>
         </Box>
-        <Typography variant='h3'>Most Popular</Typography>
-        <Box sx={{ backgroundColor: "blue", height: "275px", width: "auto" }}>
-          Most popular carousel
+        <Typography variant="h3">Most Popular</Typography>
+        <Box sx={{  height: "275px", width: "auto" }}>
+        <Carousel sx={{ width: "100%" }} index={4} animation="slide" navButtonsAlwaysVisible={true}>
+            {items}
+          </Carousel>
         </Box>
-        <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-        <Typography variant='h3'>What's Hot</Typography>
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+          <Typography variant="h3">What's Hot</Typography>
         </Box>
-        
-        <Box sx={{ backgroundColor: "green", height: "275px", width: "auto" }}>
-          What's Hot carousel
+
+        <Box sx={{  height: "275px", width: "auto" }}>
+        <Carousel sx={{ width: "100%" }} index={4} animation="slide" navButtonsAlwaysVisible={true}>
+            {items}
+          </Carousel>
         </Box>
-        <Typography variant='h3'>Latest News</Typography>
+        <Typography variant="h3">Latest News</Typography>
         <Box sx={{ backgroundColor: "orange", height: "200px", width: "auto" }}>
           Latest News articles
         </Box>

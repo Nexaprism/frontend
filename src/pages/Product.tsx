@@ -34,7 +34,6 @@ const reviews = [20, 58, 99, 74, 88, 84, 71, 15, 100, 48];
 const Product: FC = () => {
   const [items, setItems] = useState<any[]>();
   const theme = useTheme();
-  const isLG = useMediaQuery(theme.breakpoints.up('lg'));
 
   const addItems = () => {
     const newsItems: Array<any> = [];

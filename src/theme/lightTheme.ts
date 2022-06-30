@@ -8,8 +8,21 @@ const lightTheme = createTheme({
         },
       },
       typography: {
+        fontFamily: "Questrial",
         button: {
           fontFamily: 'Lexend'
+        }
+      },
+      components: {
+        MuiButton: {
+          styleOverrides: {
+            root: {
+              transition: "transform 0.15s ease-in-out",
+              '&:hover': {
+                transform: "scale3d(1.2, 1.2, 1)"
+              }
+            }
+          }
         }
       }
 });
