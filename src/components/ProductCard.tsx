@@ -47,9 +47,9 @@ const ProductCard: FC = () => {
             }}
           >
             <RatingSmall value={product.rating} />
-            <Box overflow="hidden">
+            <Box overflow="hidden" >
               {product.tags.map((tag) => (
-                <Chip label={tag} sx={{ height: 15 }} />
+                <Chip label={tag} sx={{ height: 15, m: 0.15 }} />
               ))}
             </Box>
           </Stack>

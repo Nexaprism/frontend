@@ -11,7 +11,7 @@ const newsStory = {
 const Glance: FC = () => {
 
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center'}}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 2}}>
             <Stack direction='column'>
             <Typography variant='h3'>At a glance:</Typography>
             <Typography variant='caption'>{newsStory.date}</Typography>

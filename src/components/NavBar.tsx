@@ -22,6 +22,7 @@ import { selectTheme, setTheme } from "../store/theme/themeReducer";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { styled, alpha } from "@mui/material/styles";
 import mainLogo from '../assets/img/nexaprismLogoSmall.png';
+import Metaverses from "../pages/Metaverses";
 
 /**
  *
@@ -94,6 +95,11 @@ const NavBar: FC = () => {
     setAnchorElUser(null);
   };
 
+  const handleButtonClick = () => {
+    setAnchorElNav(null);
+
+  }
+
   const handleThemeClick = () => {
     if (themeFromStore == "light") {
       dispatch(setTheme("dark"));
@@ -102,7 +108,7 @@ const NavBar: FC = () => {
     }
   };
 
-  const pages = ["Metaverses", "AR", "VR", "Games", "News", "Crypto", "Shop"];
+  const pages = ["metaverses", "ar", "vr", "games", "news", "crypto", "shop"];
   const settings = ["My profile", "Sign out"];
 
   return (
@@ -160,7 +166,7 @@ const NavBar: FC = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} component={Link} to={"/" + page}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
@@ -210,7 +216,8 @@ const NavBar: FC = () => {
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
+                component={Link}
+                to={"/" + page}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
                 {page}
@@ -218,7 +225,7 @@ const NavBar: FC = () => {
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-            <IconButton onClick={handleThemeClick} sx={{ p: 0 }}>
+            <IconButton onClick={handleThemeClick} sx={{ p: 0, color: 'white' }} >
               {themeFromStore == "dark" ? <Brightness7Icon /> : <BedtimeIcon />}
             </IconButton>
           </Box>

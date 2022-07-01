@@ -25,7 +25,7 @@ const DetailBox: FC = () => {
       }));
 
     return (
-        <Box sx={{ mt: 10, pl: 3}}>
+        <Stack direction="column" sx={{mt: 5, pl: 3}}>
             <Typography variant='h5' sx={{textDecoration: 'underline', pl: 1}}>Details: </Typography>
             <Stack spacing={0} direction='column' justifyContent='center'>
                 <Item><Typography variant='body2' sx={{fontWeight: 600, pr: 1}}>Name:</Typography>{details.name}</Item>
@@ -37,7 +37,7 @@ const DetailBox: FC = () => {
                 <Item><Typography variant='body2' sx={{fontWeight: 600, pr: 1}}>Governance:</Typography>{details.governance}</Item>
             </Stack>
             
-        </Box>
+        </Stack>
     )
 }
 

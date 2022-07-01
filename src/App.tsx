@@ -12,6 +12,7 @@ import lightTheme from './theme/lightTheme';
 import darkTheme from './theme/darkTheme';
 import Footer from './components/Footer';
 import Product from './pages/Product';
+import Metaverses from './pages/Metaverses';
 
 function App() {
   const theme = useAppSelector(selectTheme);
@@ -24,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path='/product' element={<Product />} />
+          <Route path="/metaverses" element={<Metaverses />} />
         </Routes>
       </Box>
       <Footer />

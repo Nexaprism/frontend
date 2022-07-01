@@ -4,7 +4,7 @@ const lightTheme = createTheme({
     palette: {
         mode: 'light',
         primary: {
-          main: "#63006e",
+          main: "#201438",
         },
       },
       typography: {
@@ -21,6 +21,20 @@ const lightTheme = createTheme({
               '&:hover': {
                 transform: "scale3d(1.2, 1.2, 1)"
               }
+            }
+          }
+        },
+        MuiCard: {
+          styleOverrides: {
+            root: {
+              background: 'linear-gradient(to bottom, #cdcccf, #ababab)'
+            }
+          }
+        },
+        MuiChip: {
+          styleOverrides: {
+            root: {
+              background: 'linear-gradient(to right bottom, #ede65f, #eda65f)'
             }
           }
         }

@@ -30,6 +30,20 @@ const darkTheme = createTheme({
           }
         }
       }
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          background: 'linear-gradient(to bottom, #989799, #6a6a6b)'
+        }
+      }
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          background: 'linear-gradient(to right bottom, #4849b8, #6248b8)'
+        }
+      }
     }
   }
 });

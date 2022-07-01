@@ -83,7 +83,6 @@ const Product: FC = () => {
         <Stack
           direction={{ xs: "column", md: "row" }}
           sx={{
-            backgroundColor: "gray",
             height: "auto",
             display: "flex",
             justifyContent: "center",
@@ -100,7 +99,6 @@ const Product: FC = () => {
 
         <Box
           sx={{
-            backgroundColor: "purple",
             height: "auto",
             flexGrow: 1,
             p: 3,
@@ -121,7 +119,6 @@ const Product: FC = () => {
         </Box>
         <Box
           sx={{
-            backgroundColor: "gray",
             height: "575px",
             display: "flex",
             justifyContent: "center",

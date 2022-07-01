@@ -13,10 +13,10 @@ const DescriptionBox: FC = () => {
   const Item = styled("div")(({ theme }) => ({
     //backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     backgroundColor: "transparent",
-    ...theme.typography.body2,
+    ...theme.typography.body1,
     padding: theme.spacing(1),
     textAlign: "left",
-    color: theme.palette.text.secondary,
+    color: theme.palette.text.primary,
     display: "inline-flex",
   }));
 
@@ -25,7 +25,7 @@ const DescriptionBox: FC = () => {
       <Stack>
         <Item>
           <Typography
-            variant="body2"
+            variant="body1"
             sx={{ fontWeight: 600, textDecoration: "underline", pr: 1 }}
           >
             Description:
@@ -34,7 +34,7 @@ const DescriptionBox: FC = () => {
         </Item>
         <Item>
           <Typography
-            variant="body2"
+            variant="body1"
             sx={{ fontWeight: 600, textDecoration: "underline", pr: 2 }}
           >
             Company:
@@ -43,7 +43,7 @@ const DescriptionBox: FC = () => {
         </Item>
         <Item>
           <Typography
-            variant="body2"
+            variant="body1"
             sx={{ fontWeight: 600, textDecoration: "underline", pr: 1 }}
           >
             Developers:
@@ -52,7 +52,7 @@ const DescriptionBox: FC = () => {
         </Item>
         <Item>
           <Typography
-            variant="body2"
+            variant="body1"
             sx={{ fontWeight: 600, textDecoration: "underline", pr: 1 }}
           >
             URL:

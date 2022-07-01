@@ -17,7 +17,7 @@ const JumboNews: FC = () => {
             <Stack direction="column" sx={{position: 'absolute', top: {xs: '50%', sm: '50%', md: '60%'}, left: '5%'}}>
             <Typography variant='h3'>{newsStory.title}</Typography>
             <Typography variant='subtitle1' >Learn More</Typography>         
-            <Stack direction="row">
+            <Stack direction="row" spacing={1}>
                 {newsStory.tags.map(tag => <Chip label={tag} />)}
             </Stack>
             </Stack>
