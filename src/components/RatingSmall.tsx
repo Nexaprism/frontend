@@ -27,7 +27,7 @@ function RatingSmall(props: CircularProgressProps & { value: number; }) {
     }, [])
     return (
         <Box sx={{ position: 'relative', p: 3 }}>
-            <Box>
+            <Box sx={{display: 'flex', justifyContent: 'center'}}>
                 <CircularProgress variant="determinate" size={50} sx={{color: `${ratingColor}`}} {...props} />
             </Box>
             

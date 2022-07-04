@@ -37,6 +37,16 @@ const lightTheme = createTheme({
               background: 'linear-gradient(to right bottom, #ede65f, #eda65f)'
             }
           }
+        },
+        MuiLink: {
+          styleOverrides: {
+            root: {
+              color: 'black',
+              '&:hover': {
+                color: '"#201438"'
+              },
+            }
+          }
         }
       }
 });

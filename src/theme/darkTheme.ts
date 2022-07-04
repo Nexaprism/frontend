@@ -44,6 +44,13 @@ const darkTheme = createTheme({
           background: 'linear-gradient(to right bottom, #4849b8, #6248b8)'
         }
       }
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          color: 'white'
+        }
+      }
     }
   }
 });

@@ -27,13 +27,13 @@ const Footer: FC = () => {
     >
       <Stack direction="column" justifyContent="center" spacing={5}>
         <Stack direction="row" spacing={5} justifyContent="center">
-          <Link href="https://www.facebook.com/nexaprism" rel="noopener" target="_blank">
+          <Link href="https://www.facebook.com/nexaprism" rel="noopener" target="_blank" sx={{color: 'white'}}>
             <FacebookIcon />
           </Link>
-          <Link href="https://twitter.com/nexaprism" rel="noopener" target="_blank" color="inherit">
+          <Link href="https://twitter.com/nexaprism" rel="noopener" target="_blank" color="inherit" sx={{color: 'white'}}>
             <TwitterIcon />
           </Link>
-          <Link href="https://www.reddit.com/r/nexaprism/" rel="noopener" target="_blank" color="inherit">
+          <Link href="https://www.reddit.com/r/nexaprism/" rel="noopener" target="_blank" color="inherit" sx={{color: 'white'}}>
             <RedditIcon />
           </Link>
 
@@ -44,18 +44,18 @@ const Footer: FC = () => {
           />
         </Stack>
         <Stack direction="row" spacing={4} justifyContent="center">
-          <Link href="" underline="hover">
+          <Link href="" underline="hover" sx={{color: 'white'}}>
             About
           </Link>
           <Divider orientation='vertical' color="white"/>
-          <Link href="mailto:nexaprism@gmail.com" underline="hover" color="inherit">
+          <Link href="mailto:nexaprism@gmail.com" underline="hover" sx={{color: 'white'}}>
           Contact Us
           </Link>
 
         </Stack>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Typography sx={{ pr: 2 }} color="white">Site by CitizenSnipz</Typography>
-          <Link href="https://github.com/citizensnipz" target="_blank" color="inherit">
+          <Link href="https://github.com/citizensnipz" target="_blank" sx={{color: 'white'}}>
             <GitHubIcon />
           </Link>
         </Box>

@@ -13,6 +13,11 @@ import darkTheme from './theme/darkTheme';
 import Footer from './components/Footer';
 import Product from './pages/Product';
 import Metaverses from './pages/Metaverses';
+import VR from './pages/VR';
+import AR from './pages/AR';
+import Crypto from './pages/Crypto';
+import Shop from './pages/Shop';
+import News from './pages/News';
 
 function App() {
   const theme = useAppSelector(selectTheme);
@@ -26,6 +31,11 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path='/product' element={<Product />} />
           <Route path="/metaverses" element={<Metaverses />} />
+          <Route path="/vr" element={<VR />} />
+          <Route path="/ar" element={<AR />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/crypto" element={<Crypto />} />
+          <Route path="/shop" element={<Shop />} />
         </Routes>
       </Box>
       <Footer />

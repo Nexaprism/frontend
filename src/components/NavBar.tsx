@@ -218,7 +218,7 @@ const NavBar: FC = () => {
                 key={page}
                 component={Link}
                 to={"/" + page}
-                sx={{ my: 2, color: "white", display: "block" }}
+                sx={{ my: 2, color: "white", display: "flex", justifyContent: 'center' }}
               >
                 {page}
               </Button>
