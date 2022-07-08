@@ -24,7 +24,7 @@ function RatingMedium(props: CircularProgressProps & { value: number; }) {
 
     useEffect(() => {
         setRatingColor(findRatingColor(props.value))
-    }, [])
+    }, [props.value])
     return (
         <Box sx={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
             <CircularProgress variant="determinate" size={150} sx={{color: `${ratingColor}`}} {...props} />

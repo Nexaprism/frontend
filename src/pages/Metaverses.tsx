@@ -237,9 +237,7 @@ const Metaverses: FC = () => {
             return item;
           })}
         </Grid>
-        <Box sx={{display: 'flex', justifyContent: 'center'}}>
-        <Pagination count={4} />
-        </Box>
+        
         
         <Carousel sx={{ width: "100%" }} index={4} animation="slide">
           {newsItems}

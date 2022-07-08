@@ -21,7 +21,7 @@ const newsStory = {
 
 const NewsCard: FC = () => {
   return (
-    <Card sx={{ maxWidth: 345, maxHeight: 500 }}>
+    <Card sx={{ maxWidth: 345, maxHeight: 500, minWidth: 190 }}>
       <CardMedia
         component="img"
         alt="green iguana"
@@ -33,7 +33,7 @@ const NewsCard: FC = () => {
           {newsStory.title}
         </Typography>
         <Divider />
-        <Box component="div" sx={{ height: {sm: 75, md: 80, lg: 90}, overflow: "hidden" }}>
+        <Box component="div" sx={{ height: {sm: 75, md: 80, lg: 90}, overflow: "hidden", textOverflow: 'ellipsis' }}>
           <Typography gutterBottom variant="body2" color="text.secondary">
             {newsStory.content}
           </Typography>

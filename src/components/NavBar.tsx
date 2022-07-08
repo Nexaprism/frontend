@@ -203,7 +203,7 @@ const NavBar: FC = () => {
           >
             nexaprism
           </Typography>
-          <Box sx={{ display: { sm: "none", md: "flex" }, pr: 2 }}>
+          <Box sx={{ display: {xs: "none", md: "flex" }, pr: 2 }}>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />

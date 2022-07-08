@@ -20,6 +20,8 @@ import Shop from './pages/Shop';
 import News from './pages/News';
 import SignUp from './pages/SignUp';
 import LogIn from './pages/LogIn';
+import Article from './pages/Article';
+import Profile from './pages/Profile';
 
 function App() {
   const theme = useAppSelector(selectTheme);
@@ -40,6 +42,8 @@ function App() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<LogIn />} />
+          <Route path="/article" element={<Article />} />
+          <Route path="/account" element={<Profile /> } />
         </Routes>
       </Box>
       <Footer />

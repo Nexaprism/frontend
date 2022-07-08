@@ -19,12 +19,31 @@ import ProductCard from "../components/ProductCard";
  */
 
 const Home: FC = () => {
-  const [items, setItems] = useState<any[]>();
+  const [big, setBig] = useState<any[]>();
+  const [small, setSmall] = useState<any[]>();
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("sm"));
 
   const addItems = () => {
-    const newsItems: Array<any> = [];
+    const lessItems: Array<any> = [];
+    const moreItems: Array<any> = [];
+
     for (let i = 0; i < 3; i++) {
-      newsItems.push(
+      lessItems.push(
+        <Stack
+          direction="row"
+          spacing={3}
+          display="flex"
+          justifyContent="center"
+        >
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+        </Stack>
+      );
+    }
+    for (let i = 0; i < 3; i++) {
+      moreItems.push(
         <Stack
           direction="row"
           spacing={3}
@@ -38,12 +57,13 @@ const Home: FC = () => {
         </Stack>
       );
     }
-    setItems(newsItems);
+    setSmall(lessItems);
+    setBig(moreItems);
   };
 
   useEffect(() => {
     addItems();
-  });
+  }, [ matches]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -55,9 +75,10 @@ const Home: FC = () => {
         <Stack
           direction="row"
           sx={{
-            backgroundColor: "red",
             maxHeight: { xs: 350, md: 550, lg: 400 },
             width: "100%",
+            borderBottomRightRadius: 20,
+            borderBottomLeftRadius: 20,
           }}
         >
           <Box
@@ -89,7 +110,7 @@ const Home: FC = () => {
             animation="slide"
             navButtonsAlwaysVisible={true}
           >
-            {items}
+            { big}
           </Carousel>
         </Box>
         <Typography variant="h3">Most Popular</Typography>
@@ -100,7 +121,7 @@ const Home: FC = () => {
             animation="slide"
             navButtonsAlwaysVisible={true}
           >
-            {items}
+            { big}
           </Carousel>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -110,11 +131,11 @@ const Home: FC = () => {
         <Box sx={{ height: "275px", width: "auto" }}>
           <Carousel
             sx={{ width: "100%" }}
-            index={4}
+            index={0}
             animation="slide"
             navButtonsAlwaysVisible={true}
           >
-            {items}
+            { big}
           </Carousel>
         </Box>
         <Typography variant="h3">Latest News</Typography>
