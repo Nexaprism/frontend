@@ -15,12 +15,12 @@ const newsStory = {
 const SmallNewsCard: FC = () => {
 
     return (
-        <Card sx={{maxWidth: 800, maxHeight: 225}}>
+        <Card sx={{maxWidth: 800, maxHeight: 225, width: '100%'}}>
             <CardActionArea>
-                <Stack direction="row">
+                <Stack direction="row" >
                     <Stack direction="column" width="60%" spacing={1} sx={{display: 'flex', pl: 2, pt: 1}}>
-                        <Typography variant='h4'>{newsStory.title}</Typography>
-                        <Typography>{newsStory.subHeading}</Typography>
+                        <Typography fontSize={{sm: 23, md: 28, lg: 28}}>{newsStory.title}</Typography>
+                        <Typography fontSize={{sm: 16, md: 18, lg: 20}}>{newsStory.subHeading}</Typography>
                         <Chip label={newsStory.mainTag} sx={{maxWidth: 100}}/>
                         <Typography variant='caption'>{newsStory.date}</Typography>
                         <Link>Read more...</Link>

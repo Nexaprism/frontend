@@ -20,9 +20,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Link } from "react-router-dom";
 import { selectTheme, setTheme } from "../store/theme/themeReducer";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { styled, alpha } from "@mui/material/styles";
-import mainLogo from '../assets/img/nexaprismLogoSmall.png';
-import Metaverses from "../pages/Metaverses";
+import { styled, alpha, useTheme } from "@mui/material/styles";
+import mainLogo from "../assets/img/nexLogo13.png";
 
 /**
  *
@@ -35,8 +34,16 @@ const NavBar: FC = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const themeFromStore = useAppSelector(selectTheme);
+  const themeObj = useTheme();
   const dispatch = useAppDispatch();
 
+  const AcctLink = styled(Link)(({ theme }) => ({
+    textDecoration: "none",
+    color: themeFromStore == "light" ? "black" : "white",
+    "&:visited": {
+      color: "primary",
+    },
+  }));
 
   const Search = styled("div")(({ theme }) => ({
     position: "relative",
@@ -97,8 +104,7 @@ const NavBar: FC = () => {
 
   const handleButtonClick = () => {
     setAnchorElNav(null);
-
-  }
+  };
 
   const handleThemeClick = () => {
     if (themeFromStore == "light") {
@@ -108,15 +114,15 @@ const NavBar: FC = () => {
     }
   };
 
-  const pages = ["metaverses", "ar", "vr", "games", "news", "crypto", "shop"];
-  const settings = ["My profile", "Sign out"];
+  const pages = ["metaverses", "ar", "vr", "news", "crypto", "shop"];
+  const settings = ["My Profile", "Sign Up", "Log In"];
 
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Box sx={{display: { xs: "none", md: "flex" }}}>
-            <img src={mainLogo} height='50px'/>
+          <Box sx={{ display: { xs: "none", md: "flex" }, pt: 1 }}>
+            <img src={mainLogo} height="50px" />
           </Box>
           <Typography
             variant="h5"
@@ -131,7 +137,7 @@ const NavBar: FC = () => {
               color: "inherit",
               textDecoration: "none",
               flexGrow: 1,
-              width: '100%'
+              width: "100%",
             }}
           >
             nexaprism
@@ -177,8 +183,8 @@ const NavBar: FC = () => {
            *
            * //responsive menu split
            */}
-          <Box sx={{display: { xs: "flex", md: "none" }}}>
-            <img src={mainLogo} height='50px'/>
+          <Box sx={{ display: { xs: "flex", md: "none" }, pt: 1 }}>
+            <img src={mainLogo} height="50px" />
           </Box>
           <Typography
             variant="h5"
@@ -197,7 +203,7 @@ const NavBar: FC = () => {
           >
             nexaprism
           </Typography>
-          <Box sx={{ display: "flex", pr: 2 }}>
+          <Box sx={{ display: { sm: "none", md: "flex" }, pr: 2 }}>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -218,14 +224,22 @@ const NavBar: FC = () => {
                 key={page}
                 component={Link}
                 to={"/" + page}
-                sx={{ my: 2, color: "white", display: "flex", justifyContent: 'center' }}
+                sx={{
+                  my: 2,
+                  color: "white",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
               >
                 {page}
               </Button>
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-            <IconButton onClick={handleThemeClick} sx={{ p: 0, color: 'white' }} >
+            <IconButton
+              onClick={handleThemeClick}
+              sx={{ p: 0, color: "white" }}
+            >
               {themeFromStore == "dark" ? <Brightness7Icon /> : <BedtimeIcon />}
             </IconButton>
           </Box>
@@ -236,7 +250,10 @@ const NavBar: FC = () => {
               </IconButton>
             </Tooltip>
             <Menu
-              sx={{ mt: "45px" }}
+              sx={{
+                mt: "45px",
+                backgroundColor: `${themeObj.palette.primary}`,
+              }}
               id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{
@@ -251,11 +268,21 @@ const NavBar: FC = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+              <AcctLink to={"/account"}>
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <Typography textAlign="center">My Account</Typography>
                 </MenuItem>
-              ))}
+              </AcctLink>
+              <AcctLink to={"/signup"}>
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <Typography textAlign="center">Sign Up</Typography>
+                </MenuItem>
+              </AcctLink>
+              <AcctLink to={"/login"}>
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <Typography textAlign="center">Log In</Typography>
+                </MenuItem>
+              </AcctLink>
             </Menu>
           </Box>
         </Toolbar>

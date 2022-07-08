@@ -18,6 +18,8 @@ import AR from './pages/AR';
 import Crypto from './pages/Crypto';
 import Shop from './pages/Shop';
 import News from './pages/News';
+import SignUp from './pages/SignUp';
+import LogIn from './pages/LogIn';
 
 function App() {
   const theme = useAppSelector(selectTheme);
@@ -36,6 +38,8 @@ function App() {
           <Route path="/news" element={<News />} />
           <Route path="/crypto" element={<Crypto />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<LogIn />} />
         </Routes>
       </Box>
       <Footer />

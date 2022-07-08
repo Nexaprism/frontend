@@ -25,7 +25,12 @@ const Home: FC = () => {
     const newsItems: Array<any> = [];
     for (let i = 0; i < 3; i++) {
       newsItems.push(
-        <Stack direction="row" spacing={3} display='flex' justifyContent='center'>
+        <Stack
+          direction="row"
+          spacing={3}
+          display="flex"
+          justifyContent="center"
+        >
           <ProductCard />
           <ProductCard />
           <ProductCard />
@@ -77,14 +82,24 @@ const Home: FC = () => {
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
           <Typography variant="h3">Most Recent</Typography>
         </Box>
-        <Box sx={{ height: "275px", width: "auto"}}>
-          <Carousel sx={{ width: "100%" }} index={4} animation="slide" navButtonsAlwaysVisible={true}>
+        <Box sx={{ height: "275px", width: "auto" }}>
+          <Carousel
+            sx={{ width: "100%" }}
+            index={4}
+            animation="slide"
+            navButtonsAlwaysVisible={true}
+          >
             {items}
           </Carousel>
         </Box>
         <Typography variant="h3">Most Popular</Typography>
-        <Box sx={{  height: "275px", width: "auto" }}>
-        <Carousel sx={{ width: "100%" }} index={4} animation="slide" navButtonsAlwaysVisible={true}>
+        <Box sx={{ height: "275px", width: "auto" }}>
+          <Carousel
+            sx={{ width: "100%" }}
+            index={4}
+            animation="slide"
+            navButtonsAlwaysVisible={true}
+          >
             {items}
           </Carousel>
         </Box>
@@ -92,8 +107,13 @@ const Home: FC = () => {
           <Typography variant="h3">What's Hot</Typography>
         </Box>
 
-        <Box sx={{  height: "275px", width: "auto" }}>
-        <Carousel sx={{ width: "100%" }} index={4} animation="slide" navButtonsAlwaysVisible={true}>
+        <Box sx={{ height: "275px", width: "auto" }}>
+          <Carousel
+            sx={{ width: "100%" }}
+            index={4}
+            animation="slide"
+            navButtonsAlwaysVisible={true}
+          >
             {items}
           </Carousel>
         </Box>

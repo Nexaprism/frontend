@@ -13,6 +13,9 @@ const darkTheme = createTheme({
     background: {
       default: "#1e1f1f",
     },
+    primary: {
+      main: "#1e1f1f",
+    },
   },
   typography: {
     fontFamily: "Questrial",
@@ -27,7 +30,8 @@ const darkTheme = createTheme({
           transition: "transform 0.15s ease-in-out",
           '&:hover': {
             transform: "scale3d(1.2, 1.2, 1)"
-          }
+          },
+          color: 'white'
         }
       }
     },
