@@ -31,8 +31,11 @@ const darkTheme = createTheme({
           '&:hover': {
             transform: "scale3d(1.2, 1.2, 1)"
           },
-          color: 'white'
-        }
+          color: 'white',
+        },
+        contained: {
+          backgroundColor: "purple"
+        },
       }
     },
     MuiCard: {

@@ -99,25 +99,25 @@ const Profile: FC = () => {
         <Typography variant="h2">Account details</Typography>
         <Divider />
         <Stack direction="row" spacing={4} sx={{alignItems: "center"}}>
-          <Avatar>CS</Avatar>
-          <Typography>{user.name}</Typography>
+          <Avatar sx={{height: 115, width: 115}}>CS</Avatar>
+          <Typography fontSize={22} sx={{fontWeight: 600}}>{user.name}</Typography>
         </Stack>
         <Stack direction="row" spacing={2}>
-          <Box>Email: </Box>
+          <Typography sx={{fontWeight: 600}}>Email:</Typography>
           <Typography>{user.email}</Typography>
         </Stack>
         <Stack direction="row" spacing={2}>
-          <Box>Member since: </Box>
+        <Typography sx={{fontWeight: 600}}>Member since:</Typography>
           <Typography>{user.created}, 1 month, 22 days</Typography>
         </Stack>
         <Stack direction="row" spacing={2}>
-          <Box>Number of reviews: </Box>
+        <Typography sx={{fontWeight: 600}}>Number of reviews:</Typography>
           <Typography>{user.totalReviews}</Typography>
         </Stack>
         <Box>
           <Button sx={buttonStyles}>Edit Profile</Button>
         </Box>
-        <Stack spacing={2} direction={{xs: "column", md: "row"}} sx={{display: 'flex', alignItems: 'center'}}>
+        <Stack spacing={2} direction={{xs: "column", md: "row"}} sx={{display: 'flex', alignItems: 'center', pt: 3}}>
             <Box sx={{justifyContent: 'flex-start', minWidth: 280, width: "50%"}}>
             <Typography variant="h3" >Your reviews:</Typography>
             </Box>

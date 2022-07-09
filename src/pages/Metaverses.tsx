@@ -39,6 +39,10 @@ const Metaverses: FC = () => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
 
+  const buttonStyles = {
+    "&:hover": { transform: "none" },
+  }
+
   const addItems = () => {
     const productItems: Array<any> = [];
     for (let i = 0; i < 3; i++) {
@@ -206,21 +210,21 @@ const Metaverses: FC = () => {
             aria-label="outlined primary button group"
           >
             <Button
-              sx={{ "&:hover": { transform: "none" } }}
+              sx={buttonStyles}
               variant={enabledButton[0] == true ? "contained" : "outlined"}
               onClick={() => sortButtonHandler(0)}
             >
               Highest First
             </Button>
             <Button
-              sx={{ "&:hover": { transform: "none" } }}
+              sx={buttonStyles}
               variant={enabledButton[1] == true ? "contained" : "outlined"}
               onClick={() => sortButtonHandler(1)}
             >
               Lowest First
             </Button>
             <Button
-              sx={{ "&:hover": { transform: "none" } }}
+              sx={buttonStyles}
               variant={enabledButton[2] == true ? "contained" : "outlined"}
               onClick={() => sortButtonHandler(2)}
             >

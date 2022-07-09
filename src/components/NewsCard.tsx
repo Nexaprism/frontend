@@ -34,7 +34,7 @@ const NewsCard: FC = () => {
         </Typography>
         <Divider />
         <Box component="div" sx={{ height: {sm: 75, md: 80, lg: 90}, overflow: "hidden", textOverflow: 'ellipsis' }}>
-          <Typography gutterBottom variant="body2" color="text.secondary">
+          <Typography gutterBottom variant="body2" color="text.secondary" noWrap={true}>
             {newsStory.content}
           </Typography>
         </Box>
