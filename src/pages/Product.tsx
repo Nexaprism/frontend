@@ -20,6 +20,9 @@ import ReviewCard from "../components/ReviewCard";
 import Carousel from "react-material-ui-carousel";
 import RatingSmall from "../components/RatingSmall";
 import RatingMedium from "../components/ReviewMedium";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { selectIsLoggedIn } from "../store/app/appReducer";
+import { selectToken } from "../store/user/userReducer";
 
 /**
  * jumbo image
@@ -50,6 +53,12 @@ const Product: FC = () => {
   const [sliderValue, setSliderValue] = useState<
     number | string | Array<number | string>
   >(0);
+  const [reviewContent, setReviewContent] = useState<string>("");
+  const [isValid, setIsValid] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const token = useAppSelector(selectToken);
+
 
   const multilineStyles = {
     '& input:valid + fieldset': {
@@ -79,6 +88,14 @@ const Product: FC = () => {
     return `${value}`;
   }
 
+  const checkValid = (text: string) => {
+    if (reviewContent === '' || text === '' || reviewContent.length < 10) {
+      setIsValid(false)
+    } else {
+      setIsValid(true)
+    }
+  };
+
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     setSliderValue(newValue);
   };
@@ -86,6 +103,56 @@ const Product: FC = () => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSliderValue(event.target.value === "" ? "" : Number(event.target.value));
   };
+
+  const submitReviewHandler = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    const today = new Date().toLocaleDateString();
+    const graphqlQuery = {
+      query: `
+        mutation {
+          createReview(reviewInput: {
+            rating: "${Number(sliderValue)}", 
+            content: "${reviewContent}", 
+            date: "${today}" 
+          }) {
+            _id
+            user
+          }
+        }
+      `
+    };
+    fetch("http://localhost:3080/graphql", {
+      method: "POST",
+      headers: {
+        "Authorization": 'Bearer ' + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(graphqlQuery)
+    })
+      .then(res => {
+        return res.json();
+      })
+      .then(resData => {
+        //error handling
+        if(resData.errors && resData.errors[0].status === 422) {
+          console.log(resData);
+          throw new Error(
+            "Validation failed. Could not authenticate user"
+          )
+        }
+        if(resData.errors) {
+          console.log(resData);
+          throw new Error('Review creation failed');
+        }
+        //passed errors, set states & dispatching logic here
+        console.log(resData);
+        //@dev TO DO:
+        //reroute user to the page they are currently on to refresh it
+      })
+      .catch(err => {
+        console.log(err);
+      })
+  }
 
   const addItems = () => {
     const newsItems: Array<any> = [];
@@ -152,13 +219,17 @@ const Product: FC = () => {
 
           {/* your rating */}
           <Box
+          component="form"
+          onSubmit={submitReviewHandler}
             sx={{ display: "flex", justifyContent: "center", width: "100%", pt: 5, pb: 5 }}
           >
+            
             <Stack direction="row" spacing={8} width="80%" alignItems="center">
               <Box>
                 <RatingMedium value={Number(sliderValue)} />
               </Box>
               <Stack direction="column" spacing={2} width="100%">
+              <Typography sx={{display: isLoggedIn ? "none" : "flex"}}>Log in or sign up to submit your own review</Typography>
                 <Stack direction="row" spacing={2}>
                   <Slider
                     aria-label="Your Rating:"
@@ -166,12 +237,13 @@ const Product: FC = () => {
                     getAriaValueText={valuetext}
                     color="secondary"
                     onChange={handleSliderChange}
+                    disabled={!isLoggedIn}
                   />
                   <Input
                     value={sliderValue}
                     size="small"
                     onChange={handleInputChange}
-                    //onBlur={handleBlur}
+                    disabled={!isLoggedIn}
                     inputProps={{
                       step: 1,
                       min: 0,
@@ -187,12 +259,14 @@ const Product: FC = () => {
                   multiline
                   rows={5}
                   required
+                  disabled={!isLoggedIn}
                   variant="filled"
                   placeholder="What do you think?..."
                   id="validation-outlined-input"
+                  onChange={(e) => {setReviewContent(e.target.value); checkValid(e.target.value);}}
                   sx={multilineStyles}
                 />
-                <Button sx={buttonStyles}>Submit</Button>
+                <Button sx={buttonStyles} disabled={!isValid && !isLoggedIn} type="submit">Submit</Button>
               </Stack>
             </Stack>
           </Box>

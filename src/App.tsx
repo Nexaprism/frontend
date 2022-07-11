@@ -22,13 +22,23 @@ import SignUp from './pages/SignUp';
 import LogIn from './pages/LogIn';
 import Article from './pages/Article';
 import Profile from './pages/Profile';
+import UserUpdater from './store/user/userUpdater';
+
+const Updaters = () => {
+  return (
+    <>
+      <UserUpdater />
+    </>
+  )
+}
 
 function App() {
   const theme = useAppSelector(selectTheme);
 
   return (
-    <ThemeProvider theme={theme == 'light' ? lightTheme : darkTheme}>
+    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <CssBaseline />
+      <Updaters />
       <NavBar />
       <Box sx={{minHeight: '100vh'}}>
         <Routes>
