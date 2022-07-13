@@ -58,7 +58,6 @@ const Product: FC = () => {
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const token = useAppSelector(selectToken);
-  const username = useAppSelector(selectUsername);
 
 
   const multilineStyles = {
@@ -107,14 +106,12 @@ const Product: FC = () => {
 
   const submitReviewHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    const today = new Date().toLocaleDateString();
     const graphqlQuery = {
       query: `
         mutation {
           createReview(reviewInput: {
             rating: "${Number(sliderValue)}", 
             content: "${reviewContent}", 
-            date: "${today}",
           }) {
             _id
             user {

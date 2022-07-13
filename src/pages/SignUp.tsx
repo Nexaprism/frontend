@@ -55,7 +55,6 @@ const SignUp: FC = () => {
   }
 
   const signUpHandler = (e: React.SyntheticEvent) => {
-    let today = new Date().toLocaleDateString();
     e.preventDefault();
     const graphqlQuery = {
       query: `
@@ -64,7 +63,6 @@ const SignUp: FC = () => {
             email: "${email}", 
             username: "${username}", 
             password: "${password}", 
-            creationDate: "${today}",
           }) {
             _id
             username

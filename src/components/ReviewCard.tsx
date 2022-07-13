@@ -25,8 +25,8 @@ interface ReviewCardProps {
 
 const ReviewCard: FC<{user: String, content: String, date: String, rating: number}> = ({user, content, date, rating}) => {
   return (
-    <Card sx={{ maxWidth: 450, minWidth: 350, maxHeight: 200, display: "flex", borderRadius: 5, p: 2 }}>
-      <CardActionArea sx={{display: 'flex'}}>
+    <Card sx={{ maxWidth: 450, minWidth: 350, maxHeight: 200, display: "flex", borderRadius: 5 }}>
+      <CardActionArea sx={{display: 'flex', p: 2}}>
         <Box sx={{ width: '50%'}}>
           <RatingMedium value={rating} />
         </Box>

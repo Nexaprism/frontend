@@ -13,7 +13,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { FC, useEffect, useState } from "react";
+import { ChangeEvent, FC, useEffect, useState } from "react";
 import ReviewCard from "../components/ReviewCard";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAppSelector } from "../store/hooks";
@@ -41,6 +41,7 @@ const user = {
 const Profile: FC = () => {
   const [reviews, setReviews] = useState<any>([]);
   const [totalReviews, setTotalReviews] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
   const token = useAppSelector(selectToken);
 
   const buttonStyles = {
@@ -94,19 +95,25 @@ const Profile: FC = () => {
     justifyContent: "center",
   }));
 
+  const handlePageChange = (event: ChangeEvent<any>, value: number) => {
+    event.preventDefault();
+    console.log("page is " + value)
+    setPage(value);
+  }
+
   const getReviews = () => {
     const graphqlQuery = {
       query: `
       {
-        reviews {
+        reviews(page: ${page}) {
             reviews {
                 _id
-                date
                 content
                 user {
                     username
                 }
                 rating
+                createdAt
             }
         totalReviews
         }
@@ -136,7 +143,7 @@ const Profile: FC = () => {
 
   useEffect(() => {
     getReviews();
-  }, []);
+  }, [page]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", m: 10 }}>
@@ -197,12 +204,12 @@ const Profile: FC = () => {
               md={6}
               sx={{ display: "flex", justifyContent: "center" }}
             >
-              <ReviewCard rating={review.rating} user={review.user.username} content={review.content} date={review.date} />
+              <ReviewCard rating={review.rating} user={review.user.username} content={review.content} date={review.createdAt} />
             </Grid>
           ))}
         </Grid>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Pagination count={4} />
+          <Pagination count={4} page={page} onChange={handlePageChange}/>
         </Box>
       </Stack>
     </Box>
