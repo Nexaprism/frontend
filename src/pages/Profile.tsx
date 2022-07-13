@@ -16,6 +16,8 @@ import {
 import { FC, useEffect, useState } from "react";
 import ReviewCard from "../components/ReviewCard";
 import SearchIcon from "@mui/icons-material/Search";
+import { useAppSelector } from "../store/hooks";
+import { selectToken } from "../store/user/userReducer";
 
 /**
  * Account details:
@@ -27,18 +29,19 @@ import SearchIcon from "@mui/icons-material/Search";
  *
  */
 
-const reviews = [20, 58, 99, 74, 88, 84, 71, 15, 100, 48];
+//const reviews = [20, 58, 99, 74, 88, 84, 71, 15, 100, 48];
 
 const user = {
-    name: "CitizenSnipz",
-    email: "joshkroz@gmail.com",
-    created: "06/27/2022",
-    totalReviews: 112,
-
-}
+  name: "CitizenSnipz",
+  email: "joshkroz@gmail.com",
+  created: "06/27/2022",
+  totalReviews: 112,
+};
 
 const Profile: FC = () => {
-  const theme = useTheme();
+  const [reviews, setReviews] = useState<any>([]);
+  const [totalReviews, setTotalReviews] = useState<number>(0);
+  const token = useAppSelector(selectToken);
 
   const buttonStyles = {
     color: "white",
@@ -91,38 +94,88 @@ const Profile: FC = () => {
     justifyContent: "center",
   }));
 
-  useEffect(() => {}, []);
+  const getReviews = () => {
+    const graphqlQuery = {
+      query: `
+      {
+        reviews {
+            reviews {
+                _id
+                date
+                content
+                user {
+                    username
+                }
+                rating
+            }
+        totalReviews
+        }
+      }
+        `,
+    };
+    fetch("http://localhost:3080/graphql", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(graphqlQuery),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        if (resData.errors) {
+          console.log(resData);
+          throw new Error("Fetching reviews failed");
+        }
+        setReviews(resData.data.reviews.reviews);
+        setTotalReviews(resData.data.reviews.totalReviews);
+      });
+  };
+
+  useEffect(() => {
+    getReviews();
+  }, []);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", m: 10 }}>
       <Stack direction="column" width="100%" spacing={2}>
         <Typography variant="h2">Account details</Typography>
         <Divider />
-        <Stack direction="row" spacing={4} sx={{alignItems: "center"}}>
-          <Avatar sx={{height: 115, width: 115}}>CS</Avatar>
-          <Typography fontSize={22} sx={{fontWeight: 600}}>{user.name}</Typography>
+        <Stack direction="row" spacing={4} sx={{ alignItems: "center" }}>
+          <Avatar sx={{ height: 115, width: 115 }}>CS</Avatar>
+          <Typography fontSize={22} sx={{ fontWeight: 600 }}>
+            {user.name}
+          </Typography>
         </Stack>
         <Stack direction="row" spacing={2}>
-          <Typography sx={{fontWeight: 600}}>Email:</Typography>
+          <Typography sx={{ fontWeight: 600 }}>Email:</Typography>
           <Typography>{user.email}</Typography>
         </Stack>
         <Stack direction="row" spacing={2}>
-        <Typography sx={{fontWeight: 600}}>Member since:</Typography>
+          <Typography sx={{ fontWeight: 600 }}>Member since:</Typography>
           <Typography>{user.created}, 1 month, 22 days</Typography>
         </Stack>
         <Stack direction="row" spacing={2}>
-        <Typography sx={{fontWeight: 600}}>Number of reviews:</Typography>
+          <Typography sx={{ fontWeight: 600 }}>Number of reviews:</Typography>
           <Typography>{user.totalReviews}</Typography>
         </Stack>
         <Box>
           <Button sx={buttonStyles}>Edit Profile</Button>
         </Box>
-        <Stack spacing={2} direction={{xs: "column", md: "row"}} sx={{display: 'flex', alignItems: 'center', pt: 3}}>
-            <Box sx={{justifyContent: 'flex-start', minWidth: 280, width: "50%"}}>
-            <Typography variant="h3" >Your reviews:</Typography>
-            </Box>
-          
-          <Box sx={{justifyContent: 'flex-end', width: "50%"}}>
+        <Stack
+          spacing={2}
+          direction={{ xs: "column", md: "row" }}
+          sx={{ display: "flex", alignItems: "center", pt: 3 }}
+        >
+          <Box
+            sx={{ justifyContent: "flex-start", minWidth: 280, width: "50%" }}
+          >
+            <Typography variant="h3">Your reviews:</Typography>
+          </Box>
+
+          <Box sx={{ justifyContent: "flex-end", width: "50%" }}>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -137,14 +190,14 @@ const Profile: FC = () => {
 
         <Divider />
         <Grid container spacing={3}>
-          {reviews.map((review) => (
+          {reviews.map((review: any) => (
             <Grid
               item
               xs={12}
               md={6}
               sx={{ display: "flex", justifyContent: "center" }}
             >
-              <ReviewCard rating={review} />
+              <ReviewCard rating={review.rating} user={review.user.username} content={review.content} date={review.date} />
             </Grid>
           ))}
         </Grid>

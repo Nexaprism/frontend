@@ -23,22 +23,22 @@ interface ReviewCardProps {
 }
 
 
-const ReviewCard: FC<{rating: number}> = ({rating}) => {
+const ReviewCard: FC<{user: String, content: String, date: String, rating: number}> = ({user, content, date, rating}) => {
   return (
-    <Card sx={{ maxWidth: 450, minWidth: 350, maxHeight: 200, display: "flex", borderRadius: 5 }}>
+    <Card sx={{ maxWidth: 450, minWidth: 350, maxHeight: 200, display: "flex", borderRadius: 5, p: 2 }}>
       <CardActionArea sx={{display: 'flex'}}>
         <Box sx={{ width: '50%'}}>
           <RatingMedium value={rating} />
         </Box>
           <CardContent sx={{width: '50%' }}>
             <Typography gutterBottom variant="h5" component="div">
-              {review.user}
+              {user}
             </Typography>
             <Typography variant="body2" color="text.secondary" component="div" sx={{pb: 2}}>
-              {review.review}
+              {content}
             </Typography>
             <Typography variant='caption' color="text.secondary">
-                {review.date}
+                {date}
             </Typography>
           </CardContent>
       </CardActionArea>

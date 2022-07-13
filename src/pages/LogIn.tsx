@@ -14,7 +14,7 @@ import logoLight from "../assets/img/nexLogoLight.png";
 import { setIsLoggedIn } from "../store/app/appReducer";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { selectTheme } from "../store/theme/themeReducer";
-import { setToken } from "../store/user/userReducer";
+import { setToken, setUsername } from "../store/user/userReducer";
 
 const LogIn: FC = () => {
   const theme = useAppSelector(selectTheme);
@@ -90,6 +90,7 @@ const LogIn: FC = () => {
         console.log(resData);
         dispatch(setIsLoggedIn(true));
         dispatch(setToken(resData.data.login.token));
+        //dispatch(setUsername(resData.data.login.username));
         localStorage.setItem('token', resData.data.login.token);
         localStorage.setItem('userId', resData.data.login.userId);
         const remainingMilliseconds = 60 * 60 * 1000;

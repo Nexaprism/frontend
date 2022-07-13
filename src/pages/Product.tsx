@@ -22,7 +22,7 @@ import RatingSmall from "../components/RatingSmall";
 import RatingMedium from "../components/ReviewMedium";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { selectIsLoggedIn } from "../store/app/appReducer";
-import { selectToken } from "../store/user/userReducer";
+import { selectToken, selectUsername } from "../store/user/userReducer";
 
 /**
  * jumbo image
@@ -58,6 +58,7 @@ const Product: FC = () => {
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const token = useAppSelector(selectToken);
+  const username = useAppSelector(selectUsername);
 
 
   const multilineStyles = {
@@ -113,10 +114,12 @@ const Product: FC = () => {
           createReview(reviewInput: {
             rating: "${Number(sliderValue)}", 
             content: "${reviewContent}", 
-            date: "${today}" 
+            date: "${today}",
           }) {
             _id
-            user
+            user {
+              username
+            }
           }
         }
       `
@@ -287,7 +290,7 @@ const Product: FC = () => {
                   md={6}
                   sx={{ display: "flex", justifyContent: "center" }}
                 >
-                  <ReviewCard rating={review} />
+                  <ReviewCard rating={review} user="username" content="great content here" date="4/20/2022" />
                 </Grid>
               ))}
             </Grid>
