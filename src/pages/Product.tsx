@@ -23,6 +23,7 @@ import RatingMedium from "../components/ReviewMedium";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { selectIsLoggedIn } from "../store/app/appReducer";
 import { selectToken, selectUsername } from "../store/user/userReducer";
+import { User } from "../store/user/userTypes";
 
 /**
  * jumbo image
@@ -47,6 +48,15 @@ import { selectToken, selectUsername } from "../store/user/userReducer";
  *
  */
 const reviews = [20, 58, 99, 74, 88, 84, 71, 15, 100, 48];
+
+const user: User = {
+  username: "awesomeguy",
+  _id: "1660642",
+  reviews: ["good", "bad", "ok"],
+  avatar: "picture here",
+  email: "awesome@test.com",
+  password: "password",
+}
 
 const Product: FC = () => {
   const [items, setItems] = useState<any[]>();
@@ -73,6 +83,7 @@ const Product: FC = () => {
       borderLeftWidth: 6,
       padding: '4px !important', // override inline-style
     },
+    minWidth: 350
   }
 
   const buttonStyles= {
@@ -199,7 +210,7 @@ const Product: FC = () => {
       </Box>
       {/* description */}
       <Stack direction="column" sx={{ display: "flex", alignItems: "center"}}>
-        <Box sx={{ width: { xl: 1500, lg: 1200, md: 800, sm: 600 } }}>
+        <Box sx={{ width: { xl: 1500, lg: 1200, md: 900, sm: 600 } }}>
           <Stack
             direction={{ xs: "column", md: "row" }}
             sx={{
@@ -227,6 +238,10 @@ const Product: FC = () => {
             <Stack direction="row" spacing={8} width="80%" alignItems="center">
               <Box>
                 <RatingMedium value={Number(sliderValue)} />
+                <Box sx={{width: "100%", display: "flex", justifyContent: "center", pt: 2}}>
+                <Typography>Your rating</Typography>
+                </Box>
+                
               </Box>
               <Stack direction="column" spacing={2} width="100%">
               <Typography sx={{display: isLoggedIn ? "none" : "flex"}}>Log in or sign up to submit your own review</Typography>
@@ -287,7 +302,7 @@ const Product: FC = () => {
                   md={6}
                   sx={{ display: "flex", justifyContent: "center" }}
                 >
-                  <ReviewCard rating={review} user="username" content="great content here" date="4/20/2022" />
+                  <ReviewCard rating={review} user={user} content="great content here" date="4/20/2022" />
                 </Grid>
               ))}
             </Grid>

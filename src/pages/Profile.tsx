@@ -97,9 +97,9 @@ const Profile: FC = () => {
 
   const handlePageChange = (event: ChangeEvent<any>, value: number) => {
     event.preventDefault();
-    console.log("page is " + value)
+    console.log("page is " + value);
     setPage(value);
-  }
+  };
 
   const getReviews = () => {
     const graphqlQuery = {
@@ -204,12 +204,17 @@ const Profile: FC = () => {
               md={6}
               sx={{ display: "flex", justifyContent: "center" }}
             >
-              <ReviewCard rating={review.rating} user={review.user.username} content={review.content} date={review.createdAt} />
+              <ReviewCard
+                rating={review.rating}
+                user={review.user.username}
+                content={review.content}
+                date={review.createdAt}
+              />
             </Grid>
           ))}
         </Grid>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Pagination count={4} page={page} onChange={handlePageChange}/>
+          <Pagination count={4} page={page} onChange={handlePageChange} />
         </Box>
       </Stack>
     </Box>
