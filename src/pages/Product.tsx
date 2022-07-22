@@ -58,7 +58,7 @@ const reviews = [20, 58, 99, 74, 88, 84, 71, 15, 100, 48];
 
 const user: User = {
   username: "awesomeguy",
-  _id: "1660642",
+  id: "1660642",
   reviews: ["good", "bad", "ok"],
   avatar: "picture here",
   email: "awesome@test.com",

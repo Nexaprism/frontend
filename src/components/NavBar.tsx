@@ -22,7 +22,15 @@ import { selectTheme, setTheme } from "../store/theme/themeReducer";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { styled, alpha, useTheme } from "@mui/material/styles";
 import mainLogo from "../assets/img/nexLogo13.png";
-import { selectAvatar } from "../store/user/userReducer";
+import {
+  selectAvatar,
+  setAvatar,
+  setEmail,
+  setToken,
+  setUserId,
+  setUsername,
+} from "../store/user/userReducer";
+import { selectIsLoggedIn, setIsLoggedIn } from "../store/app/appReducer";
 
 /**
  *
@@ -38,6 +46,7 @@ const NavBar: FC = () => {
   const themeObj = useTheme();
   const dispatch = useAppDispatch();
   const avatar = useAppSelector(selectAvatar);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
   const AcctLink = styled(Link)(({ theme }) => ({
     textDecoration: "none",
@@ -116,8 +125,16 @@ const NavBar: FC = () => {
     }
   };
 
+  const logout = () => {
+    dispatch(setUserId(""));
+    dispatch(setUsername(""));
+    dispatch(setToken(""));
+    dispatch(setEmail(""));
+    dispatch(setAvatar(""));
+    dispatch(setIsLoggedIn(false));
+  };
+
   const pages = ["metaverses", "ar", "vr", "news", "crypto", "shop"];
-  const settings = ["My Profile", "Sign Up", "Log In"];
 
   return (
     <AppBar position="static">
@@ -205,7 +222,7 @@ const NavBar: FC = () => {
           >
             nexaprism
           </Typography>
-          <Box sx={{ display: {xs: "none", md: "flex" }, pr: 2 }}>
+          <Box sx={{ display: { xs: "none", md: "flex" }, pr: 2 }}>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -270,21 +287,31 @@ const NavBar: FC = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <AcctLink to={"/account"}>
-                <MenuItem onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">My Account</Typography>
-                </MenuItem>
-              </AcctLink>
-              <AcctLink to={"/signup"}>
-                <MenuItem onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">Sign Up</Typography>
-                </MenuItem>
-              </AcctLink>
+              {isLoggedIn ? (
+                <AcctLink to={"/account"}>
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">My Account</Typography>
+                  </MenuItem>
+                </AcctLink>
+              ) : null}
+              {isLoggedIn ? null : (
+                <AcctLink to={"/signup"}>
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">Sign Up</Typography>
+                  </MenuItem>
+                </AcctLink>
+              )}
+
               <AcctLink to={"/login"}>
                 <MenuItem onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">Log In</Typography>
                 </MenuItem>
               </AcctLink>
+              {isLoggedIn ? (
+                <MenuItem onClick={logout}>
+                  <Typography>Logout</Typography>
+                </MenuItem>
+              ) : null}
             </Menu>
           </Box>
         </Toolbar>

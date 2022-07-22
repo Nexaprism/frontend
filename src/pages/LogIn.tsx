@@ -12,13 +12,13 @@ import {
   Typography,
 } from "@mui/material";
 import { FC, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoDark from "../assets/img/nexLogo13.png";
 import logoLight from "../assets/img/nexLogoLight.png";
 import { setIsLoggedIn } from "../store/app/appReducer";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { selectTheme } from "../store/theme/themeReducer";
-import { setEmail, setToken, setUserId, setUsername } from "../store/user/userReducer";
+import { setAvatar, setEmail, setToken, setUserId, setUsername } from "../store/user/userReducer";
 
 const LogIn: FC = () => {
   const theme = useAppSelector(selectTheme);
@@ -28,6 +28,7 @@ const LogIn: FC = () => {
   const [passError, setPassError] = useState<boolean>(false);
   const [showPass, setShowPass] = useState<boolean>(false);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const buttonStyles = {
     color: "white",
@@ -77,6 +78,7 @@ const LogIn: FC = () => {
                     userId
                     username
                     email
+                    avatar
                 }
             }
         `,
@@ -110,8 +112,12 @@ const LogIn: FC = () => {
         dispatch(setUsername(data.username));
         dispatch(setUserId(data.userId));
         dispatch(setEmail(data.email));
+        dispatch(setAvatar(data.avatar));
         localStorage.setItem("token", data.token);
         localStorage.setItem("userId", data.userId);
+        localStorage.setItem("email", data.email);
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("avatar", data.avatar);
         const remainingMilliseconds = 60 * 60 * 1000;
         const expiryDate = new Date(
           new Date().getTime() + remainingMilliseconds
@@ -124,6 +130,7 @@ const LogIn: FC = () => {
       .catch((err) => {
         console.log(err);
       });
+      navigate("/");
   };
 
 
