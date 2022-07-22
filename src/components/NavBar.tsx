@@ -22,6 +22,7 @@ import { selectTheme, setTheme } from "../store/theme/themeReducer";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { styled, alpha, useTheme } from "@mui/material/styles";
 import mainLogo from "../assets/img/nexLogo13.png";
+import { selectAvatar } from "../store/user/userReducer";
 
 /**
  *
@@ -36,6 +37,7 @@ const NavBar: FC = () => {
   const themeFromStore = useAppSelector(selectTheme);
   const themeObj = useTheme();
   const dispatch = useAppDispatch();
+  const avatar = useAppSelector(selectAvatar);
 
   const AcctLink = styled(Link)(({ theme }) => ({
     textDecoration: "none",
@@ -246,7 +248,7 @@ const NavBar: FC = () => {
           <Box sx={{ flexGrow: 0, pl: 2 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="" src="" />
+                <Avatar alt="" src={avatar} />
               </IconButton>
             </Tooltip>
             <Menu

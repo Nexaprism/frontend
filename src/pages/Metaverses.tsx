@@ -17,6 +17,7 @@ import JumboNews from "../components/JumboNews";
 import MiniProductCard from "../components/MiniProductCard";
 import NewsCard from "../components/NewsCard";
 import ProductCard from "../components/ProductCard";
+import { Product } from "../store/product/types";
 
 const items = [
   "item 1",
@@ -36,11 +37,68 @@ const Metaverses: FC = () => {
   const [products, setProducts] = useState<any[]>();
   const [newsItems, setNewsItems] = useState<any[]>();
   const [enabledButton, setEnabledButton] = useState<boolean[]>([false, false, true]);
+  const [prodList, setProdList] = useState<Product[]>([]);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
 
   const buttonStyles = {
     "&:hover": { transform: "none" },
+  }
+
+  const getProducts = () => {
+    let productList: Product[] = [];
+    const graphqlQuery = {
+      query: `
+      {
+        products {
+            products {
+                name
+                imgUrl
+                createdAt
+                updatedAt
+            }
+        }
+      }
+        `,
+    };
+    fetch("http://localhost:3080/graphql", {
+      method: "POST",
+      headers: {
+        //Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(graphqlQuery),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        if (resData.errors) {
+          console.log(resData);
+          throw new Error("Fetching products failed");
+        }
+        resData.data.products.products.map((product: any) => {
+          let newProd: Product = {
+            id: product._id,
+            company: product.company,
+            blockchain: product.blockchain,
+            marketCap: product.marketCap,
+            token: product.token,
+            description: product.description,
+            launchDate: product.launchDate,
+            imgUrl: product.imgUrl,
+            name: product.name,
+            createdAt: product.createdAt,
+            updatedAt: product.updatedAt,
+            governance: product.governance,
+            url: product.url,
+            developers: product.developers,
+          };
+          productList.push(newProd);
+        });
+        setProdList(productList);
+        console.log(resData.data.products);
+      });
   }
 
   const addItems = () => {
@@ -53,10 +111,10 @@ const Metaverses: FC = () => {
           display="flex"
           justifyContent="center"
         >
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+            <ProductCard name={""} img={""} id=""/>
+            <ProductCard name={""} img={""} id=""/>
+            <ProductCard name={""} img={""} id=""/>
+            <ProductCard name={""} img={""} id=""/>
         </Stack>
       );
     }
@@ -132,6 +190,7 @@ const Metaverses: FC = () => {
   };
 
   useEffect(() => {
+    getProducts();
     separateTheItems();
     addItems();
     addNewsItems();

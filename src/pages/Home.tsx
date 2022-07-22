@@ -4,6 +4,7 @@ import Carousel from "react-material-ui-carousel";
 import Glance from "../components/Glance";
 import JumboNews from "../components/JumboNews";
 import ProductCard from "../components/ProductCard";
+import { Product } from "../store/product/types";
 
 /**
  * big jumbo carousel of news w/ featured articles on the side (hidden on mobile)
@@ -21,10 +22,59 @@ import ProductCard from "../components/ProductCard";
 const Home: FC = () => {
   const [big, setBig] = useState<any[]>();
   const [small, setSmall] = useState<any[]>();
+  const [prodList, setProdList] = useState<any[]>([]);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
 
-  const addItems = () => {
+  const getProducts = async () => {
+    let productList: Product[] = [];
+    const graphqlQuery = {
+      query: `
+      {
+        products {
+            products {
+                _id
+                name
+                imgUrl
+                createdAt
+                updatedAt
+            }
+        }
+      }
+        `,
+    };
+    fetch("http://localhost:3080/graphql", {
+      method: "POST",
+      headers: {
+        //Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(graphqlQuery),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        if (resData.errors) {
+          console.log(resData);
+          throw new Error("Fetching products failed");
+        }
+        resData.data.products.products.map((product: any) => {
+          let newProd: any = {
+            imgUrl: product.imgUrl,
+            name: product.name,
+            id: product._id,
+          };
+          productList.push(newProd);
+        });
+        setProdList(productList);
+        addItems(productList[0].name, productList[0].imgUrl, productList[0].id);
+        console.log(productList)
+        console.log("https://localhost:3080/" + productList[0].imgUrl)
+      });
+  }
+
+  const addItems = (name: string, img: string, id: string) => {
     const lessItems: Array<any> = [];
     const moreItems: Array<any> = [];
 
@@ -35,10 +85,11 @@ const Home: FC = () => {
           spacing={3}
           display="flex"
           justifyContent="center"
+          key={i}
         >
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
         </Stack>
       );
     }
@@ -49,11 +100,12 @@ const Home: FC = () => {
           spacing={3}
           display="flex"
           justifyContent="center"
+          key={i}
         >
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
         </Stack>
       );
     }
@@ -62,7 +114,10 @@ const Home: FC = () => {
   };
 
   useEffect(() => {
-    addItems();
+    getProducts();
+    
+    
+    
   }, [ matches]);
 
   return (
@@ -110,7 +165,7 @@ const Home: FC = () => {
             animation="slide"
             navButtonsAlwaysVisible={true}
           >
-            { big}
+            {big}
           </Carousel>
         </Box>
         <Typography variant="h3">Most Popular</Typography>
@@ -121,7 +176,7 @@ const Home: FC = () => {
             animation="slide"
             navButtonsAlwaysVisible={true}
           >
-            { big}
+            {big}
           </Carousel>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -135,7 +190,7 @@ const Home: FC = () => {
             animation="slide"
             navButtonsAlwaysVisible={true}
           >
-            { big}
+            {big}
           </Carousel>
         </Box>
         <Typography variant="h3">Latest News</Typography>

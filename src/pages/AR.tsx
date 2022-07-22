@@ -49,10 +49,10 @@ import {
             display="flex"
             justifyContent="center"
           >
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
+            <ProductCard name={""} img={""} id=""/>
+            <ProductCard name={""} img={""} id=""/>
+            <ProductCard name={""} img={""} id=""/>
+            <ProductCard name={""} img={""} id=""/>
           </Stack>
         );
       }

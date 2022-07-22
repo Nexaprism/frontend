@@ -1,29 +1,33 @@
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Box,
   Button,
   Divider,
   FormControl,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logoDark from "../assets/img/nexLogo13.png";
 import logoLight from "../assets/img/nexLogoLight.png";
 import { setIsLoggedIn } from "../store/app/appReducer";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { selectTheme } from "../store/theme/themeReducer";
-import { setToken, setUsername } from "../store/user/userReducer";
+import { setEmail, setToken, setUserId, setUsername } from "../store/user/userReducer";
 
 const LogIn: FC = () => {
   const theme = useAppSelector(selectTheme);
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [isValid, setIsValid] = useState<boolean>(false);
-    const [passError, setPassError] = useState<boolean>(false);
+  const [emailField, setEmailField] = useState<String>("");
+  const [password, setPassword] = useState<String>("");
+  const [isValid, setIsValid] = useState<boolean>(false);
+  const [passError, setPassError] = useState<boolean>(false);
+  const [showPass, setShowPass] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-
 
   const buttonStyles = {
     color: "white",
@@ -33,15 +37,25 @@ const LogIn: FC = () => {
       transform: "none",
     },
     "&:disabled": {
-        background: "gray"
-      },
+      background: "gray",
+    },
   };
 
-  const checkValid = (text: string) => {
-    if (password === '' || email === '' || text === '' || password.length < 6) {
-      setIsValid(false)
+  const handleClickShowPassword = () => {
+    setShowPass(!showPass);
+  };
+
+  const handleChange = (text: String) => {
+    setPassword(text);
+    console.log(password)
+    checkValid(text);
+  }
+
+  const checkValid = (text: String) => {
+    if (password === "" || emailField === "" || text === "" || password.length < 6) {
+      setIsValid(false);
     } else {
-      setIsValid(true)
+      setIsValid(true);
     }
   };
 
@@ -56,56 +70,62 @@ const LogIn: FC = () => {
   const logInHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const graphqlQuery = {
-        query: `
+      query: `
             {
-                login(email: "${email}", password: "${password}") {
+                login(email: "${emailField}", password: "${password}") {
                     token
                     userId
+                    username
+                    email
                 }
             }
-        `
+        `,
     };
     fetch("http://localhost:3080/graphql", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(graphqlQuery)
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(graphqlQuery),
     })
-    .then(res => {
+      .then((res) => {
         return res.json();
       })
-    .then(resData => {
+      .then((resData) => {
         //error handling
-        if(resData.errors && resData.errors[0].status === 422) {
-            console.log(resData);
-            throw new Error(
-              "Validation failed. Account already exists with that email address."
-            );
-          }
-          if(resData.errors) {
-            throw new Error("user login failed");
-          }
+        if (resData.errors && resData.errors[0].status === 422) {
+          console.log(resData);
+          throw new Error(
+            "Validation failed. Account already exists with that email address."
+          );
+        }
+        if (resData.errors) {
+          throw new Error("user login failed");
+        }
         //success, dispatches and setStates
-        console.log(resData);
+        const data = resData.data.login;
+        console.log(data);
         dispatch(setIsLoggedIn(true));
-        dispatch(setToken(resData.data.login.token));
-        //dispatch(setUsername(resData.data.login.username));
-        localStorage.setItem('token', resData.data.login.token);
-        localStorage.setItem('userId', resData.data.login.userId);
+        dispatch(setToken(data.token));
+        dispatch(setUsername(data.username));
+        dispatch(setUserId(data.userId));
+        dispatch(setEmail(data.email));
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", data.userId);
         const remainingMilliseconds = 60 * 60 * 1000;
         const expiryDate = new Date(
-            new Date().getTime() + remainingMilliseconds
+          new Date().getTime() + remainingMilliseconds
         );
-        localStorage.setItem('expiryDate', expiryDate.toISOString());
+        localStorage.setItem("expiryDate", expiryDate.toISOString());
         //@dev TO DO:
         //set auto logout here
         //setAutoLogout(remainingMilliseconds);
-    })
-    .catch(err => {
+      })
+      .catch((err) => {
         console.log(err);
-    })
-  }
+      });
+  };
+
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
@@ -131,15 +151,39 @@ const LogIn: FC = () => {
           <Typography fontSize={25}>Log in</Typography>
           <FormControl sx={{ display: "flex", width: "100%" }}>
             <Typography>Email:</Typography>
-            <TextField onChange={(e) => {setEmail(e.target.value); checkValid(e.target.value);}}/>
+            <TextField
+              onChange={(e) => {
+                setEmailField(e.target.value);
+                checkValid(e.target.value);
+              }}
+            />
             <Typography>Password:</Typography>
-            <TextField 
-                required 
-                error={passError}
-                type="password" 
-                onChange={(e) => {setPassword(e.target.value); checkValid(e.target.value); passwordHint();}}
-                helperText={passError ? "Password must be 6 characters or longer" : ""}
-                />
+            <OutlinedInput
+              required
+              error={passError}
+              type={showPass ? "text" : "password"}
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                checkValid(e.target.value);
+              }}
+              onKeyDown={() => checkValid(password)}
+              onKeyUp={() => checkValid(password)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={(e: React.SyntheticEvent) =>
+                      e.preventDefault()
+                    }
+                    edge="end"
+                  >
+                    {showPass ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
             <Stack spacing={3} sx={{ pt: 2 }}>
               <Button type="submit" disabled={!isValid} sx={buttonStyles}>
                 Log In

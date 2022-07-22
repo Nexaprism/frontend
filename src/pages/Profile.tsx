@@ -16,9 +16,18 @@ import {
 import { ChangeEvent, FC, useEffect, useState } from "react";
 import ReviewCard from "../components/ReviewCard";
 import SearchIcon from "@mui/icons-material/Search";
-import { useAppSelector } from "../store/hooks";
-import { selectToken } from "../store/user/userReducer";
-
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  selectAvatar,
+  selectEmail,
+  selectToken,
+  selectUserId,
+  selectUsername,
+  setAvatar,
+} from "../store/user/userReducer";
+import triangle1 from "../assets/img/triangle1.png";
+import triangle2 from "../assets/img/triangle2.png";
+import triangle3 from "../assets/img/triangle3.png";
 /**
  * Account details:
  * (age of account "member since", number of reviews, username, email, avatar)
@@ -43,6 +52,11 @@ const Profile: FC = () => {
   const [totalReviews, setTotalReviews] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const token = useAppSelector(selectToken);
+  const username = useAppSelector(selectUsername);
+  const userId = useAppSelector(selectUserId);
+  const email = useAppSelector(selectEmail);
+  const avatar = useAppSelector(selectAvatar);
+  const dispatch = useAppDispatch();
 
   const buttonStyles = {
     color: "white",
@@ -51,6 +65,7 @@ const Profile: FC = () => {
       background: "#cc7be3",
       transform: "none",
     },
+    mr: 4,
   };
 
   const Search = styled("div")(({ theme }) => ({
@@ -94,6 +109,46 @@ const Profile: FC = () => {
     alignItems: "center",
     justifyContent: "center",
   }));
+
+  const chooseAvatar = (image: string) => {
+    const graphqlQuery = {
+      query: `
+      mutation {
+        updateUserAvatar(id: "${userId}", userInput: {
+          email: "${email}",
+          avatar: "${image}",
+        }) {
+          _id
+          avatar
+        }
+      }
+      `,
+    };
+    fetch("http://localhost:3080/graphql", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(graphqlQuery),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        //error handling
+        if (resData.errors && resData.errors[0].status === 422) {
+          console.log(resData);
+          throw new Error("Validation failed. Could not authenticate user");
+        }
+        if (resData.errors) {
+          console.log(resData);
+          throw new Error("Review creation failed");
+        }
+        console.log(resData.data);
+        dispatch(setAvatar(image));
+      });
+  };
 
   const handlePageChange = (event: ChangeEvent<any>, value: number) => {
     event.preventDefault();
@@ -151,14 +206,26 @@ const Profile: FC = () => {
         <Typography variant="h2">Account details</Typography>
         <Divider />
         <Stack direction="row" spacing={4} sx={{ alignItems: "center" }}>
-          <Avatar sx={{ height: 115, width: 115 }}>CS</Avatar>
+          <Avatar sx={{ height: 115, width: 115 }} src={avatar} />
           <Typography fontSize={22} sx={{ fontWeight: 600 }}>
-            {user.name}
+            {username}
           </Typography>
+        </Stack>
+        <Typography>Choose an avatar</Typography>
+        <Stack direction="row" spacing={3}>
+          <Box component="a" onClick={() => chooseAvatar(triangle1)}>
+            <img src={triangle1} height="100" />
+          </Box>
+          <Box component="a" onClick={() => chooseAvatar(triangle2)}>
+            <img src={triangle2} height="100" />
+          </Box>
+          <Box component="a" onClick={() => chooseAvatar(triangle3)}>
+            <img src={triangle3} height="100" />
+          </Box>
         </Stack>
         <Stack direction="row" spacing={2}>
           <Typography sx={{ fontWeight: 600 }}>Email:</Typography>
-          <Typography>{user.email}</Typography>
+          <Typography>{email}</Typography>
         </Stack>
         <Stack direction="row" spacing={2}>
           <Typography sx={{ fontWeight: 600 }}>Member since:</Typography>
@@ -168,8 +235,9 @@ const Profile: FC = () => {
           <Typography sx={{ fontWeight: 600 }}>Number of reviews:</Typography>
           <Typography>{user.totalReviews}</Typography>
         </Stack>
-        <Box>
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
           <Button sx={buttonStyles}>Edit Profile</Button>
+          <Button sx={buttonStyles}>Logout</Button>
         </Box>
         <Stack
           spacing={2}

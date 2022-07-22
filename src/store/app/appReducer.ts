@@ -4,10 +4,10 @@ import { RootState, AppThunk } from '..';
 export interface AppState {
   isLoading: boolean;
   isLoggedIn: boolean;
-}
+};
 
 const initialState: AppState = {
-  isLoading: false,
+  isLoading: true,
   isLoggedIn: false,
 };
 
@@ -30,7 +30,7 @@ export const appSlice = createSlice({
 
   export const { setIsLoading, setIsLoggedIn } = appSlice.actions;
 
-  export const selectApp = (state: RootState) => state.app.isLoading;
+  export const selectIsLoading = (state: RootState) => state.app.isLoading;
   export const selectIsLoggedIn = (state: RootState) => state.app.isLoggedIn;
 
   export default appSlice.reducer;

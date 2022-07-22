@@ -21,9 +21,16 @@ import Carousel from "react-material-ui-carousel";
 import RatingSmall from "../components/RatingSmall";
 import RatingMedium from "../components/ReviewMedium";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { selectIsLoggedIn } from "../store/app/appReducer";
+import {
+  selectIsLoading,
+  selectIsLoggedIn,
+  setIsLoading,
+} from "../store/app/appReducer";
 import { selectToken, selectUsername } from "../store/user/userReducer";
 import { User } from "../store/user/userTypes";
+import image from "../assets/img/largeImage.jpeg";
+import { useParams } from "react-router-dom";
+import { Product } from "../store/product/types";
 
 /**
  * jumbo image
@@ -56,54 +63,71 @@ const user: User = {
   avatar: "picture here",
   email: "awesome@test.com",
   password: "password",
-}
+};
 
-const Product: FC = () => {
+const ProductPage: FC = () => {
   const [items, setItems] = useState<any[]>();
   const [sliderValue, setSliderValue] = useState<
     number | string | Array<number | string>
   >(0);
   const [reviewContent, setReviewContent] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [product, setProduct] = useState<Product | undefined>({
+    name: "",
+    imgUrl: "",
+    description: "",
+    url: "",
+    company: "",
+    developers: [""],
+    launchDate: "",
+    marketCap: "",
+    token: "",
+    governance: "",
+    blockchain: "",
+    createdAt: "",
+    updatedAt: "",
+    id: "",
+  });
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const token = useAppSelector(selectToken);
-
+  const isLoading = useAppSelector(selectIsLoading);
+  const { id } = useParams();
 
   const multilineStyles = {
-    '& input:valid + fieldset': {
-      borderColor: 'green',
+    "& input:valid + fieldset": {
+      borderColor: "green",
       borderWidth: 2,
     },
-    '& input:invalid + fieldset': {
-      borderColor: 'red',
+    "& input:invalid + fieldset": {
+      borderColor: "red",
       borderWidth: 2,
     },
-    '& input:valid:focus + fieldset': {
+    "& input:valid:focus + fieldset": {
       borderLeftWidth: 6,
-      padding: '4px !important', // override inline-style
+      padding: "4px !important", // override inline-style
     },
-    minWidth: 350
-  }
+    minWidth: 350,
+  };
 
-  const buttonStyles= {
-    color: 'white',
-    background: 'linear-gradient(to bottom, #bf1aed, #201438)',
+  const buttonStyles = {
+    color: "white",
+    background: "linear-gradient(to bottom, #bf1aed, #201438)",
     "&:hover": {
       background: "#cc7be3",
-      transform: "none"
+      transform: "none",
     },
-  }
+  };
 
   function valuetext(value: number) {
     return `${value}`;
   }
 
   const checkValid = (text: string) => {
-    if (reviewContent === '' || text === '' || reviewContent.length < 10) {
-      setIsValid(false)
+    if (reviewContent === "" || text === "" || reviewContent.length < 10) {
+      setIsValid(false);
     } else {
-      setIsValid(true)
+      setIsValid(true);
     }
   };
 
@@ -113,6 +137,47 @@ const Product: FC = () => {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSliderValue(event.target.value === "" ? "" : Number(event.target.value));
+  };
+
+  const getProduct = async () => {
+    let returnedProd: Product | undefined;
+    const graphqlQuery = {
+      query: `
+        {
+          product(id: "${id}") {
+            name
+            description
+            developers
+            token
+            company
+            governance
+            launchDate
+            url
+            imgUrl
+            blockchain
+            marketCap
+          }
+        }
+      `,
+    };
+    await fetch("http://localhost:3080/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(graphqlQuery),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((resData) => {
+        if (resData.errors) {
+          console.log(resData);
+          throw new Error("Fetching product failed");
+        }
+        returnedProd = resData.data.product;
+      });
+    return returnedProd;
   };
 
   const submitReviewHandler = (e: React.SyntheticEvent) => {
@@ -130,46 +195,45 @@ const Product: FC = () => {
             }
           }
         }
-      `
+      `,
     };
     fetch("http://localhost:3080/graphql", {
       method: "POST",
       headers: {
-        "Authorization": 'Bearer ' + token,
+        Authorization: "Bearer " + token,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(graphqlQuery)
+      body: JSON.stringify(graphqlQuery),
     })
-      .then(res => {
+      .then((res) => {
         return res.json();
       })
-      .then(resData => {
+      .then((resData) => {
         //error handling
-        if(resData.errors && resData.errors[0].status === 422) {
+        if (resData.errors && resData.errors[0].status === 422) {
           console.log(resData);
-          throw new Error(
-            "Validation failed. Could not authenticate user"
-          )
+          throw new Error("Validation failed. Could not authenticate user");
         }
-        if(resData.errors) {
+        if (resData.errors) {
           console.log(resData);
-          throw new Error('Review creation failed');
+          throw new Error("Review creation failed");
         }
         //passed errors, set states & dispatching logic here
         console.log(resData);
         //@dev TO DO:
         //reroute user to the page they are currently on to refresh it
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
-      })
-  }
+      });
+  };
 
   const addItems = () => {
+    //console.log(id);
     const newsItems: Array<any> = [];
     for (let i = 0; i < 3; i++) {
       newsItems.push(
-        <Stack direction="row" spacing={3}>
+        <Stack direction="row" spacing={3} key={i}>
           <NewsCard />
           <NewsCard />
           <NewsCard />
@@ -181,8 +245,14 @@ const Product: FC = () => {
   };
 
   useEffect(() => {
+    const getData = async () => {
+      const data: Product | undefined = await getProduct();
+      setProduct(data);
+    };
+    getData();
     addItems();
-  });
+    dispatch(setIsLoading(false));
+  }, [isLoading]);
 
   return (
     <Box sx={{ backgroundColor: "inherit" }}>
@@ -190,26 +260,66 @@ const Product: FC = () => {
         id="jumbo"
         sx={{
           width: "100%",
-          height: "50vh",
-          backgroundColor: "red",
+          height: {
+            xl: "50vh",
+            lg: "50vh",
+            md: "80vh",
+            sm: "80vh",
+            xs: "80vh",
+          },
+          backgroundSize: "cover",
+          backgroundImage:
+            product == undefined
+              ? "none"
+              : `url(${"http://localhost:3080/" + product.imgUrl})`,
           display: "flex",
+          flexDirection: {
+            xl: "row",
+            lg: "row",
+            md: "column",
+            sm: "column",
+            xs: "column",
+          },
         }}
       >
-        <Typography variant="h1" sx={{ width: "75%" }}>
-          Big Logo
-        </Typography>
+        <Box
+          id="detailBox"
+          sx={{
+            width: { xl: "75%", lg: "75%", md: "100%", sm: "100%", xs: "100%" },
+            backgroundColor: "black",
+            height: { xl: "100%", lg: "100%", md: "75%", sm: "75%", xs: "75%" },
+          }}
+        >
+          <Typography
+            sx={{
+              width: "75%",
+              color: "white",
+              fontSize: { lg: "6.5em", sm: "6.5em", xs: "5em" },
+              pl: 4
+            }}
+          >
+            {product == undefined ? "temp" : product.name}
+          </Typography>
+        </Box>
+
         <Box
           sx={{
-            width: "25%",
+            width: { xl: "25%", lg: "25%", md: "100%", sm: "100%", xs: "100%" },
             backgroundColor: alpha("#807e7c", 0.55),
             minWidth: "250px",
           }}
         >
-          <DetailBox />
+          <DetailBox
+            token={product == undefined ? "temp" : product.token}
+            blockchain={product == undefined ? "temp" : product.blockchain}
+            governance={product == undefined ? "temp" : product.governance}
+            marketCap={product == undefined ? "temp" : product.marketCap}
+            launchDate={product == undefined ? "temp" : product.launchDate}
+          />
         </Box>
       </Box>
       {/* description */}
-      <Stack direction="column" sx={{ display: "flex", alignItems: "center"}}>
+      <Stack direction="column" sx={{ display: "flex", alignItems: "center" }}>
         <Box sx={{ width: { xl: 1500, lg: 1200, md: 900, sm: 600 } }}>
           <Stack
             direction={{ xs: "column", md: "row" }}
@@ -220,7 +330,16 @@ const Product: FC = () => {
             }}
           >
             <Box>
-              <DescriptionBox />
+              {product == undefined ? (
+                ""
+              ) : (
+                <DescriptionBox
+                  description={product.description}
+                  company={product.company}
+                  developers={product.developers}
+                  url={product.url}
+                />
+              )}
             </Box>
 
             <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -230,21 +349,34 @@ const Product: FC = () => {
 
           {/* your rating */}
           <Box
-          component="form"
-          onSubmit={submitReviewHandler}
-            sx={{ display: "flex", justifyContent: "center", width: "100%", pt: 5, pb: 5 }}
+            component="form"
+            onSubmit={submitReviewHandler}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              width: "100%",
+              pt: 5,
+              pb: 5,
+            }}
           >
-            
             <Stack direction="row" spacing={8} width="80%" alignItems="center">
               <Box>
                 <RatingMedium value={Number(sliderValue)} />
-                <Box sx={{width: "100%", display: "flex", justifyContent: "center", pt: 2}}>
-                <Typography>Your rating</Typography>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    pt: 2,
+                  }}
+                >
+                  <Typography>Your rating</Typography>
                 </Box>
-                
               </Box>
               <Stack direction="column" spacing={2} width="100%">
-              <Typography sx={{display: isLoggedIn ? "none" : "flex"}}>Log in or sign up to submit your own review</Typography>
+                <Typography sx={{ display: isLoggedIn ? "none" : "flex" }}>
+                  Log in or sign up to submit your own review
+                </Typography>
                 <Stack direction="row" spacing={2}>
                   <Slider
                     aria-label="Your Rating:"
@@ -266,7 +398,7 @@ const Product: FC = () => {
                       type: "number",
                       "aria-labelledby": "input-slider",
                     }}
-                    sx={{ minWidth: 45}}
+                    sx={{ minWidth: 45 }}
                   />
                 </Stack>
 
@@ -278,10 +410,19 @@ const Product: FC = () => {
                   variant="filled"
                   placeholder="What do you think?..."
                   id="validation-outlined-input"
-                  onChange={(e) => {setReviewContent(e.target.value); checkValid(e.target.value);}}
+                  onChange={(e) => {
+                    setReviewContent(e.target.value);
+                    checkValid(e.target.value);
+                  }}
                   sx={multilineStyles}
                 />
-                <Button sx={buttonStyles} disabled={!isValid && !isLoggedIn} type="submit">Submit</Button>
+                <Button
+                  sx={buttonStyles}
+                  disabled={!isValid && !isLoggedIn}
+                  type="submit"
+                >
+                  Submit
+                </Button>
               </Stack>
             </Stack>
           </Box>
@@ -295,14 +436,20 @@ const Product: FC = () => {
             }}
           >
             <Grid container spacing={3}>
-              {reviews.map((review) => (
+              {reviews.map((review, index) => (
                 <Grid
                   item
                   xs={12}
                   md={6}
                   sx={{ display: "flex", justifyContent: "center" }}
+                  key={index}
                 >
-                  <ReviewCard rating={review} user={user} content="great content here" date="4/20/2022" />
+                  <ReviewCard
+                    rating={review}
+                    user={user}
+                    content="great content here"
+                    date="4/20/2022"
+                  />
                 </Grid>
               ))}
             </Grid>
@@ -326,4 +473,4 @@ const Product: FC = () => {
   );
 };
 
-export default Product;
+export default ProductPage;

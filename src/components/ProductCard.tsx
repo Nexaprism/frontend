@@ -9,11 +9,12 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import image from "../assets/img/nexaprismLogoSmall.png";
 import RatingBig from "./RatingBig";
 import RatingSmall from "./RatingSmall";
 import ReviewMedium from "./ReviewMedium";
+import { Link } from "react-router-dom";
 
 const product = {
   title: "Decentraland",
@@ -22,7 +23,8 @@ const product = {
   rating: 84,
 };
 
-const ProductCard: FC = () => {
+function ProductCard(props: {img: string, name: string, id: string}) {
+
   return (
     <Box
       sx={{
@@ -31,10 +33,10 @@ const ProductCard: FC = () => {
         width: { sm: 150, md: 250, lg: 275 },
       }}
     >
-      <CardActionArea sx={{ borderRadius: 5 }}>
+      <CardActionArea sx={{ borderRadius: 5 }} component={Link} to={"/product/" + props.id}>
         <Card sx={{ borderRadius: 5 }}>
           <Box sx={{ maxHeight: 200, position: "relative" }}>
-            <CardMedia sx={{ height: 200 }} image={image} />
+            <CardMedia sx={{ height: 200 }} image={props.img} />
             <Box
               sx={{
                 position: "absolute",
@@ -45,7 +47,7 @@ const ProductCard: FC = () => {
             >
               <Chip label={product.mainTag} size="small"/>
               <Typography fontSize={{ sm: 18, md: 22, lg: 25 }}>
-                {product.title}
+                {props.name}
               </Typography>
             </Box>
           </Box>
@@ -65,7 +67,7 @@ const ProductCard: FC = () => {
               sx={{ display: { sm: "none", md: "block" } }}
             >
               {product.tags.slice(0, 4).map((tag) => (
-                <Chip label={tag} sx={{ height: 15, m: 0.15 }} />
+                <Chip label={tag} key={tag} sx={{ height: 15, m: 0.15 }} />
               ))}
             </Box>
           </Stack>

@@ -137,7 +137,7 @@ const ReviewCard: FC<{
           </Stack>
         </Stack>
       </Dialog>
-      <CardActionArea sx={{ display: "flex", p: 2 }}>
+      <CardActionArea sx={{ display: "flex", p: 2 }} component="a">
         <Box sx={{ width: "50%" }}>
           <RatingMedium value={rating} />
         </Box>
