@@ -36,6 +36,7 @@ const Home: FC = () => {
                 _id
                 name
                 imgUrl
+                rating
                 createdAt
                 updatedAt
             }
@@ -64,17 +65,18 @@ const Home: FC = () => {
             imgUrl: product.imgUrl,
             name: product.name,
             id: product._id,
+            rating: product.rating,
           };
           productList.push(newProd);
         });
         setProdList(productList);
-        addItems(productList[0].name, productList[0].imgUrl, productList[0].id);
+        addItems(productList[0].name, productList[0].imgUrl, productList[0].id, productList[0].rating);
         console.log(productList)
         console.log("https://localhost:3080/" + productList[0].imgUrl)
       });
   }
 
-  const addItems = (name: string, img: string, id: string) => {
+  const addItems = (name: string, img: string, id: string, rating: number) => {
     const lessItems: Array<any> = [];
     const moreItems: Array<any> = [];
 
@@ -87,9 +89,9 @@ const Home: FC = () => {
           justifyContent="center"
           key={i}
         >
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating} />
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
         </Stack>
       );
     }
@@ -102,10 +104,10 @@ const Home: FC = () => {
           justifyContent="center"
           key={i}
         >
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} />
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
+          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
         </Stack>
       );
     }

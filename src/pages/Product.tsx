@@ -87,6 +87,7 @@ const ProductPage: FC = () => {
     createdAt: "",
     updatedAt: "",
     id: "",
+    rating: 0,
   });
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -140,6 +141,7 @@ const ProductPage: FC = () => {
   };
 
   const getProduct = async () => {
+    dispatch(setIsLoading(true));
     let returnedProd: Product | undefined;
     const graphqlQuery = {
       query: `
@@ -156,6 +158,7 @@ const ProductPage: FC = () => {
             imgUrl
             blockchain
             marketCap
+            rating
           }
         }
       `,
@@ -188,6 +191,7 @@ const ProductPage: FC = () => {
           createReview(reviewInput: {
             rating: "${Number(sliderValue)}", 
             content: "${reviewContent}", 
+            productId: "${id}",
           }) {
             _id
             user {
@@ -295,7 +299,7 @@ const ProductPage: FC = () => {
               width: "75%",
               color: "white",
               fontSize: { lg: "6.5em", sm: "6.5em", xs: "5em" },
-              pl: 4
+              pl: 4,
             }}
           >
             {product == undefined ? "temp" : product.name}
@@ -343,7 +347,9 @@ const ProductPage: FC = () => {
             </Box>
 
             <Box sx={{ display: "flex", justifyContent: "center" }}>
-              <RatingBig value={84} />
+              {!isLoading && product && product.rating > 0 ? (
+                <RatingBig value={product.rating} />
+              ) : null}
             </Box>
           </Stack>
 

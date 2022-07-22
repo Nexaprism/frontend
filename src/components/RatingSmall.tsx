@@ -15,7 +15,7 @@ function RatingSmall(props: CircularProgressProps & { value: number; }) {
             color = "#35db02"; //green
         } else if (value >= 33 && value < 77) {
             color = "#db9702"; //orange
-        } else {
+        } else if (value < 33) {
             color = "#db0202"; //red
         }
 

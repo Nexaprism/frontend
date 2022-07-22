@@ -93,6 +93,7 @@ const Metaverses: FC = () => {
             governance: product.governance,
             url: product.url,
             developers: product.developers,
+            rating: product.rating
           };
           productList.push(newProd);
         });
@@ -111,10 +112,10 @@ const Metaverses: FC = () => {
           display="flex"
           justifyContent="center"
         >
-            <ProductCard name={""} img={""} id=""/>
-            <ProductCard name={""} img={""} id=""/>
-            <ProductCard name={""} img={""} id=""/>
-            <ProductCard name={""} img={""} id=""/>
+            <ProductCard name={""} img={""} id="" rating={0}/>
+            <ProductCard name={""} img={""} id="" rating={0}/>
+            <ProductCard name={""} img={""} id="" rating={0}/>
+            <ProductCard name={""} img={""} id="" rating={0}/>
         </Stack>
       );
     }

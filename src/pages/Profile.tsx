@@ -56,7 +56,6 @@ const user = {
 
 const Profile: FC = () => {
   const [reviews, setReviews] = useState<any>([]);
-  const [totalReviews, setTotalReviews] = useState<number>(0);
   const [creationDate, setCreationDate] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [user, setUser] = useState<User>({
@@ -200,6 +199,9 @@ const Profile: FC = () => {
               email
               password
               avatar
+              reviews {
+                _id
+              }
             }
             createdAt
             updatedAt
@@ -233,7 +235,7 @@ const Profile: FC = () => {
           avatar: userData.avatar,
           reviews: userData.reviews == undefined ? [] : userData.reviews
         }
-        console.log(userData.username)
+        console.log(userData.reviews)
         setUser(currentUser);
         setCreationDate(resData.data.user.createdAt)
         }
@@ -276,7 +278,6 @@ const Profile: FC = () => {
           throw new Error("Fetching reviews failed");
         }
         setReviews(resData.data.reviews.reviews);
-        setTotalReviews(resData.data.reviews.totalReviews);
       });
   };
 

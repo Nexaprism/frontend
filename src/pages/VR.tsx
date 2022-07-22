@@ -49,10 +49,10 @@ import {
             display="flex"
             justifyContent="center"
           >
-            <ProductCard name={""} img={""} id=""/>
-            <ProductCard name={""} img={""} id=""/>
-            <ProductCard name={""} img={""} id=""/>
-            <ProductCard name={""} img={""} id=""/>
+            <ProductCard name={""} img={""} id="" rating={0}/>
+            <ProductCard name={""} img={""} id="" rating={0}/>
+            <ProductCard name={""} img={""} id="" rating={0}/>
+            <ProductCard name={""} img={""} id="" rating={0}/>
           </Stack>
         );
       }

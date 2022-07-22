@@ -68,6 +68,7 @@ const LogIn: FC = () => {
     }
   };
 
+
   const logInHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const graphqlQuery = {

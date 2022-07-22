@@ -23,7 +23,7 @@ const product = {
   rating: 84,
 };
 
-function ProductCard(props: {img: string, name: string, id: string}) {
+function ProductCard(props: {img: string, name: string, id: string, rating: number}) {
 
   return (
     <Box
@@ -61,7 +61,7 @@ function ProductCard(props: {img: string, name: string, id: string}) {
               justifyContent: "center",
             }}
           >
-            <RatingSmall value={product.rating} />
+            <RatingSmall value={props.rating} />
             <Box
               overflow="hidden"
               sx={{ display: { sm: "none", md: "block" } }}

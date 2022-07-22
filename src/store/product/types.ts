@@ -13,4 +13,5 @@ export type Product = {
     updatedAt: string;
     createdAt: string;
     developers: string[];
+    rating: number;
 }
