@@ -37,6 +37,8 @@ const Home: FC = () => {
                 name
                 imgUrl
                 rating
+                mainTag
+                tags
                 createdAt
                 updatedAt
             }
@@ -66,17 +68,18 @@ const Home: FC = () => {
             name: product.name,
             id: product._id,
             rating: product.rating,
+            mainTag: product.mainTag,
+            tags: product.tags
           };
           productList.push(newProd);
         });
         setProdList(productList);
-        addItems(productList[0].name, productList[0].imgUrl, productList[0].id, productList[0].rating);
-        console.log(productList)
-        console.log("https://localhost:3080/" + productList[0].imgUrl)
-      });
-  }
+        addItems(productList);
 
-  const addItems = (name: string, img: string, id: string, rating: number) => {
+      });
+  };
+
+  const addItems = (products: Product[]) => {
     const lessItems: Array<any> = [];
     const moreItems: Array<any> = [];
 
@@ -89,9 +92,30 @@ const Home: FC = () => {
           justifyContent="center"
           key={i}
         >
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating} />
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
+          <ProductCard
+            name={products[0].name}
+            img={"http://localhost:3080/" + products[0].imgUrl}
+            id={products[0].id}
+            rating={products[0].rating}
+            mainTag={products[0].mainTag}
+            tags={products[0].tags}
+          />
+          <ProductCard
+            name={products[1].name}
+            img={"http://localhost:3080/" + products[1].imgUrl}
+            id={products[1].id}
+            rating={products[1].rating}
+            mainTag={products[1].mainTag}
+            tags={products[1].tags}
+          />
+          <ProductCard
+            name={products[2].name}
+            img={"http://localhost:3080/" + products[2].imgUrl}
+            id={products[2].id}
+            rating={products[2].rating}
+            mainTag={products[2].mainTag}
+            tags={products[2].tags}
+          />
         </Stack>
       );
     }
@@ -104,10 +128,38 @@ const Home: FC = () => {
           justifyContent="center"
           key={i}
         >
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
-          <ProductCard name={name} img={"http://localhost:3080/" + img} id={id} rating={rating}/>
+          <ProductCard
+            name={products[0].name}
+            img={"http://localhost:3080/" + products[0].imgUrl}
+            id={products[0].id}
+            rating={products[0].rating}
+            mainTag={products[0].mainTag}
+            tags={products[0].tags}
+          />
+          <ProductCard
+            name={products[1].name}
+            img={"http://localhost:3080/" + products[1].imgUrl}
+            id={products[1].id}
+            rating={products[1].rating}
+            mainTag={products[1].mainTag}
+            tags={products[1].tags}
+          />
+          <ProductCard
+            name={products[2].name}
+            img={"http://localhost:3080/" + products[2].imgUrl}
+            id={products[2].id}
+            rating={products[2].rating}
+            mainTag={products[2].mainTag}
+            tags={products[2].tags}
+          />
+          <ProductCard
+            name={products[3].name}
+            img={"http://localhost:3080/" + products[3].imgUrl}
+            id={products[3].id}
+            rating={products[3].rating}
+            mainTag={products[3].mainTag}
+            tags={products[3].tags}
+          />
         </Stack>
       );
     }
@@ -117,10 +169,7 @@ const Home: FC = () => {
 
   useEffect(() => {
     getProducts();
-    
-    
-    
-  }, [ matches]);
+  }, [matches]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>

@@ -14,4 +14,6 @@ export type Product = {
     createdAt: string;
     developers: string[];
     rating: number;
+    tags: string[];
+    mainTag: string;
 }

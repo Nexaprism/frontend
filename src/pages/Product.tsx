@@ -31,6 +31,9 @@ import { User } from "../store/user/userTypes";
 import image from "../assets/img/largeImage.jpeg";
 import { useParams } from "react-router-dom";
 import { Product } from "../store/product/types";
+import { Article } from "../store/article/types";
+import { useGetProductQuery } from "../store/product/hooks";
+import { useGetAllArticlesQuery } from "../store/article/hooks";
 
 /**
  * jumbo image
@@ -88,12 +91,16 @@ const ProductPage: FC = () => {
     updatedAt: "",
     id: "",
     rating: 0,
+    mainTag: "",
+    tags: [""],
   });
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const token = useAppSelector(selectToken);
   const isLoading = useAppSelector(selectIsLoading);
   const { id } = useParams();
+  const findProducts = useGetProductQuery(id);
+  const articles = useGetAllArticlesQuery();
 
   const multilineStyles = {
     "& input:valid + fieldset": {
@@ -142,45 +149,11 @@ const ProductPage: FC = () => {
 
   const getProduct = async () => {
     dispatch(setIsLoading(true));
-    let returnedProd: Product | undefined;
-    const graphqlQuery = {
-      query: `
-        {
-          product(id: "${id}") {
-            name
-            description
-            developers
-            token
-            company
-            governance
-            launchDate
-            url
-            imgUrl
-            blockchain
-            marketCap
-            rating
-          }
-        }
-      `,
-    };
-    await fetch("http://localhost:3080/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(graphqlQuery),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        if (resData.errors) {
-          console.log(resData);
-          throw new Error("Fetching product failed");
-        }
-        returnedProd = resData.data.product;
-      });
-    return returnedProd;
+    return findProducts;
+  };
+
+  const getArticles = async () => {
+    return articles;
   };
 
   const submitReviewHandler = (e: React.SyntheticEvent) => {
@@ -232,16 +205,40 @@ const ProductPage: FC = () => {
       });
   };
 
-  const addItems = () => {
-    //console.log(id);
+  const addItems = (articles: Article[]) => {
     const newsItems: Array<any> = [];
+    console.log(articles)
     for (let i = 0; i < 3; i++) {
       newsItems.push(
         <Stack direction="row" spacing={3} key={i}>
-          <NewsCard />
-          <NewsCard />
-          <NewsCard />
-          <NewsCard />
+          <NewsCard
+            image={"http://localhost:3080/" + articles[0].imgUrl}
+            content={articles[0].content}
+            title={articles[0].title}
+            date={articles[0].updatedAt}
+            id={articles[0].id}
+          />
+          <NewsCard
+            image={"http://localhost:3080/" + articles[1].imgUrl}
+            content={articles[1].content}
+            title={articles[1].title}
+            date={articles[1].updatedAt}
+            id={articles[1].id}
+          />
+          <NewsCard
+            image={"http://localhost:3080/" + articles[0].imgUrl}
+            content={articles[0].content}
+            title={articles[0].title}
+            date={articles[0].updatedAt}
+            id={articles[0].id}
+          />
+          <NewsCard
+            image={"http://localhost:3080/" + articles[1].imgUrl}
+            content={articles[1].content}
+            title={articles[1].title}
+            date={articles[1].updatedAt}
+            id={articles[1].id}
+          />
         </Stack>
       );
     }
@@ -249,12 +246,15 @@ const ProductPage: FC = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0)
     const getData = async () => {
       const data: Product | undefined = await getProduct();
+      const artData: Article[] | undefined = await getArticles();
       setProduct(data);
+      addItems(artData);
+      console.log(artData);
     };
     getData();
-    addItems();
     dispatch(setIsLoading(false));
   }, [isLoading]);
 
@@ -284,6 +284,7 @@ const ProductPage: FC = () => {
             sm: "column",
             xs: "column",
           },
+          boxShadow: 6,
         }}
       >
         <Box

@@ -1,3 +1,4 @@
+import { jsx } from "@emotion/react";
 import {
   Box,
   Button,
@@ -10,114 +11,155 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { FC, useEffect, useState } from "react";
+import { FC, JSXElementConstructor, useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
+import { JsxElement } from "typescript";
 import Glance from "../components/Glance";
 import JumboNews from "../components/JumboNews";
 import MiniProductCard from "../components/MiniProductCard";
 import NewsCard from "../components/NewsCard";
 import ProductCard from "../components/ProductCard";
+import { setIsLoading } from "../store/app/appReducer";
+import { useAppDispatch } from "../store/hooks";
+import { useGetProductsMainTag } from "../store/product/hooks";
 import { Product } from "../store/product/types";
 
-const items = [
-  "item 1",
-  "item 2",
-  "item 3",
-  "item 4",
-  "item 5",
-  "item 6",
-  "item 7",
-  "item 8",
-  "item 9",
-  "item 10",
-];
-
 const Metaverses: FC = () => {
+  const dispatch = useAppDispatch();
   const [firstHalf, setFirstHalf] = useState<any>([]);
   const [products, setProducts] = useState<any[]>();
   const [newsItems, setNewsItems] = useState<any[]>();
-  const [enabledButton, setEnabledButton] = useState<boolean[]>([false, false, true]);
+  const [enabledButton, setEnabledButton] = useState<boolean[]>([
+    false,
+    false,
+    true,
+  ]);
   const [prodList, setProdList] = useState<Product[]>([]);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
+  const metaverseProducts = useGetProductsMainTag("metaverse");
 
   const buttonStyles = {
     "&:hover": { transform: "none" },
-  }
+  };
 
-  const getProducts = () => {
-    let productList: Product[] = [];
-    const graphqlQuery = {
-      query: `
-      {
-        products {
-            products {
-                name
-                imgUrl
-                createdAt
-                updatedAt
-            }
-        }
+  const getProducts = async () => {
+    dispatch(setIsLoading(true));
+    return metaverseProducts;
+    // let productList: Product[] = [];
+    // const graphqlQuery = {
+    //   query: `
+    //   {
+    //     products {
+    //         products {
+    //             name
+    //             imgUrl
+    //             rating
+    //             mainTag
+    //             tags
+    //             createdAt
+    //             updatedAt
+    //         }
+    //     }
+    //   }
+    //     `,
+    // };
+    // fetch("http://localhost:3080/graphql", {
+    //   method: "POST",
+    //   headers: {
+    //     //Authorization: "Bearer " + token,
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(graphqlQuery),
+    // })
+    //   .then((res) => {
+    //     return res.json();
+    //   })
+    //   .then((resData) => {
+    //     if (resData.errors) {
+    //       console.log(resData);
+    //       throw new Error("Fetching products failed");
+    //     }
+    //     resData.data.products.products.map((product: any) => {
+    //       let newProd: Product = {
+    //         id: product._id,
+    //         company: product.company,
+    //         blockchain: product.blockchain,
+    //         marketCap: product.marketCap,
+    //         token: product.token,
+    //         description: product.description,
+    //         launchDate: product.launchDate,
+    //         imgUrl: product.imgUrl,
+    //         name: product.name,
+    //         createdAt: product.createdAt,
+    //         updatedAt: product.updatedAt,
+    //         governance: product.governance,
+    //         url: product.url,
+    //         developers: product.developers,
+    //         rating: product.rating,
+    //         mainTag: product.mainTag,
+    //         tags: product.tags,
+    //       };
+    //       productList.push(newProd);
+    //     });
+    //     setProdList(productList);
+    //     addItems(productList);
+    //     console.log(resData.data.products);
+    //   });
+  };
+
+  const makeCarouselPage = (
+    index: number,
+    products: Product[],
+    pageSize: number
+  ) => {
+    let page: any[] = [];
+    for (let i = 0; i < pageSize; i++) {
+      if (index > products.length - 1) {
+        break;
       }
-        `,
-    };
-    fetch("http://localhost:3080/graphql", {
-      method: "POST",
-      headers: {
-        //Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(graphqlQuery),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        if (resData.errors) {
-          console.log(resData);
-          throw new Error("Fetching products failed");
-        }
-        resData.data.products.products.map((product: any) => {
-          let newProd: Product = {
-            id: product._id,
-            company: product.company,
-            blockchain: product.blockchain,
-            marketCap: product.marketCap,
-            token: product.token,
-            description: product.description,
-            launchDate: product.launchDate,
-            imgUrl: product.imgUrl,
-            name: product.name,
-            createdAt: product.createdAt,
-            updatedAt: product.updatedAt,
-            governance: product.governance,
-            url: product.url,
-            developers: product.developers,
-            rating: product.rating
-          };
-          productList.push(newProd);
-        });
-        setProdList(productList);
-        console.log(resData.data.products);
-      });
-  }
+      page.push(
+        <ProductCard
+          name={products[index].name}
+          img={"http://localhost:3080/" + products[index].imgUrl}
+          id={products[index].id}
+          rating={products[index].rating}
+          mainTag={products[index].mainTag}
+          tags={products[index].tags}
+        />
+      );
+      index++;
+    }
+    return page;
+  };
 
-  const addItems = () => {
+  const addItems = (allProducts: Product[]) => {
+    const products = allProducts.slice(0, 11);
     const productItems: Array<any> = [];
-    for (let i = 0; i < 3; i++) {
+    let page: any[] = [];
+    let cardCount = 0;
+    let carouselSize = matches ? 4 : 3;
+    let carouselPageCount = matches ? 2 : 3;
+    console.log(products);
+
+    for (let i = 0; i < carouselPageCount; i++) {
+      page = makeCarouselPage(cardCount, products, carouselSize);
       productItems.push(
         <Stack
+          key={i}
           direction="row"
           spacing={3}
           display="flex"
           justifyContent="center"
         >
-            <ProductCard name={""} img={""} id="" rating={0}/>
-            <ProductCard name={""} img={""} id="" rating={0}/>
-            <ProductCard name={""} img={""} id="" rating={0}/>
-            <ProductCard name={""} img={""} id="" rating={0}/>
+          {page.map((card) => {
+            return card;
+          })}
         </Stack>
       );
+      cardCount += carouselSize;
+      if(cardCount > products.length) {break}
+      page = [];
     }
     setProducts(productItems);
   };
@@ -132,10 +174,10 @@ const Metaverses: FC = () => {
           display="flex"
           justifyContent="center"
         >
-          <NewsCard />
-          <NewsCard />
-          <NewsCard />
-          <NewsCard />
+          <NewsCard image={""} content={""} title={""} date={""} id={""} />
+          <NewsCard image={""} content={""} title={""} date={""} id={""} />
+          <NewsCard image={""} content={""} title={""} date={""} id={""} />
+          <NewsCard image={""} content={""} title={""} date={""} id={""} />
         </Stack>
       );
     }
@@ -148,19 +190,23 @@ const Metaverses: FC = () => {
     if (matches) {
       let row = false;
       let countToTwo = 0;
-      items.map((item, index) => {
+      prodList.map((product, index) => {
         if (countToTwo == 0 && !row) {
-          color = 'linear-gradient(to bottom, #cdcccf, #ababab)'
+          color = "linear-gradient(to bottom, #cdcccf, #ababab)";
         } else if (countToTwo == 1 && !row) {
-          color = 'linear-gradient(to right bottom, #7d7d7d, #4d4d4d)'
+          color = "linear-gradient(to right bottom, #7d7d7d, #4d4d4d)";
         } else if (countToTwo == 0 && row) {
-          color = 'linear-gradient(to right bottom, #7d7d7d, #4d4d4d)'
+          color = "linear-gradient(to right bottom, #7d7d7d, #4d4d4d)";
         } else if (countToTwo == 1 && row) {
-          color = 'linear-gradient(to bottom, #cdcccf, #ababab)'
+          color = "linear-gradient(to bottom, #cdcccf, #ababab)";
         }
         itemArray.push(
           <Grid item xs={12} md={6} sx={{ background: color }}>
-            <MiniProductCard key={item} />
+            <MiniProductCard
+              key={index}
+              name={product.name}
+              rating={product.rating}
+            />
           </Grid>
         );
         if (!row && countToTwo == 1) {
@@ -172,11 +218,18 @@ const Metaverses: FC = () => {
         countToTwo = countToTwo > 1 ? 0 : countToTwo;
       });
     } else {
-      items.map((item, index) => {
-        color = index % 2 ? 'linear-gradient(to right bottom, #7d7d7d, #4d4d4d)' : 'linear-gradient(to bottom, #cdcccf, #ababab)';
+      prodList.map((product, index) => {
+        color =
+          index % 2
+            ? "linear-gradient(to right bottom, #7d7d7d, #4d4d4d)"
+            : "linear-gradient(to bottom, #cdcccf, #ababab)";
         itemArray.push(
           <Grid item xs={12} md={6} sx={{ background: color }}>
-            <MiniProductCard key={item} />
+            <MiniProductCard
+              key={index}
+              name={product.name}
+              rating={product.rating}
+            />
           </Grid>
         );
       });
@@ -191,11 +244,19 @@ const Metaverses: FC = () => {
   };
 
   useEffect(() => {
-    getProducts();
+    const getData = async () => {
+      const metaProdData = await getProducts();
+      setProdList(metaProdData.prodArray);
+      addItems(metaProdData.prodArray);
+    };
+    getData();
+    //getProducts();
     separateTheItems();
-    addItems();
+    //addItems();
     addNewsItems();
-  }, [items, matches]);
+    dispatch(setIsLoading(false));
+    console.log(matches);
+  }, [matches]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", pt: 4 }}>
@@ -295,14 +356,13 @@ const Metaverses: FC = () => {
         <Grid
           container
           direction="row"
-          sx={{ display: "flex", justifyContent: "space-evenly"}}
+          sx={{ display: "flex", justifyContent: "space-evenly" }}
         >
           {firstHalf.map((item: any) => {
             return item;
           })}
         </Grid>
-        
-        
+
         <Carousel sx={{ width: "100%" }} index={4} animation="slide">
           {newsItems}
         </Carousel>

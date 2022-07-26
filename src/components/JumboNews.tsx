@@ -25,6 +25,7 @@ const JumboNews: FC = () => {
         backgroundImage: `url(${image})`,
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
+        boxShadow: 6
       }}
     >
       <Stack

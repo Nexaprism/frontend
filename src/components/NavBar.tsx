@@ -17,7 +17,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import BedtimeIcon from "@mui/icons-material/Bedtime";
 import SearchIcon from "@mui/icons-material/Search";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { selectTheme, setTheme } from "../store/theme/themeReducer";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { styled, alpha, useTheme } from "@mui/material/styles";
@@ -47,6 +47,7 @@ const NavBar: FC = () => {
   const dispatch = useAppDispatch();
   const avatar = useAppSelector(selectAvatar);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const navigate = useNavigate();
 
   const AcctLink = styled(Link)(({ theme }) => ({
     textDecoration: "none",
@@ -132,6 +133,7 @@ const NavBar: FC = () => {
     dispatch(setEmail(""));
     dispatch(setAvatar(""));
     dispatch(setIsLoggedIn(false));
+    navigate("/");
   };
 
   const pages = ["metaverses", "ar", "vr", "news", "crypto", "shop"];

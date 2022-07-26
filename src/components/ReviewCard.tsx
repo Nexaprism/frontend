@@ -89,6 +89,7 @@ const ReviewCard: FC<{
         maxHeight: 200,
         display: "flex",
         borderRadius: 5,
+        boxShadow: 3
       }}
     >
       {/*For Edits */}

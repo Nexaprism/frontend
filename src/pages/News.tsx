@@ -42,10 +42,10 @@ const News: FC = () => {
     for (let i = 0; i < 3; i++) {
       newsItems.push(
         <Stack direction="row" spacing={3}>
-          <NewsCard />
-          <NewsCard />
-          <NewsCard />
-          <NewsCard />
+          <NewsCard image={""} content={""} title={""} date={""} id={""} />
+          <NewsCard image={""} content={""} title={""} date={""} id={""} />
+          <NewsCard image={""} content={""} title={""} date={""} id={""} />
+          <NewsCard image={""} content={""} title={""} date={""} id={""} />
         </Stack>
       );
     }
@@ -96,6 +96,7 @@ const News: FC = () => {
   }));
 
   useEffect(() => {
+    window.scrollTo(0, 0)
     addItems();
   });
 
@@ -114,8 +115,8 @@ const News: FC = () => {
               width: "65%",
               backgroundSize: "cover",
               backgroundImage: `url(${mainLogo})`,
-              display: 'flex',
-              justifyContent: 'flex-end',
+              display: "flex",
+              justifyContent: "flex-end",
               mr: 2,
             }}
           >
@@ -130,8 +131,8 @@ const News: FC = () => {
                 height: 142,
                 backgroundSize: "cover",
                 backgroundImage: `url(${mainLogo})`,
-                display: 'flex',
-              justifyContent: 'flex-end',
+                display: "flex",
+                justifyContent: "flex-end",
               }}
             >
               <Box sx={{ p: 1 }}>
@@ -144,8 +145,8 @@ const News: FC = () => {
                 height: 142,
                 backgroundSize: "cover",
                 backgroundImage: `url(${mainLogo})`,
-                display: 'flex',
-              justifyContent: 'flex-end',
+                display: "flex",
+                justifyContent: "flex-end",
               }}
             >
               <Box sx={{ p: 1 }}>
@@ -172,7 +173,10 @@ const News: FC = () => {
           </Stack>
         </Box>
         <Box>
-          <Typography variant="h3" sx={{ pb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+          <Typography
+            variant="h3"
+            sx={{ pb: 3, display: "flex", justifyContent: "flex-end" }}
+          >
             On The Pulse
           </Typography>
           <Stack
@@ -206,7 +210,10 @@ const News: FC = () => {
           </Stack>
         </Box>
         <Box>
-          <Typography variant="h3" sx={{ pb: 3, display: 'flex', justifyContent: 'flex-end'  }}>
+          <Typography
+            variant="h3"
+            sx={{ pb: 3, display: "flex", justifyContent: "flex-end" }}
+          >
             From around the web
           </Typography>
           <Box

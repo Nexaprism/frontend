@@ -49,10 +49,10 @@ import {
             display="flex"
             justifyContent="center"
           >
-            <ProductCard name={""} img={""} id="" rating={0}/>
-            <ProductCard name={""} img={""} id="" rating={0}/>
-            <ProductCard name={""} img={""} id="" rating={0}/>
-            <ProductCard name={""} img={""} id="" rating={0}/>
+            <ProductCard name={""} img={""} id="" rating={0} tags={[""]} mainTag={""}/>
+            <ProductCard name={""} img={""} id="" rating={0} tags={[""]} mainTag={""}/>
+            <ProductCard name={""} img={""} id="" rating={0} tags={[""]} mainTag={""}/>
+            <ProductCard name={""} img={""} id="" rating={0} tags={[""]} mainTag={""}/>
           </Stack>
         );
       }
@@ -69,10 +69,10 @@ import {
             display="flex"
             justifyContent="center"
           >
-            <NewsCard />
-            <NewsCard />
-            <NewsCard />
-            <NewsCard />
+            <NewsCard image={""} content={""} title={""} date={""} id={""}/>
+            <NewsCard image={""} content={""} title={""} date={""} id={""}/>
+            <NewsCard image={""} content={""} title={""} date={""} id={""}/>
+            <NewsCard image={""} content={""} title={""} date={""} id={""}/>
           </Stack>
         );
       }
@@ -97,7 +97,7 @@ import {
           }
           itemArray.push(
             <Grid item xs={12} md={6} sx={{ background: color }}>
-              <MiniProductCard key={item} />
+              <MiniProductCard key={item} name={"temp"} rating={79}/>
             </Grid>
           );
           if (!row && countToTwo == 1) {
@@ -113,7 +113,7 @@ import {
           color = index % 2 ? 'linear-gradient(to right bottom, #7d7d7d, #4d4d4d)' : 'linear-gradient(to bottom, #cdcccf, #ababab)';
           itemArray.push(
             <Grid item xs={12} md={6} sx={{ background: color }}>
-              <MiniProductCard key={item} />
+              <MiniProductCard key={item} name={"temp"} rating={79}/>
             </Grid>
           );
         });

@@ -10,12 +10,12 @@ const product = {
     ratingQuantity: 127,
   };
 
-const MiniProductCard: FC = () => {
+const MiniProductCard: FC<{name: string, rating: number}> = ({name, rating }) => {
 
     return (
         <Stack direction="row" width="auto" sx={{display: 'flex', alignItems: 'center'}}>
-            <RatingSmall value={product.rating} />
-            <Typography>{product.title}</Typography>
+            <RatingSmall value={rating} />
+            <Typography>{name}</Typography>
             <Typography>Reviews: {product.ratingQuantity}</Typography>
         </Stack>
     )

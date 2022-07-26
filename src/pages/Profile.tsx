@@ -33,8 +33,9 @@ import {
 import triangle1 from "../assets/img/triangle1.png";
 import triangle2 from "../assets/img/triangle2.png";
 import triangle3 from "../assets/img/triangle3.png";
-import { setIsLoggedIn } from "../store/app/appReducer";
+import { selectIsLoading, setIsLoading, setIsLoggedIn } from "../store/app/appReducer";
 import { useNavigate } from "react-router-dom";
+import { useGetUserQuery, useAvatarUpdate } from "../store/user/hooks";
 /**
  * Account details:
  * (age of account "member since", number of reviews, username, email, avatar)
@@ -47,18 +48,13 @@ import { useNavigate } from "react-router-dom";
 
 //const reviews = [20, 58, 99, 74, 88, 84, 71, 15, 100, 48];
 
-const user = {
-  name: "CitizenSnipz",
-  email: "joshkroz@gmail.com",
-  created: "06/27/2022",
-  totalReviews: 112,
-};
-
 const Profile: FC = () => {
   const [reviews, setReviews] = useState<any>([]);
-  const [creationDate, setCreationDate] = useState<string>("");
+  const [creationDate, setCreationDate] = useState<string | undefined>("");
   const [page, setPage] = useState<number>(1);
-  const [user, setUser] = useState<User>({
+  const isLoading = useAppSelector(selectIsLoading);
+  const [reload, setReload] = useState<boolean>();
+  const [user, setUser] = useState<User | undefined>({
     id: "",
     username: "",
     email: "",
@@ -71,6 +67,9 @@ const Profile: FC = () => {
   const email = useAppSelector(selectEmail);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const userData = useGetUserQuery(userId, token);
+  const updateAvatarFunc = useAvatarUpdate();
+
 
   const buttonStyles = {
     color: "white",
@@ -125,12 +124,14 @@ const Profile: FC = () => {
   }));
 
   const findUserSince = () => {
-    const userDate = new Date(creationDate);
-    const year = userDate.getFullYear();
+    if (creationDate) {
+      const userDate = new Date(creationDate);
+      const year = userDate.getFullYear();
     const month = userDate.getMonth() + 1;
     const day = userDate.getDate();
     const convertedDate = month.toString() + "/" + day.toString() + "/" + year.toString();
     return convertedDate;
+    }
   }
 
   const logout = () => {
@@ -144,43 +145,13 @@ const Profile: FC = () => {
   };
 
   const chooseAvatar = (image: string) => {
-    const graphqlQuery = {
-      query: `
-      mutation {
-        updateUserAvatar(id: "${userId}", userInput: {
-          email: "${email}",
-          avatar: "${image}",
-        }) {
-          _id
-          avatar
-        }
-      }
-      `,
-    };
-    fetch("http://localhost:3080/graphql", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(graphqlQuery),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        //error handling
-        if (resData.errors && resData.errors[0].status === 422) {
-          console.log(resData);
-          throw new Error("Validation failed. Could not authenticate user");
-        }
-        if (resData.errors) {
-          console.log(resData);
-          throw new Error("Review creation failed");
-        }
-        console.log(resData.data);
-        dispatch(setAvatar(image));
-      });
+    setReload(!reload);
+    setIsLoading(true);
+    if (userId && email && token) {
+      updateAvatarFunc(image, userId, email, token!);
+    }
+    dispatch(setAvatar(image));
+    
   };
 
   const handlePageChange = (event: ChangeEvent<any>, value: number) => {
@@ -189,57 +160,9 @@ const Profile: FC = () => {
     setPage(value);
   };
 
-  const getUser = () => {
-    const graphqlQuery = {
-      query: `
-      {
-        user(id: "${userId}") {
-            user {
-              username
-              email
-              password
-              avatar
-              reviews {
-                _id
-              }
-            }
-            createdAt
-            updatedAt
-          }
-      }
-        `,
-    };
-    fetch("http://localhost:3080/graphql", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(graphqlQuery),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        if (resData.errors) {
-          console.log(resData);
-          throw new Error("Fetching user failed");
-        }
-        const userData = resData.data.user.user;
-        console.log(userData)
-        let currentUser: User = {
-          id: userData._id,
-          username: userData.username,
-          email: userData.email,
-          password: userData.password,
-          avatar: userData.avatar,
-          reviews: userData.reviews == undefined ? [] : userData.reviews
-        }
-        console.log(userData.reviews)
-        setUser(currentUser);
-        setCreationDate(resData.data.user.createdAt)
-        }
-      );
+  const getUser = async () => {
+    dispatch(setIsLoading(true));
+    return userData
   };
 
   const getReviews = () => {
@@ -281,11 +204,48 @@ const Profile: FC = () => {
       });
   };
 
+  const addReviews = () => {
+    let reviewArray = [];
+    if(user) {
+      for (let i = 0; i < 3; i++) {
+        reviewArray.push(
+          <Grid
+                item
+                xs={12}
+                md={6}
+                sx={{ display: "flex", justifyContent: "center" }}
+              >
+          <ReviewCard
+            rating={65}
+            user={user}
+            content={"sample content"}
+            date={creationDate!}
+          />
+          </Grid>
+        )
+      }
+    }
+    
+    setReviews(reviewArray);
+  }
+
   useEffect(() => {
-    getUser();
+    const getData = async () => {
+      const data = await getUser();
+      setUser(data.user);
+      setCreationDate(data.createdAt);
+      console.log(data)
+      setIsLoading(false);
+    };
+    getData();
+    addReviews();
     //getReviews();
     findUserSince();
-  }, [page]);
+    setTimeout(() => {
+      setReload(false);
+    }, 1500);
+    setIsLoading(false);
+  }, [ reload, page]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", m: 10 }}>
@@ -293,9 +253,9 @@ const Profile: FC = () => {
         <Typography variant="h2">Account details</Typography>
         <Divider />
         <Stack direction="row" spacing={4} sx={{ alignItems: "center" }}>
-          <Avatar sx={{ height: 115, width: 115 }} src={user.avatar} />
+          <Avatar sx={{ height: 115, width: 115 }} src={user == undefined ? "none" : user.avatar} />
           <Typography fontSize={22} sx={{ fontWeight: 600 }}>
-            {user.username}
+            {user == undefined ? "none": user.username}
           </Typography>
         </Stack>
         <Typography>Choose an avatar</Typography>
@@ -312,7 +272,7 @@ const Profile: FC = () => {
         </Stack>
         <Stack direction="row" spacing={2}>
           <Typography sx={{ fontWeight: 600 }}>Email:</Typography>
-          <Typography>{user.email}</Typography>
+          <Typography>{user == undefined ? "none" : user.email}</Typography>
         </Stack>
         <Stack direction="row" spacing={2}>
           <Typography sx={{ fontWeight: 600 }}>Member since:</Typography>
@@ -320,7 +280,7 @@ const Profile: FC = () => {
         </Stack>
         <Stack direction="row" spacing={2}>
           <Typography sx={{ fontWeight: 600 }}>Number of reviews:</Typography>
-          <Typography>{user.reviews.length}</Typography>
+          <Typography>{user == undefined ? 0 : user.reviews.length}</Typography>
         </Stack>
         <Box sx={{ display: "flex", flexDirection: "row" }}>
           <Button sx={buttonStyles}>Edit Profile</Button>
@@ -352,6 +312,7 @@ const Profile: FC = () => {
 
         <Divider />
         <Grid container spacing={3}>
+          {/* 
           {reviews.map((review: any) => (
             <Grid
               item
@@ -366,7 +327,11 @@ const Profile: FC = () => {
                 date={review.createdAt}
               />
             </Grid>
-          ))}
+            ))}
+          */}
+          {reviews}
+          
+          
         </Grid>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <Pagination count={4} page={page} onChange={handlePageChange} />

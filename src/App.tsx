@@ -6,7 +6,7 @@ import { Box, CssBaseline, ThemeProvider } from '@mui/material';
 import { useAppSelector } from './store/hooks';
 import { selectTheme } from './store/theme/themeReducer';
 import NavBar from './components/NavBar';
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import lightTheme from './theme/lightTheme';
 import darkTheme from './theme/darkTheme';
@@ -43,7 +43,6 @@ function App() {
       <Box sx={{minHeight: '100vh'}}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path='/product' element={<Product />} />
           <Route path='/product/:id' element={<Product />} />
           <Route path="/metaverses" element={<Metaverses />} />
           <Route path="/vr" element={<VR />} />
@@ -53,7 +52,7 @@ function App() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<LogIn />} />
-          <Route path="/article" element={<Article />} />
+          <Route path="/article/:id" element={<Article />} />
           <Route path="/account" element={<Profile /> } />
         </Routes>
       </Box>
