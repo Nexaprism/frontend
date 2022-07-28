@@ -1,31 +1,28 @@
-import { Box, Chip, Link, Stack, Typography } from "@mui/material";
+import { Box, Chip, Stack, Typography } from "@mui/material";
 import { FC } from "react";
+import { Link } from "react-router-dom";
 import image from "../assets/img/largeImage.jpeg";
 
-const newsStory = {
-  title: "Decentraland breaks $1 billion USD",
-  content:
-    "Decentraland's main currency, MANA, recently broke a major milestone this Tuesday. The burgeoning metaverse's token just surpassed a market cap of $1 billion USD valuation.",
-  date: "04/27/2021",
-  author: "Josh Kroslowitz",
-  mainTag: "metaverse",
-  tags: ["VR", "game", "web3"],
-};
-
-const JumboNews: FC = () => {
+const JumboNews: FC<{
+  title: string;
+  mainTag: string;
+  tags: string[];
+  imgUrl: string;
+  id: string;
+}> = ({title, mainTag, tags, imgUrl, id}) => {
   return (
     <Box
       component={Link}
-      href="#"
+      to={"/article/" + id}
       sx={{
         position: "relative",
         width: "100%",
         height: { xs: 350, md: 550, lg: 400 },
         backgroundSize: "cover",
-        backgroundImage: `url(${image})`,
+        backgroundImage: `url(${"http://localhost:3080/" + imgUrl})`,
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
-        boxShadow: 6
+        boxShadow: 6,
       }}
     >
       <Stack
@@ -36,14 +33,17 @@ const JumboNews: FC = () => {
           left: "5%",
         }}
       >
-        <Typography fontSize={ {sm: 30, md: 40, lg: 50}} sx={{ color: "white" }}>
-          {newsStory.title}
+        <Typography
+          fontSize={{ sm: 30, md: 40, lg: 50 }}
+          sx={{ color: "white" }}
+        >
+          {title}
         </Typography>
         <Typography variant="subtitle1" sx={{ color: "white" }}>
           Learn More
         </Typography>
         <Stack direction="row" spacing={1}>
-          {newsStory.tags.map((tag) => (
+          {tags.map((tag) => (
             <Chip label={tag} key={tag} />
           ))}
         </Stack>

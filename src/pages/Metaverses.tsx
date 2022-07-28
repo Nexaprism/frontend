@@ -19,8 +19,13 @@ import JumboNews from "../components/JumboNews";
 import MiniProductCard from "../components/MiniProductCard";
 import NewsCard from "../components/NewsCard";
 import ProductCard from "../components/ProductCard";
-import { setIsLoading } from "../store/app/appReducer";
-import { useAppDispatch } from "../store/hooks";
+import { selectIsLoading, setIsLoading } from "../store/app/appReducer";
+import {
+  useGetArticlesMainTag,
+  useGetLatestArticleByTag,
+} from "../store/article/hooks";
+import { Article } from "../store/article/types";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useGetProductsMainTag } from "../store/product/hooks";
 import { Product } from "../store/product/types";
 
@@ -29,15 +34,30 @@ const Metaverses: FC = () => {
   const [firstHalf, setFirstHalf] = useState<any>([]);
   const [products, setProducts] = useState<any[]>();
   const [newsItems, setNewsItems] = useState<any[]>();
+  const [reload, setReload] = useState<boolean>(true);
+  const [latestNews, setLatestNews] = useState<Article>({
+    id: "",
+    title: "",
+    author: "",
+    content: "",
+    mainTag: "",
+    tags: [""],
+    createdAt: "",
+    updatedAt: "",
+    imgUrl: "",
+  });
   const [enabledButton, setEnabledButton] = useState<boolean[]>([
     false,
     false,
     true,
   ]);
   const [prodList, setProdList] = useState<Product[]>([]);
+  const [artList, setArtList] = useState<Article[]>([]);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
   const metaverseProducts = useGetProductsMainTag("metaverse");
+  const metaverseArticles = useGetArticlesMainTag("metaverse");
+  const isLoading = useAppSelector(selectIsLoading);
 
   const buttonStyles = {
     "&:hover": { transform: "none" },
@@ -46,67 +66,16 @@ const Metaverses: FC = () => {
   const getProducts = async () => {
     dispatch(setIsLoading(true));
     return metaverseProducts;
-    // let productList: Product[] = [];
-    // const graphqlQuery = {
-    //   query: `
-    //   {
-    //     products {
-    //         products {
-    //             name
-    //             imgUrl
-    //             rating
-    //             mainTag
-    //             tags
-    //             createdAt
-    //             updatedAt
-    //         }
-    //     }
-    //   }
-    //     `,
-    // };
-    // fetch("http://localhost:3080/graphql", {
-    //   method: "POST",
-    //   headers: {
-    //     //Authorization: "Bearer " + token,
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(graphqlQuery),
-    // })
-    //   .then((res) => {
-    //     return res.json();
-    //   })
-    //   .then((resData) => {
-    //     if (resData.errors) {
-    //       console.log(resData);
-    //       throw new Error("Fetching products failed");
-    //     }
-    //     resData.data.products.products.map((product: any) => {
-    //       let newProd: Product = {
-    //         id: product._id,
-    //         company: product.company,
-    //         blockchain: product.blockchain,
-    //         marketCap: product.marketCap,
-    //         token: product.token,
-    //         description: product.description,
-    //         launchDate: product.launchDate,
-    //         imgUrl: product.imgUrl,
-    //         name: product.name,
-    //         createdAt: product.createdAt,
-    //         updatedAt: product.updatedAt,
-    //         governance: product.governance,
-    //         url: product.url,
-    //         developers: product.developers,
-    //         rating: product.rating,
-    //         mainTag: product.mainTag,
-    //         tags: product.tags,
-    //       };
-    //       productList.push(newProd);
-    //     });
-    //     setProdList(productList);
-    //     addItems(productList);
-    //     console.log(resData.data.products);
-    //   });
   };
+
+  const getArticles = async () => {
+    dispatch(setIsLoading(true));
+    return metaverseArticles;
+  };
+
+  // const getLatestArticle = async () => {
+  //   return latestMetaArticle;
+  // }
 
   const makeCarouselPage = (
     index: number,
@@ -120,12 +89,38 @@ const Metaverses: FC = () => {
       }
       page.push(
         <ProductCard
+          key={index}
           name={products[index].name}
           img={"http://localhost:3080/" + products[index].imgUrl}
           id={products[index].id}
           rating={products[index].rating}
           mainTag={products[index].mainTag}
           tags={products[index].tags}
+        />
+      );
+      index++;
+    }
+    return page;
+  };
+
+  const makeNewsCarouselPage = (
+    index: number,
+    articles: Article[],
+    pageSize: number
+  ) => {
+    let page: any[] = [];
+    for (let i = 0; i < pageSize; i++) {
+      if (index > articles.length - 1) {
+        break;
+      }
+      page.push(
+        <NewsCard
+          key={index}
+          title={articles[index].title}
+          image={"http://localhost:3080/" + articles[index].imgUrl}
+          id={articles[index].id}
+          content={articles[index].content}
+          date={articles[index].updatedAt}
         />
       );
       index++;
@@ -140,8 +135,6 @@ const Metaverses: FC = () => {
     let cardCount = 0;
     let carouselSize = matches ? 4 : 3;
     let carouselPageCount = matches ? 2 : 3;
-    console.log(products);
-
     for (let i = 0; i < carouselPageCount; i++) {
       page = makeCarouselPage(cardCount, products, carouselSize);
       productItems.push(
@@ -158,30 +151,38 @@ const Metaverses: FC = () => {
         </Stack>
       );
       cardCount += carouselSize;
-      if(cardCount > products.length) {break}
+      if (cardCount > products.length) {
+        break;
+      }
       page = [];
     }
     setProducts(productItems);
   };
 
-  const addNewsItems = () => {
-    const news: Array<any> = [];
-    for (let i = 0; i < 3; i++) {
-      news.push(
+  const addNewsItems = (allArticles: Article[]) => {
+    const articles = allArticles.slice(0, 11);
+    const articleItems: Array<any> = [];
+    let page: any[] = [];
+    let cardCount = 0;
+    let carouselSize = matches ? 4 : 3;
+    let carouselPageCount = matches ? 2 : 3;
+    for (let i = 0; i < carouselPageCount; i++) {
+      page = makeNewsCarouselPage(cardCount, articles, carouselSize);
+      articleItems.push(
         <Stack
+          key={i}
           direction="row"
           spacing={3}
           display="flex"
           justifyContent="center"
         >
-          <NewsCard image={""} content={""} title={""} date={""} id={""} />
-          <NewsCard image={""} content={""} title={""} date={""} id={""} />
-          <NewsCard image={""} content={""} title={""} date={""} id={""} />
-          <NewsCard image={""} content={""} title={""} date={""} id={""} />
+          {page.map((card) => {
+            return card;
+          })}
         </Stack>
       );
     }
-    setNewsItems(news);
+    setNewsItems(articleItems);
   };
 
   const separateTheItems = () => {
@@ -201,9 +202,15 @@ const Metaverses: FC = () => {
           color = "linear-gradient(to bottom, #cdcccf, #ababab)";
         }
         itemArray.push(
-          <Grid item xs={12} md={6} sx={{ background: color }}>
+          <Grid
+            key={product.name}
+            item
+            xs={12}
+            md={6}
+            sx={{ background: color }}
+          >
             <MiniProductCard
-              key={index}
+              id={product.id}
               name={product.name}
               rating={product.rating}
             />
@@ -224,9 +231,15 @@ const Metaverses: FC = () => {
             ? "linear-gradient(to right bottom, #7d7d7d, #4d4d4d)"
             : "linear-gradient(to bottom, #cdcccf, #ababab)";
         itemArray.push(
-          <Grid item xs={12} md={6} sx={{ background: color }}>
+          <Grid
+            key={product.name}
+            item
+            xs={12}
+            md={6}
+            sx={{ background: color }}
+          >
             <MiniProductCard
-              key={index}
+              id={product.id}
               name={product.name}
               rating={product.rating}
             />
@@ -246,17 +259,23 @@ const Metaverses: FC = () => {
   useEffect(() => {
     const getData = async () => {
       const metaProdData = await getProducts();
+      const metaArtData = await getArticles();
+      //const metaNewsArt = await getLatestArticle();
       setProdList(metaProdData.prodArray);
+      setArtList(metaArtData.returnedArticles);
+      setLatestNews(metaArtData.returnedArticles[0]);
       addItems(metaProdData.prodArray);
+      addNewsItems(metaArtData.returnedArticles);
+      //console.log(metaNewsArt);
+      separateTheItems();
+      dispatch(setIsLoading(false));
     };
     getData();
-    //getProducts();
-    separateTheItems();
-    //addItems();
-    addNewsItems();
-    dispatch(setIsLoading(false));
+    setTimeout(() => {
+      setReload(false);
+    }, 1500);
     console.log(matches);
-  }, [matches]);
+  }, [reload, matches]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", pt: 4 }}>
@@ -295,7 +314,13 @@ const Metaverses: FC = () => {
                 width: { sm: "100%", md: "100%", lg: "75%", xl: "75%" },
               }}
             >
-              <JumboNews />
+              <JumboNews
+                title={latestNews.title}
+                mainTag={latestNews.mainTag}
+                tags={latestNews.tags}
+                id={latestNews.id}
+                imgUrl={latestNews.imgUrl}
+              />
             </Box>
 
             <Box

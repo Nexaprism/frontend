@@ -96,7 +96,7 @@ const News: FC = () => {
   }));
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+
     addItems();
   });
 
@@ -105,7 +105,13 @@ const News: FC = () => {
       <Stack direction="column" spacing={3}>
         <Typography variant="h2">News</Typography>
         <Divider />
-        <JumboNews />
+        <JumboNews
+                title={""}
+                mainTag={""}
+                tags={[""]}
+                id={""}
+                imgUrl={""}
+              />
         <Typography variant="h3">Editor's Picks</Typography>
         <Stack direction="row" width="100%" sx={{ display: "flex" }}>
           <Stack

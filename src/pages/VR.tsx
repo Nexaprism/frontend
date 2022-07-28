@@ -129,7 +129,7 @@ const VR: FC = () => {
         }
         itemArray.push(
           <Grid item xs={12} md={6} sx={{ background: color }}>
-            <MiniProductCard key={item} name={"temp"} rating={79} />
+            <MiniProductCard id={""} key={item} name={"temp"} rating={79} />
           </Grid>
         );
         if (!row && countToTwo == 1) {
@@ -148,7 +148,7 @@ const VR: FC = () => {
             : "linear-gradient(to bottom, #cdcccf, #ababab)";
         itemArray.push(
           <Grid item xs={12} md={6} sx={{ background: color }}>
-            <MiniProductCard key={item} name={"temp"} rating={79} />
+            <MiniProductCard id={""} key={item} name={"temp"} rating={79} />
           </Grid>
         );
       });
@@ -205,7 +205,13 @@ const VR: FC = () => {
                 width: { sm: "100%", md: "100%", lg: "75%", xl: "75%" },
               }}
             >
-              <JumboNews />
+              <JumboNews
+                title={""}
+                mainTag={""}
+                tags={[""]}
+                id={""}
+                imgUrl={""}
+              />
             </Box>
 
             <Box

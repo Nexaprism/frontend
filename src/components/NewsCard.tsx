@@ -12,13 +12,6 @@ import { FC } from "react";
 import { Link } from "react-router-dom";
 import mainLogo from "../assets/img/nexaprismLogoSmall.png";
 
-const newsStory = {
-  title: "Decentraland breaks $1 billion USD",
-  content:
-    "Decentraland's main currency, MANA, recently broke a major milestone this Tuesday. The burgeoning metaverse's token just surpassed a market cap of $1 billion USD valuation.",
-  date: "04/27/2021",
-  author: "Josh Kroslowitz",
-};
 
 const NewsCard: FC<{
   image: string;

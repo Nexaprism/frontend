@@ -194,7 +194,13 @@ const Home: FC = () => {
               width: { sm: "100%", md: "100%", lg: "75%", xl: "75%" },
             }}
           >
-            <JumboNews />
+            <JumboNews
+                title={""}
+                mainTag={""}
+                tags={[""]}
+                id={""}
+                imgUrl={""}
+              />
           </Box>
 
           <Box

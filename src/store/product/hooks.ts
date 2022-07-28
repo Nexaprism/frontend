@@ -57,6 +57,7 @@ export const useGetProductsMainTag = async (tag?: string) => {
           {
             getProductsMainTag(tag: "${tag}") {
                 products {
+                    _id
                     name
                     description
                     developers
@@ -92,7 +93,26 @@ export const useGetProductsMainTag = async (tag?: string) => {
         console.log(resData);
         throw new Error("Fetching products failed");
       }
-      prodArray = resData.data.getProductsMainTag.products;
+      resData.data.getProductsMainTag.products.map((p: any) => {
+        let newProd: any = {
+            id: p._id,
+            name: p.name,
+            mainTag: p.mainTag,
+            tags: p.tags,
+            governance: p.governance,
+            blockchain: p.blockchain,
+            description: p.description,
+            marketCap: p.marketCap,
+            imgUrl: p.imgUrl,
+            url: p.url,
+            rating: p.rating,
+            company: p.company,
+            token: p.token,
+            launchDate: p.launchDate,
+            develoeprs: p.developers
+        }
+        prodArray.push(newProd);
+      });
       prodNum = resData.data.getProductsMainTag.totalProducts;
     });
   return {prodArray, prodNum}

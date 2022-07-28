@@ -235,7 +235,6 @@ const Profile: FC = () => {
       setUser(data.user);
       setCreationDate(data.createdAt);
       console.log(data)
-      setIsLoading(false);
     };
     getData();
     addReviews();

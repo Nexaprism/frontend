@@ -1,24 +1,31 @@
-import { Box, Stack, Typography } from '@mui/material';
-import {FC} from 'react';
-import RatingSmall from './RatingSmall';
+import { Box, Stack, Typography } from "@mui/material";
+import { FC } from "react";
+import { Link } from "react-router-dom";
+import RatingSmall from "./RatingSmall";
 
-const product = {
-    title: "Decentraland",
-    mainTag: "metaverse",
-    tags: ["web3", "crypto", "VR", "game", "DAO", "decentralized"],
-    rating: 84,
-    ratingQuantity: 127,
+const MiniProductCard: FC<{ name: string; rating: number; id: string }> = ({
+  name,
+  rating,
+  id,
+}) => {
+  const containerStyles = {
+    display: "flex",
+    alignItems: "center",
+    color: "black",
+    textDecoration: "none",
   };
-
-const MiniProductCard: FC<{name: string, rating: number}> = ({name, rating }) => {
-
-    return (
-        <Stack direction="row" width="auto" sx={{display: 'flex', alignItems: 'center'}}>
-            <RatingSmall value={rating} />
-            <Typography>{name}</Typography>
-            <Typography>Reviews: {product.ratingQuantity}</Typography>
-        </Stack>
-    )
-}
+  return (
+    <Stack
+      component={Link}
+      to={"/product/" + id}
+      direction="row"
+      width="auto"
+      sx={containerStyles}
+    >
+      <RatingSmall value={rating} />
+      <Typography>{name}</Typography>
+    </Stack>
+  );
+};
 
 export default MiniProductCard;
