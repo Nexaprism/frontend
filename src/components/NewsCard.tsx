@@ -20,6 +20,18 @@ const NewsCard: FC<{
   date: string;
   id: string;
 }> = ({ image, title, content, date, id }) => {
+  const findDate = () => {
+
+      const userDate = new Date(date);
+      const year = userDate.getFullYear();
+      const month = userDate.getMonth() + 1;
+      const day = userDate.getDate();
+      const convertedDate =
+        month.toString() + "/" + day.toString() + "/" + year.toString();
+      return convertedDate;
+
+  };
+
   return (
     <Card sx={{ maxWidth: 345, maxHeight: 500, minWidth: 190, textDecoration: "none" }}
     component={Link}
@@ -58,7 +70,7 @@ const NewsCard: FC<{
         </Box>
         <Box sx={{ height: { sm: 10, md: 15, lg: 20 } }}>
           <Typography variant="caption" color="text.secondary">
-            {date}
+            {findDate()}
           </Typography>
         </Box>
       </CardContent>

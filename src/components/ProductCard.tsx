@@ -66,7 +66,7 @@ function ProductCard(props: {
                   backgroundColor: "black",
                 }}
               >
-                <Typography sx={{pt: 3}}fontSize={{ sm: 18, md: 22, lg: 25 }} color="white">
+                <Typography sx={{pt: 3}}fontSize={{ sm: "0.75em", md: "1.1em", lg: "1.25em" }} color="white">
                   {props.name}
                 </Typography>
               </Box>
@@ -84,11 +84,11 @@ function ProductCard(props: {
           >
             <RatingSmall value={props.rating} />
             <Box
-              overflow="hidden"
+
               sx={{ display: { sm: "none", md: "block" } }}
             >
-              {props.tags.slice(0, 4).map((tag) => (
-                <Chip label={tag} key={tag} sx={{ height: 15, m: 0.15 }} />
+              {props.tags.slice(0, 3).map((tag) => (
+                <Chip label={tag} key={tag} sx={{ height: 15, m: 0 }} />
               ))}
             </Box>
           </Stack>

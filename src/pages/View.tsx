@@ -1,4 +1,3 @@
-import { jsx } from "@emotion/react";
 import {
   Box,
   Button,
@@ -11,9 +10,9 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { FC, JSXElementConstructor, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
-import { JsxElement } from "typescript";
+import { useParams } from "react-router-dom";
 import Glance from "../components/Glance";
 import JumboNews from "../components/JumboNews";
 import MiniProductCard from "../components/MiniProductCard";
@@ -28,9 +27,13 @@ import { Article } from "../store/article/types";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useGetProductsMainTag } from "../store/product/hooks";
 import { Product } from "../store/product/types";
+import { metaverseDescription, arDescription, vrDescription } from "../store/app/constants";
 
 const Metaverses: FC = () => {
   const dispatch = useAppDispatch();
+  const { category } = useParams();
+  const [pageDescription, setPageDescription] = useState<string>("");
+  const [pageTitle, setPageTitle] = useState<string>("");
   const [firstHalf, setFirstHalf] = useState<any>([]);
   const [products, setProducts] = useState<any[]>();
   const [newsItems, setNewsItems] = useState<any[]>();
@@ -51,12 +54,10 @@ const Metaverses: FC = () => {
     false,
     true,
   ]);
-  const [prodList, setProdList] = useState<Product[]>([]);
-  const [artList, setArtList] = useState<Article[]>([]);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
-  const metaverseProducts = useGetProductsMainTag("metaverse");
-  const metaverseArticles = useGetArticlesMainTag("metaverse");
+  const metaverseProducts = useGetProductsMainTag(category);
+  const metaverseArticles = useGetArticlesMainTag(category);
   const isLoading = useAppSelector(selectIsLoading);
 
   const buttonStyles = {
@@ -185,13 +186,13 @@ const Metaverses: FC = () => {
     setNewsItems(articleItems);
   };
 
-  const separateTheItems = () => {
+  const separateTheItems = (products: Product[]) => {
     let itemArray: any = [];
     let color = "white";
     if (matches) {
       let row = false;
       let countToTwo = 0;
-      prodList.map((product, index) => {
+      products.map((product, index) => {
         if (countToTwo == 0 && !row) {
           color = "linear-gradient(to bottom, #cdcccf, #ababab)";
         } else if (countToTwo == 1 && !row) {
@@ -225,7 +226,7 @@ const Metaverses: FC = () => {
         countToTwo = countToTwo > 1 ? 0 : countToTwo;
       });
     } else {
-      prodList.map((product, index) => {
+      products.map((product, index) => {
         color =
           index % 2
             ? "linear-gradient(to right bottom, #7d7d7d, #4d4d4d)"
@@ -261,21 +262,29 @@ const Metaverses: FC = () => {
       const metaProdData = await getProducts();
       const metaArtData = await getArticles();
       //const metaNewsArt = await getLatestArticle();
-      setProdList(metaProdData.prodArray);
-      setArtList(metaArtData.returnedArticles);
       setLatestNews(metaArtData.returnedArticles[0]);
       addItems(metaProdData.prodArray);
       addNewsItems(metaArtData.returnedArticles);
       //console.log(metaNewsArt);
-      separateTheItems();
+      separateTheItems(metaProdData.prodArray);
       dispatch(setIsLoading(false));
+      console.log(metaProdData)
     };
     getData();
+    if(category == "AR") {
+      setPageTitle("Augmented Reality (AR)");
+      setPageDescription(arDescription);
+    } else if (category == "VR") {
+      setPageTitle("Virtual Reality (VR)");
+      setPageDescription(vrDescription);
+    } else {
+      setPageTitle("The Metaverse");
+      setPageDescription(metaverseDescription);
+    }
     setTimeout(() => {
       setReload(false);
     }, 1500);
-    console.log(matches);
-  }, [reload, matches]);
+  }, [reload, matches, category]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", pt: 4 }}>
@@ -286,17 +295,11 @@ const Metaverses: FC = () => {
       >
         <Box>
           <Box>
-            <Typography variant="h2">The Metaverse</Typography>
+            <Typography variant="h2">{pageTitle}</Typography>
           </Box>
           <Box sx={{ pb: 2 }}>
             <Typography>
-              The metaverse is a catch-all phrase for just about anything
-              related to nascent technology and how we plan to interact with it.
-              Is it VR? Is it AR? Is it web3? Is it all of those? For now the
-              definition of the metaverse remains foggy, but ultimately it will
-              be up to us to decide what it is and isn't and starts when we get
-              together and make more content. What better place to consider all
-              that than right here, at the nexaprism.
+              {pageDescription}
             </Typography>
           </Box>
           <Divider sx={{ mb: 2 }} />
@@ -329,7 +332,7 @@ const Metaverses: FC = () => {
                 width: "25%",
               }}
             >
-              <Glance />
+              <Glance createdAt={latestNews.createdAt} content={latestNews.content}/>
             </Box>
           </Stack>
         </Box>

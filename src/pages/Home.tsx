@@ -1,9 +1,22 @@
-import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Skeleton,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
 import Glance from "../components/Glance";
 import JumboNews from "../components/JumboNews";
+import NewsCard from "../components/NewsCard";
 import ProductCard from "../components/ProductCard";
+import { selectIsLoading, setIsLoading } from "../store/app/appReducer";
+import { useGetArticlesMostRecent } from "../store/article/hooks";
+import { Article } from "../store/article/types";
+import { useAppSelector } from "../store/hooks";
+import { useGetProductsMostRecent } from "../store/product/hooks";
 import { Product } from "../store/product/types";
 
 /**
@@ -23,8 +36,30 @@ const Home: FC = () => {
   const [big, setBig] = useState<any[]>();
   const [small, setSmall] = useState<any[]>();
   const [prodList, setProdList] = useState<any[]>([]);
+  const [mostRecentProd, setMostRecentProd] = useState<any[]>([]);
+  const [mostRecentCards, setMostRecentCards] = useState<any>([]);
+  const [artList, setArtList] = useState<any[]>([
+    {
+      title: "",
+      tags: [""],
+      mainTag: "",
+      imgUrl: "",
+    },
+  ]);
+  const [newsItems, setNewsItems] = useState<any[]>();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
+  const mostRecentArticles = useGetArticlesMostRecent();
+  const recentProducts = useGetProductsMostRecent();
+  const isLoading = useAppSelector(selectIsLoading);
+
+  const getArticles = async () => {
+    return mostRecentArticles;
+  };
+
+  const getMostRecentProd = async () => {
+    return recentProducts;
+  }
 
   const getProducts = async () => {
     let productList: Product[] = [];
@@ -69,15 +104,70 @@ const Home: FC = () => {
             id: product._id,
             rating: product.rating,
             mainTag: product.mainTag,
-            tags: product.tags
+            tags: product.tags,
           };
           productList.push(newProd);
         });
         setProdList(productList);
         addItems(productList);
-
       });
   };
+
+  const makeCarouselPage = (
+    index: number,
+    products: Product[],
+    pageSize: number
+  ) => {
+    let page: any[] = [];
+    for (let i = 0; i < pageSize; i++) {
+      if (index > products.length - 1) {
+        break;
+      }
+      page.push(
+        <ProductCard
+          key={index}
+          name={products[index].name}
+          img={"http://localhost:3080/" + products[index].imgUrl}
+          id={products[index].id}
+          rating={products[index].rating}
+          mainTag={products[index].mainTag}
+          tags={products[index].tags}
+        />
+      );
+      index++;
+    }
+    return page;
+  };
+
+  const addMostRecentItems = (products: Product[]) => {
+    const productItems: Array<any> = [];
+    let page: any[] = [];
+    let cardCount = 0;
+    let carouselSize = matches ? 4 : 3;
+    let carouselPageCount = matches ? 2 : 3;
+    for (let i = 0; i < carouselPageCount; i++) {
+      page = makeCarouselPage(cardCount, products, carouselSize);
+      productItems.push(
+        <Stack
+          key={i}
+          direction="row"
+          spacing={3}
+          display="flex"
+          justifyContent="center"
+        >
+          {page.map((card) => {
+            return card;
+          })}
+        </Stack>
+      );
+      cardCount += carouselSize;
+      if (cardCount > products.length) {
+        break;
+      }
+      page = [];
+    }
+    setMostRecentCards(productItems);
+  }
 
   const addItems = (products: Product[]) => {
     const lessItems: Array<any> = [];
@@ -167,8 +257,72 @@ const Home: FC = () => {
     setBig(moreItems);
   };
 
+  const addNewsItems = (allArticles: Article[]) => {
+    const articles = allArticles.slice(0, 11);
+    const articleItems: Array<any> = [];
+    let page: any[] = [];
+    let cardCount = 0;
+    let carouselSize = matches ? 4 : 3;
+    let carouselPageCount = matches ? 2 : 3;
+    for (let i = 0; i < carouselPageCount; i++) {
+      page = makeNewsCarouselPage(cardCount, articles, carouselSize);
+      articleItems.push(
+        <Stack
+          key={i}
+          direction="row"
+          spacing={3}
+          display="flex"
+          justifyContent="center"
+        >
+          {page.map((card) => {
+            return card;
+          })}
+        </Stack>
+      );
+    }
+    setNewsItems(articleItems);
+  };
+
+  const makeNewsCarouselPage = (
+    index: number,
+    articles: Article[],
+    pageSize: number
+  ) => {
+    let page: any[] = [];
+    for (let i = 0; i < pageSize; i++) {
+      if (index > articles.length - 1) {
+        break;
+      }
+      page.push(
+        <NewsCard
+          key={index}
+          title={articles[index].title}
+          image={"http://localhost:3080/" + articles[index].imgUrl}
+          id={articles[index].id}
+          content={articles[index].content}
+          date={articles[index].updatedAt}
+        />
+      );
+      index++;
+    }
+    return page;
+  };
+
   useEffect(() => {
+    setIsLoading(true);
+    const getData = async () => {
+      const articleData = await getArticles();
+      const recentProductsData = await getMostRecentProd();
+      setArtList(articleData.returnedArticles);
+      setMostRecentProd(recentProductsData.prodArray);
+      const latestNewsArticles = articleData.returnedArticles.slice(1, 12);
+      addNewsItems(latestNewsArticles);
+      addMostRecentItems(recentProductsData.prodArray);
+      console.log(articleData.returnedArticles);
+    };
+    getData();
     getProducts();
+    setIsLoading(false);
   }, [matches]);
 
   return (
@@ -195,12 +349,12 @@ const Home: FC = () => {
             }}
           >
             <JumboNews
-                title={""}
-                mainTag={""}
-                tags={[""]}
-                id={""}
-                imgUrl={""}
-              />
+              title={artList[0].title}
+              mainTag={artList[0].mainTag}
+              tags={artList[0].tags}
+              id={artList[0].id}
+              imgUrl={artList[0].imgUrl}
+            />
           </Box>
 
           <Box
@@ -209,7 +363,10 @@ const Home: FC = () => {
               width: "25%",
             }}
           >
-            <Glance />
+            <Glance
+              createdAt={artList[0].createdAt}
+              content={artList[0].content}
+            />
           </Box>
         </Stack>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -222,7 +379,7 @@ const Home: FC = () => {
             animation="slide"
             navButtonsAlwaysVisible={true}
           >
-            {big}
+            {mostRecentCards}
           </Carousel>
         </Box>
         <Typography variant="h3">Most Popular</Typography>
@@ -251,9 +408,9 @@ const Home: FC = () => {
           </Carousel>
         </Box>
         <Typography variant="h3">Latest News</Typography>
-        <Box sx={{ backgroundColor: "orange", height: "200px", width: "auto" }}>
-          Latest News articles
-        </Box>
+        <Carousel sx={{ width: "100%" }} index={4} animation="slide">
+          {newsItems}
+        </Carousel>
       </Stack>
     </Box>
   );

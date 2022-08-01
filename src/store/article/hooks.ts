@@ -2,19 +2,25 @@ import { Article } from "./types";
 
 export const useArticleQuery = async (id?: string) => {
     let returnedArticle;
+    let createdDate;
+    let updatedDate;
     const graphqlQuery = {
       query: `
         {
           article(id: "${id}") {
-            _id
+            article {
+                _id
             title
             author
             content
             imgUrl
             mainTag
             tags
-            updatedAt
+            }
+            createdAt
+          updatedAt
           }
+          
         }
       `,
     };
@@ -33,9 +39,11 @@ export const useArticleQuery = async (id?: string) => {
           console.log(resData);
           throw new Error("Fetching article failed");
         }
-        returnedArticle = resData.data.article;
+        returnedArticle = resData.data.article.article;
+        createdDate = resData.data.article.createdAt;
+        updatedDate = resData.data.article.updatedAt;
       });
-    return returnedArticle;
+    return {returnedArticle, createdDate, updatedDate};
   }
 
   export const useGetAllArticlesQuery = async () => {
@@ -182,4 +190,59 @@ export const useArticleQuery = async (id?: string) => {
           returnedArticle = resData.data.getLatestArticleByTag;
         });
       return returnedArticle;
+  }
+
+  export const useGetArticlesMostRecent = async () => {
+    let returnedArticles: Article[] = [];
+    let totArticles: number = 0;
+    const graphqlQuery = {
+        query: `
+          {
+            getArticlesMostRecent {
+              articles {
+              _id
+              title
+              author
+              content
+              imgUrl
+              mainTag
+              tags
+              updatedAt
+              }
+              totalArticles
+            }
+          }
+        `,
+      };
+      await fetch("http://localhost:3080/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((resData) => {
+          if (resData.errors) {
+            console.log(resData);
+            throw new Error("Fetching articles failed");
+          }
+          resData.data.getArticlesMostRecent.articles.map((a: any) => {
+            let newArt: any = {
+                id: a._id,
+                title: a.title,
+                author: a.author,
+                content: a.content,
+                mainTag: a.mainTag,
+                tags: a.tags,
+                updatedAt: a.updatedAt,
+                imgUrl: a.imgUrl,
+            }
+            returnedArticles.push(newArt);
+          });
+          totArticles = resData.data.getArticlesMostRecent.totalArticles;
+        });
+        return {returnedArticles, totArticles};
   }

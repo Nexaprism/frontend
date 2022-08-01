@@ -12,9 +12,7 @@ import lightTheme from './theme/lightTheme';
 import darkTheme from './theme/darkTheme';
 import Footer from './components/Footer';
 import Product from './pages/Product';
-import Metaverses from './pages/Metaverses';
-import VR from './pages/VR';
-import AR from './pages/AR';
+import View from './pages/View';
 import Crypto from './pages/Crypto';
 import Shop from './pages/Shop';
 import News from './pages/News';
@@ -44,9 +42,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path='/product/:id' element={<Product />} />
-          <Route path="/metaverses" element={<Metaverses />} />
-          <Route path="/vr" element={<VR />} />
-          <Route path="/ar" element={<AR />} />
+          <Route path="/view/:category" element={<View />} />
           <Route path="/news" element={<News />} />
           <Route path="/crypto" element={<Crypto />} />
           <Route path="/shop" element={<Shop />} />

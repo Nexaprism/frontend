@@ -30,3 +30,9 @@ form {
 #noMask {
   mask: initial;
 }
+
+.jumboNewsMask {
+  mask-image: linear-gradient(90deg, #000 30%, transparent);
+  -webkit-mask-image: -webkit-linear-gradient(90deg, #000 30%, transparent);
+  width: 100%
+}

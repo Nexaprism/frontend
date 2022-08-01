@@ -7,20 +7,10 @@ import { Article } from "../store/article/types";
 import { useAppDispatch } from "../store/hooks";
 import { setIsLoading } from "../store/app/appReducer";
 
-const newsStory = {
-  title: "Decentraland breaks $1 billion USD",
-  content:
-    "Decentraland's main currency, MANA, recently broke a major milestone this Tuesday. The burgeoning metaverse's token just surpassed a market cap of $1 billion USD valuation.",
-  date: "04/27/2021",
-  author: "Josh Kroslowitz",
-  mainTag: "metaverse",
-  tags: ["VR", "game", "web3"],
-};
 
 const ArticlePage: FC = () => {
   const dispatch = useAppDispatch();
   const { id } = useParams();
-  console.log(id);
   const articleData = useArticleQuery(id);
   const [creationDate, setCreationDate] = useState<string | undefined>("");
   const [article, setArticle] = useState<Article | undefined>({
@@ -40,27 +30,28 @@ const ArticlePage: FC = () => {
     return articleData;
   };
 
-  const findDate = () => {
+  const findDate = (article: any) => {
     if (article) {
-      const userDate = new Date(article.updatedAt);
+      const userDate = new Date(article);
       const year = userDate.getFullYear();
       const month = userDate.getMonth() + 1;
       const day = userDate.getDate();
-      const convertedDate =
+      const result =
         month.toString() + "/" + day.toString() + "/" + year.toString();
-      return convertedDate;
+      return result;
     }
   };
 
   useEffect(() => {
     window.scrollTo(0, 0)
     const getData = async () => {
-      const data: Article | undefined = await getArticle();
-      setArticle(data);
+      const data = await getArticle();
+      setArticle(data.returnedArticle);
+      const date = findDate(data.createdDate);
+      setCreationDate(date);
     };
     getData();
-    const date = findDate();
-    setCreationDate(date);
+    
     setIsLoading(false);
   }, []);
 

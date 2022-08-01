@@ -1,7 +1,6 @@
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import { FC } from "react";
 import { Link } from "react-router-dom";
-import image from "../assets/img/largeImage.jpeg";
 
 const JumboNews: FC<{
   title: string;
@@ -9,7 +8,7 @@ const JumboNews: FC<{
   tags: string[];
   imgUrl: string;
   id: string;
-}> = ({title, mainTag, tags, imgUrl, id}) => {
+}> = ({ title, mainTag, tags, imgUrl, id }) => {
   return (
     <Box
       component={Link}
@@ -25,29 +24,43 @@ const JumboNews: FC<{
         boxShadow: 6,
       }}
     >
-      <Stack
-        direction="column"
+      <Box
+        className="jumboNewsMask"
         sx={{
+          backgroundColor: "black",
+          width: "100%",
+          height: "15rem",
           position: "absolute",
-          top: { xs: "50%", sm: "50%", md: "60%" },
-          left: "5%",
+          bottom: 0,
+          borderBottomLeftRadius: 20,
+          borderBottomRightRadius: 20,
         }}
       >
-        <Typography
-          fontSize={{ sm: 30, md: 40, lg: 50 }}
-          sx={{ color: "white" }}
+        <Stack
+          direction="column"
+          sx={{
+            position: "absolute",
+            top: { xs: "40%", sm: "45%", md: "35%" },
+            left: "5%",
+          }}
         >
-          {title}
-        </Typography>
-        <Typography variant="subtitle1" sx={{ color: "white" }}>
-          Learn More
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          {tags.map((tag) => (
-            <Chip label={tag} key={tag} />
-          ))}
+          <Typography
+            fontSize={{ sm: 30, md: 40, lg: 50 }}
+            sx={{ color: "white" }}
+          >
+            {title}
+          </Typography>
+
+          <Typography variant="subtitle1" sx={{ color: "white" }}>
+            Learn More
+          </Typography>
+          <Stack direction="row" spacing={1}>
+            {tags.map((tag) => (
+              <Chip label={tag} key={tag} />
+            ))}
+          </Stack>
         </Stack>
-      </Stack>
+      </Box>
     </Box>
   );
 };

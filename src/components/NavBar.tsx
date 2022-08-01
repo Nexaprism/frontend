@@ -136,7 +136,14 @@ const NavBar: FC = () => {
     navigate("/");
   };
 
-  const pages = ["metaverses", "ar", "vr", "news", "crypto", "shop"];
+  const pages = [
+    {link: "view/metaverse", name: "metaverses"},
+    {link: "view/AR", name: "ar"},
+    {link: "view/VR", name: "vr"},
+    {link: "news", name: "news"},
+    {link: "crypto", name: "crypto"},
+    {link: "shop", name: "shop"}
+  ];
 
   return (
     <AppBar position="static">
@@ -193,8 +200,8 @@ const NavBar: FC = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} component={Link} to={"/" + page}>
-                  <Typography textAlign="center">{page}</Typography>
+                <MenuItem key={page.name} component={Link} to={"/" + page.link}>
+                  <Typography textAlign="center">{page.name}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -242,9 +249,9 @@ const NavBar: FC = () => {
           >
             {pages.map((page) => (
               <Button
-                key={page}
+                key={page.name}
                 component={Link}
-                to={"/" + page}
+                to={"/" + page.link}
                 sx={{
                   my: 2,
                   color: "white",
@@ -252,7 +259,7 @@ const NavBar: FC = () => {
                   justifyContent: "center",
                 }}
               >
-                {page}
+                {page.name}
               </Button>
             ))}
           </Box>

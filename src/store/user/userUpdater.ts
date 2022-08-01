@@ -21,6 +21,7 @@ const UserUpdater: FC = (): null => {
       if(avatar) {
         dispatch(setAvatar(avatar));
       }
+      
       dispatch(setEmail(email));
       dispatch(setUsername(username));
     } else {
