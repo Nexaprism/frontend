@@ -21,12 +21,15 @@ import LogIn from './pages/LogIn';
 import Article from './pages/Article';
 import Profile from './pages/Profile';
 import UserUpdater from './store/user/userUpdater';
+import ProductUpdater from './store/product/productUpdater';
+import SearchResults from './pages/SearchResults';
 
 const Updaters = () => {
  
   return (
     <>
       <UserUpdater />
+      <ProductUpdater />
     </>
   )
 }
@@ -44,12 +47,11 @@ function App() {
           <Route path='/product/:id' element={<Product />} />
           <Route path="/view/:category" element={<View />} />
           <Route path="/news" element={<News />} />
-          <Route path="/crypto" element={<Crypto />} />
-          <Route path="/shop" element={<Shop />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<LogIn />} />
           <Route path="/article/:id" element={<Article />} />
           <Route path="/account" element={<Profile /> } />
+          <Route path="/search/:tags" element={<SearchResults />} />
         </Routes>
       </Box>
       <Footer />

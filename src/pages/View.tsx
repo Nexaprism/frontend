@@ -268,7 +268,6 @@ const Metaverses: FC = () => {
       //console.log(metaNewsArt);
       separateTheItems(metaProdData.prodArray);
       dispatch(setIsLoading(false));
-      console.log(metaProdData)
     };
     getData();
     if(category == "AR") {

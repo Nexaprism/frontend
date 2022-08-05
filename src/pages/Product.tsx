@@ -2,6 +2,7 @@ import {
   alpha,
   Box,
   Button,
+  Chip,
   Grid,
   Input,
   Slider,
@@ -195,10 +196,7 @@ const ProductPage: FC = () => {
           console.log(resData);
           throw new Error("Review creation failed");
         }
-        //passed errors, set states & dispatching logic here
-        console.log(resData);
-        //@dev TO DO:
-        //reroute user to the page they are currently on to refresh it
+
       })
       .catch((err) => {
         console.log(err);
@@ -207,7 +205,6 @@ const ProductPage: FC = () => {
 
   const addItems = (articles: Article[]) => {
     const newsItems: Array<any> = [];
-    console.log(articles)
     for (let i = 0; i < 3; i++) {
       newsItems.push(
         <Stack direction="row" spacing={3} key={i}>
@@ -252,7 +249,7 @@ const ProductPage: FC = () => {
       const artData: Article[] | undefined = await getArticles();
       setProduct(data);
       addItems(artData);
-      console.log(artData);
+
     };
     getData();
     dispatch(setIsLoading(false));
@@ -263,6 +260,7 @@ const ProductPage: FC = () => {
       <Box
         id="jumbo"
         sx={{
+          zIndex: -1,
           width: "100%",
           height: {
             xl: "50vh",
@@ -299,13 +297,15 @@ const ProductPage: FC = () => {
             sx={{
               width: "75%",
               color: "white",
-              fontSize: { lg: "6.5em", sm: "6.5em", xs: "5em" },
+              fontSize: { lg: "6.5em", sm: "6em", xs: "5em" },
               pl: 4,
             }}
           >
             {product == undefined ? "temp" : product.name}
           </Typography>
+          
         </Box>
+        
 
         <Box
           sx={{
@@ -324,6 +324,9 @@ const ProductPage: FC = () => {
         </Box>
       </Box>
       {/* description */}
+      <Box position="relative" sx={{top: { lg: -100 }, bottom: {md: 300, sm: 300, xs: 300} }}>
+          {product == undefined ? "" : product.tags.map((t) => <Chip sx={{m: 1, zIndex: 12}} label={t} key={t}/>)}
+        </Box>
       <Stack direction="column" sx={{ display: "flex", alignItems: "center" }}>
         <Box sx={{ width: { xl: 1500, lg: 1200, md: 900, sm: 600 } }}>
           <Stack

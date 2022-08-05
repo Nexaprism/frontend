@@ -1,22 +1,24 @@
 import {
   AppBar,
+  Autocomplete,
   Avatar,
   Box,
   Button,
   Container,
   IconButton,
-  InputBase,
   Menu,
   MenuItem,
+  Paper,
+  Switch,
+  TextField,
   Toolbar,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import BedtimeIcon from "@mui/icons-material/Bedtime";
-import SearchIcon from "@mui/icons-material/Search";
 import { Link, useNavigate } from "react-router-dom";
 import { selectTheme, setTheme } from "../store/theme/themeReducer";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
@@ -31,6 +33,7 @@ import {
   setUsername,
 } from "../store/user/userReducer";
 import { selectIsLoggedIn, setIsLoggedIn } from "../store/app/appReducer";
+import { selectAllTags, selectProducts } from "../store/product/productReducer";
 
 /**
  *
@@ -42,7 +45,13 @@ import { selectIsLoggedIn, setIsLoggedIn } from "../store/app/appReducer";
 const NavBar: FC = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [options, setOptions] = useState<any[]>([]);
+  const [value, setValue] = useState();
+  const [inputValue, setInputValue] = useState<string>();
+  const [searchBy, setSearchBy] = useState<boolean>(false);
+  const searchTags = useAppSelector(selectAllTags);
   const themeFromStore = useAppSelector(selectTheme);
+  const searchProducts = useAppSelector(selectProducts);
   const themeObj = useTheme();
   const dispatch = useAppDispatch();
   const avatar = useAppSelector(selectAvatar);
@@ -57,47 +66,6 @@ const NavBar: FC = () => {
     },
   }));
 
-  const Search = styled("div")(({ theme }) => ({
-    position: "relative",
-    marginLeft: 1,
-    width: "100%",
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    "&:hover": {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    [theme.breakpoints.up("sm")]: {
-      marginLeft: theme.spacing(1),
-      width: "auto",
-    },
-  }));
-
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: "inherit",
-    "& .MuiInputBase-input": {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create("width"),
-      width: "100%",
-      [theme.breakpoints.up("sm")]: {
-        width: "12ch",
-        "&:focus": {
-          width: "20ch",
-        },
-      },
-    },
-  }));
-
-  const SearchIconWrapper = styled("div")(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: "100%",
-    position: "absolute",
-    pointerEvents: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  }));
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -114,9 +82,9 @@ const NavBar: FC = () => {
     setAnchorElUser(null);
   };
 
-  const handleButtonClick = () => {
-    setAnchorElNav(null);
-  };
+  const handleSwitchChange = () => {
+    setSearchBy(!searchBy);
+  }
 
   const handleThemeClick = () => {
     if (themeFromStore == "light") {
@@ -137,13 +105,19 @@ const NavBar: FC = () => {
   };
 
   const pages = [
-    {link: "view/metaverse", name: "metaverses"},
-    {link: "view/AR", name: "ar"},
-    {link: "view/VR", name: "vr"},
-    {link: "news", name: "news"},
-    {link: "crypto", name: "crypto"},
-    {link: "shop", name: "shop"}
+    { link: "view/metaverse", name: "metaverses" },
+    { link: "view/AR", name: "ar" },
+    { link: "view/VR", name: "vr" },
+    { link: "news", name: "news" },
   ];
+
+  useEffect(() => {
+    let productNames: string[] = [];
+    searchProducts.map((p) => {
+      productNames.push(p.name);
+    })
+    setOptions(productNames);
+  }, []);
 
   return (
     <AppBar position="static">
@@ -232,15 +206,53 @@ const NavBar: FC = () => {
             nexaprism
           </Typography>
           <Box sx={{ display: { xs: "none", md: "flex" }, pr: 2 }}>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Search>
+
+            <Box sx={{ display: "flex", alignItems: "center", pr: 2 }}>
+              <Typography>Tag</Typography>
+              <Switch size="small" onChange={handleSwitchChange} />
+              <Typography>Name</Typography>
+            </Box>
+
+            <Autocomplete
+              options={searchBy ? options : searchTags}
+              value={value}
+              getOptionLabel={(option: string) => option}
+              onChange={(event, newValue) => {
+                if (newValue) {
+                  navigate("/search/" + newValue);
+                }
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  SelectProps={{ ...params, style: { ...{ color: "white" } } }}
+                  InputLabelProps={{
+                    ...params.InputLabelProps,
+                    style: { ...{ color: "white" } },
+                  }}
+                  InputProps={{
+                    ...params.InputProps,
+                    style: { ...{ color: "white" } },
+                    disableUnderline: true,
+                  }}
+                  sx={{
+                    width: "12em",
+                    height: "1em",
+                    borderRadius: 2,
+                    pb: 7,
+                    backgroundColor: alpha(themeObj.palette.common.white, 0.15),
+                    "&:hover": {
+                      backgroundColor: alpha(
+                        themeObj.palette.common.white,
+                        0.25
+                      ),
+                    },
+                  }}
+                  label={searchBy ? "Search by name" : "Search by tag"}
+                  variant="filled"
+                />
+              )}
+            />
           </Box>
 
           <Box

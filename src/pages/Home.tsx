@@ -48,7 +48,7 @@ const Home: FC = () => {
   ]);
   const [newsItems, setNewsItems] = useState<any[]>();
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up("sm"));
+  const matches = useMediaQuery(theme.breakpoints.up("md"));
   const mostRecentArticles = useGetArticlesMostRecent();
   const recentProducts = useGetProductsMostRecent();
   const isLoading = useAppSelector(selectIsLoading);
@@ -318,7 +318,6 @@ const Home: FC = () => {
       const latestNewsArticles = articleData.returnedArticles.slice(1, 12);
       addNewsItems(latestNewsArticles);
       addMostRecentItems(recentProductsData.prodArray);
-      console.log(articleData.returnedArticles);
     };
     getData();
     getProducts();
