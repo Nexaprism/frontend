@@ -52,6 +52,7 @@ const NavBar: FC = () => {
   const searchTags = useAppSelector(selectAllTags);
   const themeFromStore = useAppSelector(selectTheme);
   const searchProducts = useAppSelector(selectProducts);
+  const [reload, setReload] = useState<boolean>(true);
   const themeObj = useTheme();
   const dispatch = useAppDispatch();
   const avatar = useAppSelector(selectAvatar);
@@ -117,7 +118,10 @@ const NavBar: FC = () => {
       productNames.push(p.name);
     })
     setOptions(productNames);
-  }, []);
+    setTimeout(() => {
+      setReload(false);
+    }, 1600);
+  }, [reload]);
 
   return (
     <AppBar position="static">

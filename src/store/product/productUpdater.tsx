@@ -4,7 +4,6 @@ import { setAllTags, setProducts } from "./productReducer";
 import { Product } from "./types";
 
 const ProductUpdater: FC = (): null => {
-    //const [tagList, setTagList] = useState<string[]>([]);
     const dispatch = useAppDispatch();
 
   const getProducts = async () => {
@@ -59,7 +58,8 @@ const ProductUpdater: FC = (): null => {
             launchDate: "",
             createdAt: "",
             updatedAt: "",
-            rating: 0
+            rating: 0,
+            reviews: [],
          });
          p.tags.map((t: string) => {
             if(!foundTags.includes(t)) {
@@ -71,7 +71,6 @@ const ProductUpdater: FC = (): null => {
          }
         });
       });
-    //setOptions(foundProducts);
     dispatch(setProducts(foundProducts));
     dispatch(setAllTags(foundTags));
   };

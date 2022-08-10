@@ -21,9 +21,6 @@ import { User } from "../store/user/userTypes";
 import {
   selectAvatar,
   selectEmail,
-  selectToken,
-  selectUserId,
-  selectUsername,
   setAvatar,
   setEmail,
   setToken,
@@ -43,21 +40,14 @@ import { useGetUserQuery, useAvatarUpdate } from "../store/user/hooks";
 import { useGetUserReviews } from "../store/review/hooks";
 
 const Profile: FC = () => {
-  const [reviews, setReviews] = useState<any | undefined>([
-    {
-      rating: 0,
-      content: "",
-      date: "",
-      user: { username: "" },
-    },
-  ]);
-  const [reviewItems, setReviewItems] = useState<any>();
+
+  const [reviewItems, setReviewItems] = useState<any[]>([]);
   const [creationDate, setCreationDate] = useState<string | undefined>("");
   const [page, setPage] = useState<number>(1);
   const isLoading = useAppSelector(selectIsLoading);
   const [reload, setReload] = useState<boolean>();
   const [user, setUser] = useState<User | undefined>({
-    id: "",
+    _id: "",
     username: "",
     email: "",
     password: "",
@@ -172,65 +162,28 @@ const Profile: FC = () => {
     return data;
   };
 
-  const getReviews = () => {
-    const graphqlQuery = {
-      query: `
-      {
-        reviews(page: ${page}) {
-            reviews {
-                _id
-                content
-                user {
-                    username
-                }
-                rating
-                createdAt
-            }
-        totalReviews
-        }
-      }
-        `,
-    };
-    fetch("http://localhost:3080/graphql", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(graphqlQuery),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        if (resData.errors) {
-          console.log(resData);
-          throw new Error("Fetching reviews failed");
-        }
-        console.log(resData.data.reviews.reviews);
-        setReviews(resData.data.reviews.reviews);
-      });
-  };
 
   const addReviews = (reviews: any[]) => {
     let reviewArray: any[] = [];
     reviews.map((review: any, index: number) => {
-      reviewArray.push(
-        <Grid
-          key={index}
-          item
-          xs={12}
-          md={6}
-          sx={{ display: "flex", justifyContent: "center" }}
-        >
-          <ReviewCard
-            rating={review.rating}
-            content={review.content}
-            date={review.createdAt}
-            user={review.user.username}
-          />
-        </Grid>
-      );
+        reviewArray.push(
+          <Grid
+            key={index}
+            item
+            xs={12}
+            md={6}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
+            <ReviewCard
+              id={review.id}
+              rating={review.rating}
+              content={review.content}
+              date={review.createdAt}
+              user={review.user}
+              prodId={review.productId}
+            />
+          </Grid>
+        );
     });
 
     setReviewItems(reviewArray);
@@ -238,16 +191,15 @@ const Profile: FC = () => {
 
   useEffect(() => {
     const getData = async () => {
-      //console.log("token is " + token)
       const data = await getUser();
-      const reviewData = await getUserReviewData();
       setUser(data.user);
       setCreationDate(data.createdAt);
-      setReviews(reviewData);
-      addReviews(reviewData);
+      if (data.user && data.user.reviews && data.user.reviews.length > 0) {
+        const reviewData = await getUserReviewData();
+        addReviews(reviewData);
+      }
     };
     getData();
-    
     findUserSince();
     setTimeout(() => {
       setReload(false);
@@ -326,7 +278,7 @@ const Profile: FC = () => {
         <Divider />
 
         <Grid container spacing={3}>
-          {reviewItems}
+          {(reviewItems.length > 0) ? reviewItems : "No reviews yet"}
         </Grid>
 
         <Box sx={{ display: "flex", justifyContent: "center" }}>

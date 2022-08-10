@@ -2,7 +2,7 @@ import { StringMappingType } from "typescript"
 
 export type User = {
     username: string,
-    id: string,
+    _id: string,
     reviews: String[],
     avatar: string,
     email: string,

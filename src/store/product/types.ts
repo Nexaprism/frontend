@@ -1,3 +1,5 @@
+import { Review } from "../review/types";
+
 export type Product = {
     id: string;
     name: string;
@@ -16,4 +18,5 @@ export type Product = {
     rating: number;
     tags: string[];
     mainTag: string;
+    reviews: Review[];
 }

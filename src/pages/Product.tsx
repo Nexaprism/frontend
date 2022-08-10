@@ -30,11 +30,12 @@ import {
 import { selectToken, selectUsername } from "../store/user/userReducer";
 import { User } from "../store/user/userTypes";
 import image from "../assets/img/largeImage.jpeg";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Product } from "../store/product/types";
 import { Article } from "../store/article/types";
 import { useGetProductQuery } from "../store/product/hooks";
 import { useGetAllArticlesQuery } from "../store/article/hooks";
+import { useSubmitReview } from "../store/review/hooks";
 
 /**
  * jumbo image
@@ -58,22 +59,11 @@ import { useGetAllArticlesQuery } from "../store/article/hooks";
  * tags/categories
  *
  */
-const reviews = [20, 58, 99, 74, 88, 84, 71, 15, 100, 48];
 
-const user: User = {
-  username: "awesomeguy",
-  id: "1660642",
-  reviews: ["good", "bad", "ok"],
-  avatar: "picture here",
-  email: "awesome@test.com",
-  password: "password",
-};
 
 const ProductPage: FC = () => {
   const [items, setItems] = useState<any[]>();
-  const [sliderValue, setSliderValue] = useState<
-    number | string | Array<number | string>
-  >(0);
+  const [sliderValue, setSliderValue] = useState<number | string>(0);
   const [reviewContent, setReviewContent] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
   const [product, setProduct] = useState<Product | undefined>({
@@ -94,6 +84,7 @@ const ProductPage: FC = () => {
     rating: 0,
     mainTag: "",
     tags: [""],
+    reviews: [],
   });
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
@@ -102,6 +93,8 @@ const ProductPage: FC = () => {
   const { id } = useParams();
   const findProducts = useGetProductQuery(id);
   const articles = useGetAllArticlesQuery();
+  const submitReviewFunc = useSubmitReview();
+  const navigate = useNavigate();
 
   const multilineStyles = {
     "& input:valid + fieldset": {
@@ -141,7 +134,7 @@ const ProductPage: FC = () => {
   };
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
-    setSliderValue(newValue);
+    setSliderValue(Number(newValue));
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,48 +152,11 @@ const ProductPage: FC = () => {
 
   const submitReviewHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    const graphqlQuery = {
-      query: `
-        mutation {
-          createReview(reviewInput: {
-            rating: "${Number(sliderValue)}", 
-            content: "${reviewContent}", 
-            productId: "${id}",
-          }) {
-            _id
-            user {
-              username
-            }
-          }
-        }
-      `,
-    };
-    fetch("http://localhost:3080/graphql", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(graphqlQuery),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        //error handling
-        if (resData.errors && resData.errors[0].status === 422) {
-          console.log(resData);
-          throw new Error("Validation failed. Could not authenticate user");
-        }
-        if (resData.errors) {
-          console.log(resData);
-          throw new Error("Review creation failed");
-        }
-
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    submitReviewFunc.submit(sliderValue, reviewContent, id, token);
+      setTimeout(() => {
+        navigate("/product/" + id);
+      }, 1500);
+      
   };
 
   const addItems = (articles: Article[]) => {
@@ -245,11 +201,11 @@ const ProductPage: FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0)
     const getData = async () => {
-      const data: Product | undefined = await getProduct();
+      const productData: Product | undefined = await getProduct();
       const artData: Article[] | undefined = await getArticles();
-      setProduct(data);
+      setProduct(productData);
       addItems(artData);
-
+      console.log(productData?.reviews[0].productId)
     };
     getData();
     dispatch(setIsLoading(false));
@@ -446,7 +402,7 @@ const ProductPage: FC = () => {
             }}
           >
             <Grid container spacing={3}>
-              {reviews.map((review, index) => (
+              {(product && product.reviews.length > 0) ? product.reviews.map((review, index) => (
                 <Grid
                   item
                   xs={12}
@@ -455,13 +411,21 @@ const ProductPage: FC = () => {
                   key={index}
                 >
                   <ReviewCard
-                    rating={review}
-                    user={user}
-                    content="great content here"
-                    date="4/20/2022"
+                    id={review._id}
+                    rating={review.rating}
+                    user={review.user}
+                    content={review.content}
+                    date={review.createdAt}
+                    prodId={review.productId}
                   />
                 </Grid>
-              ))}
+              ))
+            : 
+            <Box sx={{display: "flex", justifyContent: "center", width: "100%"}}>
+              <Typography variant="h3">No reviews yet</Typography>
+            </Box>
+            
+            }
             </Grid>
           </Box>
           <Box

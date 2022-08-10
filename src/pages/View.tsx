@@ -29,7 +29,7 @@ import { useGetProductsMainTag } from "../store/product/hooks";
 import { Product } from "../store/product/types";
 import { metaverseDescription, arDescription, vrDescription } from "../store/app/constants";
 
-const Metaverses: FC = () => {
+const View: FC = () => {
   const dispatch = useAppDispatch();
   const { category } = useParams();
   const [pageDescription, setPageDescription] = useState<string>("");
@@ -398,4 +398,4 @@ const Metaverses: FC = () => {
   );
 };
 
-export default Metaverses;
+export default View;

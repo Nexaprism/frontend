@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { FC, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoDark from "../assets/img/nexLogo13.png";
 import logoLight from "../assets/img/nexLogoLight.png";
 import { setIsLoggedIn } from "../store/app/appReducer";
@@ -22,16 +22,20 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { selectTheme } from "../store/theme/themeReducer";
 import generator from "generate-password-ts";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { setToken, setUserId, setUsername, setEmail, setAvatar } from "../store/user/userReducer";
+import { useUserLogin } from "../store/user/hooks";
 
 const SignUp: FC = () => {
   const theme = useAppSelector(selectTheme);
-  const [email, setEmail] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
+  const [emailLocal, setEmailLocal] = useState<string>("");
+  const [usernameLocal, setUsernameLocal] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
   const [passError, setPassError] = useState<boolean>(false);
   const [showPass, setShowPass] = useState<boolean>(false);
+  const loginFunc = useUserLogin();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const buttonStyles = {
     color: "white",
@@ -62,9 +66,9 @@ const SignUp: FC = () => {
 
   const checkValid = (text: string) => {
     if (
-      username === "" ||
+      usernameLocal === "" ||
       password === "" ||
-      email === "" ||
+      emailLocal === "" ||
       text === "" ||
       password.length < 6
     ) {
@@ -82,14 +86,23 @@ const SignUp: FC = () => {
     }
   };
 
+  const logout = () => {
+    dispatch(setUserId(""));
+    dispatch(setUsername(""));
+    dispatch(setToken(""));
+    dispatch(setEmail(""));
+    dispatch(setAvatar(""));
+    dispatch(setIsLoggedIn(false));
+  };
+
   const signUpHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
     const graphqlQuery = {
       query: `
         mutation {
           createUser(userInput: {
-            email: "${email}", 
-            username: "${username}", 
+            email: "${emailLocal}", 
+            username: "${usernameLocal}", 
             password: "${password}", 
           }) {
             _id
@@ -122,11 +135,13 @@ const SignUp: FC = () => {
         }
         //passed errors, set states & dispatching logic here
         console.log(resData);
-        dispatch(setIsLoggedIn(true));
+        logout();
       })
       .catch((err) => {
         console.log(err);
       });
+      alert("Account creation successful! Please login");
+      navigate("/login");
   };
 
   return (
@@ -155,14 +170,14 @@ const SignUp: FC = () => {
             <Typography>Email:</Typography>
             <TextField
               onChange={(e) => {
-                setEmail(e.target.value);
+                setEmailLocal(e.target.value);
                 checkValid(e.target.value);
               }}
             />
             <Typography>Username:</Typography>
             <TextField
               onChange={(e) => {
-                setUsername(e.target.value);
+                setUsernameLocal(e.target.value);
                 checkValid(e.target.value);
               }}
             />

@@ -25,6 +25,17 @@ export const useGetProductQuery = async (id?: string) => {
             rating
             mainTag
             tags
+            reviews {
+                _id
+                rating
+                content
+                createdAt
+                productId
+                user {
+                    _id
+                    username
+                }
+            }
           }
         }
       `,
@@ -109,7 +120,7 @@ export const useGetProductsMainTag = async (tag?: string) => {
           company: p.company,
           token: p.token,
           launchDate: p.launchDate,
-          develoeprs: p.developers,
+          developers: p.developers,
         };
         prodArray.push(newProd);
       });
@@ -186,3 +197,4 @@ export const useGetProductsMostRecent = async () => {
     });
   return { prodArray, prodNum };
 };
+

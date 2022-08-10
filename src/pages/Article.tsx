@@ -69,7 +69,7 @@ const ArticlePage: FC = () => {
         <Box>
           {article
             ? article.tags.map((tag) => (
-                <Chip label={tag} sx={{ maxWidth: 80, maxHeight: 20 }} />
+                <Chip key={tag} label={tag} sx={{ maxWidth: 80, maxHeight: 20 }} />
               ))
             : null}
         </Box>
