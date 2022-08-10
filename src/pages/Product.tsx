@@ -35,7 +35,7 @@ import { Product } from "../store/product/types";
 import { Article } from "../store/article/types";
 import { useGetProductQuery } from "../store/product/hooks";
 import { useGetAllArticlesQuery } from "../store/article/hooks";
-import { useSubmitReview } from "../store/review/hooks";
+import { useReviews } from "../store/review/hooks";
 
 /**
  * jumbo image
@@ -93,7 +93,7 @@ const ProductPage: FC = () => {
   const { id } = useParams();
   const findProducts = useGetProductQuery(id);
   const articles = useGetAllArticlesQuery();
-  const submitReviewFunc = useSubmitReview();
+  const reviewFunc = useReviews();
   const navigate = useNavigate();
 
   const multilineStyles = {
@@ -146,13 +146,28 @@ const ProductPage: FC = () => {
     return findProducts;
   };
 
+  const correctDates = (product: Product | undefined) => {
+    if (product) {
+      let updatedProduct = product;
+      product.reviews.map((r, index) => {
+        let date = new Date(r.createdAt);
+        updatedProduct.reviews[index].createdAt = date.toLocaleDateString();
+      })
+      return updatedProduct;
+    } else {
+      return null;
+    }
+    
+    
+  }
+
   const getArticles = async () => {
     return articles;
   };
 
   const submitReviewHandler = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    submitReviewFunc.submit(sliderValue, reviewContent, id, token);
+    reviewFunc.submit(sliderValue, reviewContent, id, token);
       setTimeout(() => {
         navigate("/product/" + id);
       }, 1500);
@@ -203,9 +218,12 @@ const ProductPage: FC = () => {
     const getData = async () => {
       const productData: Product | undefined = await getProduct();
       const artData: Article[] | undefined = await getArticles();
-      setProduct(productData);
+      const dateCorrectedProduct = correctDates(productData);
+      if (dateCorrectedProduct) {
+        setProduct(dateCorrectedProduct);
+      }
       addItems(artData);
-      console.log(productData?.reviews[0].productId)
+      console.log(productData?.reviews[0])
     };
     getData();
     dispatch(setIsLoading(false));

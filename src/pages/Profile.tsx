@@ -32,6 +32,7 @@ import triangle2 from "../assets/img/triangle2.png";
 import triangle3 from "../assets/img/triangle3.png";
 import {
   selectIsLoading,
+  selectIsLoggedIn,
   setIsLoading,
   setIsLoggedIn,
 } from "../store/app/appReducer";
@@ -40,7 +41,6 @@ import { useGetUserQuery, useAvatarUpdate } from "../store/user/hooks";
 import { useGetUserReviews } from "../store/review/hooks";
 
 const Profile: FC = () => {
-
   const [reviewItems, setReviewItems] = useState<any[]>([]);
   const [creationDate, setCreationDate] = useState<string | undefined>("");
   const [page, setPage] = useState<number>(1);
@@ -62,6 +62,7 @@ const Profile: FC = () => {
   const userData = useGetUserQuery(userId, token);
   const userReviewData = useGetUserReviews(token!, userId!);
   const updateAvatarFunc = useAvatarUpdate();
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
   const buttonStyles = {
     color: "white",
@@ -162,34 +163,45 @@ const Profile: FC = () => {
     return data;
   };
 
-
   const addReviews = (reviews: any[]) => {
     let reviewArray: any[] = [];
     reviews.map((review: any, index: number) => {
-        reviewArray.push(
-          <Grid
-            key={index}
-            item
-            xs={12}
-            md={6}
-            sx={{ display: "flex", justifyContent: "center" }}
-          >
-            <ReviewCard
-              id={review.id}
-              rating={review.rating}
-              content={review.content}
-              date={review.createdAt}
-              user={review.user}
-              prodId={review.productId}
-            />
-          </Grid>
-        );
+      reviewArray.push(
+        <Grid
+          key={index}
+          item
+          xs={12}
+          md={6}
+          sx={{ display: "flex", justifyContent: "center" }}
+        >
+          <ReviewCard
+            id={review.id}
+            rating={review.rating}
+            content={review.content}
+            date={review.createdAt}
+            user={review.user}
+            prodName={review.productName}
+            prodId={review.productId}
+          />
+        </Grid>
+      );
     });
 
     setReviewItems(reviewArray);
   };
 
   useEffect(() => {
+    //auto logs out the user if their token has expired
+    const expiryDate = localStorage.getItem("expiryDate");
+    if (expiryDate) {
+      const currentTime = new Date().getTime();
+      const expiryTime = Date.parse(expiryDate);
+      if (currentTime > expiryTime) {
+        console.log(isLoggedIn);
+        navigate("/");
+      }
+    }
+
     const getData = async () => {
       const data = await getUser();
       setUser(data.user);
@@ -278,7 +290,7 @@ const Profile: FC = () => {
         <Divider />
 
         <Grid container spacing={3}>
-          {(reviewItems.length > 0) ? reviewItems : "No reviews yet"}
+          {reviewItems.length > 0 ? reviewItems : "No reviews yet"}
         </Grid>
 
         <Box sx={{ display: "flex", justifyContent: "center" }}>

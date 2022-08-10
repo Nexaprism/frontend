@@ -30,7 +30,8 @@ const ReviewCard: FC<{
   date: string;
   rating: number;
   prodId: string;
-}> = ({ id, user, content, date, rating, prodId }) => {
+  prodName?: string;
+}> = ({ id, user, content, date, rating, prodId, prodName }) => {
   const userId = useAppSelector(selectUserId);
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [openDelete, setOpenDelete] = useState<boolean>(false);
@@ -104,7 +105,6 @@ const ReviewCard: FC<{
   };
 
   useEffect(() => {
-    console.log("prodId is " + prodId)
     if (!user) {
       setTimeout(() => {
         setReload(!reload);
@@ -212,7 +212,7 @@ const ReviewCard: FC<{
             sx={{ display: "flex", justifyContent: "flex-start" }}
           >
             <Typography gutterBottom variant="h5" component="div">
-              {user.username}
+              {prodName ? prodName : user.username}
             </Typography>
             <Typography variant="body2" color="text.secondary" component="div">
               {content}
