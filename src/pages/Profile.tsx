@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { ChangeEvent, FC, useEffect, useState } from "react";
 import ReviewCard from "../components/ReviewCard";
+import SkeletonReview from "../components/SkeletonReview";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { User } from "../store/user/userTypes";
@@ -38,14 +39,16 @@ import {
 } from "../store/app/appReducer";
 import { useNavigate } from "react-router-dom";
 import { useGetUserQuery, useAvatarUpdate } from "../store/user/hooks";
-import { useGetUserReviews } from "../store/review/hooks";
+import { useReviews } from "../store/review/hooks";
 
 const Profile: FC = () => {
   const [reviewItems, setReviewItems] = useState<any[]>([]);
+  const [skeleGrid, setSkeleGrid] = useState<any[]>([]);
   const [creationDate, setCreationDate] = useState<string | undefined>("");
   const [page, setPage] = useState<number>(1);
   const isLoading = useAppSelector(selectIsLoading);
   const [reload, setReload] = useState<boolean>();
+  const [reviewCount, setReviewCount] = useState<number>(24);
   const [user, setUser] = useState<User | undefined>({
     _id: "",
     username: "",
@@ -60,7 +63,7 @@ const Profile: FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const userData = useGetUserQuery(userId, token);
-  const userReviewData = useGetUserReviews(token!, userId!);
+  const userReviewFunc = useReviews();
   const updateAvatarFunc = useAvatarUpdate();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
 
@@ -159,35 +162,77 @@ const Profile: FC = () => {
   };
 
   const getUserReviewData = async () => {
-    const data = await userReviewData;
+    dispatch(setIsLoading(true));
+    let data;
+    if (token && userId) {
+      data = await userReviewFunc.getByUser(token, userId, page);
+      setReviewItems(data.reviews)
+    }
+    
     return data;
   };
 
-  const addReviews = (reviews: any[]) => {
-    let reviewArray: any[] = [];
-    reviews.map((review: any, index: number) => {
-      reviewArray.push(
+  const makeSkeleGrid = () => {
+    let returnedArr = [];
+    for(let i = 0; i < 6; i++) {
+      returnedArr.push(
         <Grid
-          key={index}
+          key={i}
           item
           xs={12}
           md={6}
           sx={{ display: "flex", justifyContent: "center" }}
         >
-          <ReviewCard
-            id={review.id}
-            rating={review.rating}
-            content={review.content}
-            date={review.createdAt}
-            user={review.user}
-            prodName={review.productName}
-            prodId={review.productId}
-          />
+          <SkeletonReview />
         </Grid>
       );
-    });
+    };
+    //setSkeleGrid(returnedArr);
+    return returnedArr;
+  };
+
+  const addReviews = (reviews: any[]) => {
+    let reviewArray: any[] = [];
+    if(reviews.length === 0) {
+      reviewArray.push(
+        <Grid
+          item
+          xs={12}
+          md={6}
+          sx={{ display: "flex", justifyContent: "center" }}
+        >
+          <Typography variant="h2">
+            No reviews yet.
+          </Typography>
+        </Grid>
+      );
+    } else {
+      reviews.map((review: any, index: number) => {
+        reviewArray.push(
+          <Grid
+            key={index}
+            item
+            xs={12}
+            md={6}
+            sx={{ display: "flex", justifyContent: "center" }}
+          >
+            <ReviewCard
+              id={review.id}
+              rating={review.rating}
+              content={review.content}
+              date={review.createdAt}
+              user={review.user}
+              prodName={review.productName}
+              prodId={review.productId}
+            />
+          </Grid>
+        );
+      });
+    }
+    
 
     setReviewItems(reviewArray);
+    dispatch(setIsLoading(false));
   };
 
   useEffect(() => {
@@ -198,6 +243,7 @@ const Profile: FC = () => {
       const expiryTime = Date.parse(expiryDate);
       if (currentTime > expiryTime) {
         console.log(isLoggedIn);
+        logout();
         navigate("/");
       }
     }
@@ -206,17 +252,22 @@ const Profile: FC = () => {
       const data = await getUser();
       setUser(data.user);
       setCreationDate(data.createdAt);
-      if (data.user && data.user.reviews && data.user.reviews.length > 0) {
+      if (data.user) {
         const reviewData = await getUserReviewData();
-        addReviews(reviewData);
+        if (reviewData) {
+          //setReviewItems(reviewData.reviews);
+          addReviews(reviewData.reviews);
+          setReviewCount(reviewData.totReviews);
+        }
       }
     };
     getData();
     findUserSince();
+    console.log(reviewItems)
+    dispatch(setIsLoading(false));
     setTimeout(() => {
       setReload(false);
     }, 1500);
-    setIsLoading(false);
   }, [reload, page]);
 
   return (
@@ -290,11 +341,15 @@ const Profile: FC = () => {
         <Divider />
 
         <Grid container spacing={3}>
-          {reviewItems.length > 0 ? reviewItems : "No reviews yet"}
+          {isLoading ? makeSkeleGrid() : reviewItems}
         </Grid>
 
         <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Pagination count={4} page={page} onChange={handlePageChange} />
+          <Pagination
+            count={Math.round(reviewCount / 6)}
+            page={page}
+            onChange={handlePageChange}
+          />
         </Box>
       </Stack>
     </Box>

@@ -68,7 +68,6 @@ import { useReviews } from "../store/review/hooks";
  */
 
 const ProductPage: FC = () => {
-  const [items, setItems] = useState<any[]>();
   const [sliderValue, setSliderValue] = useState<number | string>(0);
   const [reviewContent, setReviewContent] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -76,6 +75,7 @@ const ProductPage: FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [alertStatus, setAlertStatus] = useState<AlertColor>("error");
+  const [newsItems, setNewsItems] = useState<any[]>();
   const [product, setProduct] = useState<Product | undefined>({
     name: "",
     imgUrl: "",
@@ -105,6 +105,8 @@ const ProductPage: FC = () => {
   const findProducts = useGetProductQuery(id);
   const articles = useGetAllArticlesQuery();
   const reviewFunc = useReviews();
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("md"));
   const acctLink = <a href="/account">My Profile</a>;
   const editReviewMsg = (
     <Typography>
@@ -193,6 +195,57 @@ const ProductPage: FC = () => {
     return articles;
   };
 
+  const makeNewsCarouselPage = (
+    index: number,
+    articles: Article[],
+    pageSize: number
+  ) => {
+    let page: any[] = [];
+    for (let i = 0; i < pageSize; i++) {
+      if (index > articles.length - 1) {
+        break;
+      }
+      page.push(
+        <NewsCard
+          key={index}
+          title={articles[index].title}
+          image={"http://localhost:3080/" + articles[index].imgUrl}
+          id={articles[index].id}
+          content={articles[index].content}
+          date={articles[index].updatedAt}
+        />
+      );
+      index++;
+    }
+    return page;
+  };
+
+  const addNewsItems = (allArticles: Article[]) => {
+    const articles = allArticles.slice(0, 11);
+    const articleItems: Array<any> = [];
+    let page: any[] = [];
+    let cardCount = 0;
+    let carouselSize = matches ? 4 : 3;
+    let carouselPageCount = matches ? 2 : 3;
+    for (let i = 0; i < carouselPageCount; i++) {
+      page = makeNewsCarouselPage(cardCount, articles, carouselSize);
+      articleItems.push(
+        <Stack
+          key={i}
+          direction="row"
+          spacing={3}
+          display="flex"
+          justifyContent="center"
+        >
+          {page.map((card) => {
+            return card;
+          })}
+        </Stack>
+      );
+    }
+    setNewsItems(articleItems);
+  };
+
   const submitReviewHandler = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     const feedback = await reviewFunc.submit(
@@ -215,44 +268,6 @@ const ProductPage: FC = () => {
     }
   };
 
-  const addItems = (articles: Article[]) => {
-    const newsItems: Array<any> = [];
-    for (let i = 0; i < 3; i++) {
-      newsItems.push(
-        <Stack direction="row" spacing={3} key={i}>
-          <NewsCard
-            image={"http://localhost:3080/" + articles[0].imgUrl}
-            content={articles[0].content}
-            title={articles[0].title}
-            date={articles[0].updatedAt}
-            id={articles[0].id}
-          />
-          <NewsCard
-            image={"http://localhost:3080/" + articles[1].imgUrl}
-            content={articles[1].content}
-            title={articles[1].title}
-            date={articles[1].updatedAt}
-            id={articles[1].id}
-          />
-          <NewsCard
-            image={"http://localhost:3080/" + articles[0].imgUrl}
-            content={articles[0].content}
-            title={articles[0].title}
-            date={articles[0].updatedAt}
-            id={articles[0].id}
-          />
-          <NewsCard
-            image={"http://localhost:3080/" + articles[1].imgUrl}
-            content={articles[1].content}
-            title={articles[1].title}
-            date={articles[1].updatedAt}
-            id={articles[1].id}
-          />
-        </Stack>
-      );
-    }
-    setItems(newsItems);
-  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -263,7 +278,7 @@ const ProductPage: FC = () => {
       if (dateCorrectedProduct) {
         setProduct(dateCorrectedProduct);
       }
-      addItems(artData);
+      addNewsItems(artData);
     };
     getData();
     dispatch(setIsLoading(false));
@@ -522,7 +537,7 @@ const ProductPage: FC = () => {
             }}
           >
             <Carousel sx={{ width: "100%" }} index={4} animation="slide">
-              {items}
+              {newsItems}
             </Carousel>
           </Box>
         </Box>
