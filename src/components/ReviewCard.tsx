@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertColor,
   Box,
   Button,
   Card,
@@ -9,7 +11,9 @@ import {
   Input,
   Modal,
   Rating,
+  Slide,
   Slider,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -17,6 +21,7 @@ import {
 import { FC, useEffect, useState } from "react";
 import { useAppSelector } from "../store/hooks";
 import { selectToken, selectUserId } from "../store/user/userReducer";
+import { SlideProps } from "@mui/material/Slide";
 import RatingBig from "./RatingBig";
 import RatingMedium from "./ReviewMedium";
 import { User } from "../store/user/userTypes";
@@ -37,10 +42,19 @@ const ReviewCard: FC<{
   const [openDelete, setOpenDelete] = useState<boolean>(false);
   const [sliderValue, setSliderValue] = useState<number | string>(rating);
   const [newReviewContent, setNewReviewContent] = useState<string>(content);
+  const [open, setOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
+  const [alertStatus, setAlertStatus] = useState<AlertColor>("error");
   const [reload, setReload] = useState<boolean>(true);
   const reviewFuncs = useReviews();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const token = useAppSelector(selectToken);
+
+  type TransitionProps = Omit<SlideProps, "direction">;
+
+  function TransitionUp(props: TransitionProps) {
+    return <Slide {...props} direction="up" />;
+  }
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     setSliderValue(Number(newValue));
@@ -65,20 +79,40 @@ const ReviewCard: FC<{
   const handleSubmitEdit = () => {
     //fetch update logic here
     if (token) {
-      reviewFuncs.update(id, Number(sliderValue), newReviewContent, token, prodId);
+      reviewFuncs.update(
+        id,
+        Number(sliderValue),
+        newReviewContent,
+        token,
+        prodId
+      );
     }
 
     setOpenEdit(!openEdit);
   };
 
-  const handleDelete = () => {
+  const handleSnackClose = () => {
+    setOpen(false);
+  };
+
+  const handleDelete = async () => {
     // fetch delete logic here
     console.log(id);
     if (token) {
-      reviewFuncs.delete(id, token);
-      setOpenDelete(!openDelete);
+      const feedback = await reviewFuncs.delete(id, token);
+      if (feedback.success) {
+        setMessage(feedback.message);
+        setAlertStatus("success");
+        setOpen(true);
+        setOpenDelete(!openDelete);
+        window.location.reload();
+      } else {
+        setMessage(feedback.message);
+        setAlertStatus("error");
+        setOpen(true);
+      }
     } else {
-      alert("Review deletion failed. Please login and try again");
+      alert("Login expired, please log in and try again");
     }
   };
 
@@ -122,6 +156,16 @@ const ReviewCard: FC<{
         boxShadow: 3,
       }}
     >
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleSnackClose}
+        TransitionComponent={TransitionUp}
+      >
+        <Alert onClose={handleSnackClose} severity={alertStatus}>
+          {message}
+        </Alert>
+      </Snackbar>
       {/*For Edits */}
       <Modal open={openEdit} onClose={handleOpenEdit}>
         <Stack sx={editBox} direction="column" spacing={3}>

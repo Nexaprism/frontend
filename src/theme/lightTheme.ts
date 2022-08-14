@@ -13,10 +13,12 @@ const lightTheme = createTheme({
     palette: {
         mode: 'light',
         primary: {
-          main: "#201438",
+          main: "#201438", //dark purple
         },
-        info: {
-          main: "#FFF"
+        success: {
+          light: "#388e3c", //medium green
+          main: "#388e3c",
+          dark: "#388e3c",
         }
       },
       typography: {
@@ -76,6 +78,18 @@ const lightTheme = createTheme({
                 opacity: 0.5,
                 backgroundColor: "#a480ed"
               }
+            }
+          }
+        },
+        MuiAlert: {
+          styleOverrides: {
+            standardSuccess: {
+              backgroundColor: "#388e3c",
+              color: "white"
+            },
+            standardError: {
+              backgroundColor: "#bd1e1e",
+              color: "white"
             }
           }
         }

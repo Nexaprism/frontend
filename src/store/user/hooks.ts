@@ -115,12 +115,15 @@ export const useAvatarUpdate = () => {
   return returnedFunction;
 };
 
-export const useUserLogin = () => {
+export const useUserFunc = () => {
   const dispatch = useAppDispatch();
   const [userData, setUserData] = useState<any>();
+  let feedback = {
+    success: false,
+    message: "",
+  };
   return {
     login: async (email: string, password: string) => {
-      console.log("Hook called!");
       const graphqlQuery = {
         query: `
                               {
@@ -148,12 +151,14 @@ export const useUserLogin = () => {
           //error handling
           if (resData.errors && resData.errors[0].status === 422) {
             console.log(resData);
-            throw new Error(
-              "Validation failed. Account already exists with that email address."
-            );
+            const msg = resData.errors[0].message;
+            feedback.message = "Validation failed. " + msg;
+            return feedback;
           }
           if (resData.errors) {
-            throw new Error("user login failed");
+            const msg = resData.errors[0].message;
+            feedback.message = "Login failed. " + msg;
+            return feedback;
           }
           //success, dispatches and setStates
           setUserData(resData.data.login);
@@ -174,16 +179,64 @@ export const useUserLogin = () => {
             new Date().getTime() + remainingMilliseconds
           );
           localStorage.setItem("expiryDate", expiryDate.toISOString());
-          //@dev TO DO:
-          //set auto logout here
-          //setAutoLogout(remainingMilliseconds);
+          feedback.message = `Login successful! Welcome back, ${data.username}`;
+          feedback.success = true;
         })
         .catch((err) => {
           console.log(err);
         });
+        return feedback;
+    },
+    signUp: async (email: string, username: string, password: string) => {
+        const graphqlQuery = {
+            query: `
+              mutation {
+                createUser(userInput: {
+                  email: "${email}", 
+                  username: "${username}", 
+                  password: "${password}", 
+                }) {
+                  _id
+                  username
+                }
+              }
+            `,
+          };
+          await fetch("http://localhost:3080/graphql", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(graphqlQuery),
+          })
+            .then((res) => {
+              return res.json();
+            })
+            .then((resData) => {
+              //error handling
+              if (resData.errors && resData.errors[0].status === 422) {
+                console.log(resData);
+                const msg = resData.errors[0].message;
+                feedback.message = "Validation failed. " + msg;
+                return feedback;
+              }
+              if (resData.errors) {
+                console.log(resData);
+                const msg = resData.errors[0].message;
+                feedback.message = "Account creation failed. " + msg;
+                return feedback;
+              }
+              setUserData(resData.data.createUser);
+              feedback.message = "Account creation successful! Please login."
+              feedback.success = true;
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+            return feedback;
     },
     data: userData,
   };
 
-  //return data;
+
 };

@@ -25,6 +25,11 @@ const UserUpdater: FC = (): null => {
       dispatch(setEmail(email));
       dispatch(setUsername(username));
     } else {
+      dispatch(setToken(""));
+      dispatch(setUserId(""));
+      dispatch(setAvatar(""));
+      dispatch(setUsername(""));
+      dispatch(setEmail(""));
       dispatch(setIsLoggedIn(false));
     }
   }, []);

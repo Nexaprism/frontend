@@ -16,7 +16,7 @@ import { selectIsLoading, setIsLoading } from "../store/app/appReducer";
 import { useGetArticlesMostRecent } from "../store/article/hooks";
 import { Article } from "../store/article/types";
 import { useAppSelector } from "../store/hooks";
-import { useGetProductsMostRecent } from "../store/product/hooks";
+import { useGetProducts } from "../store/product/hooks";
 import { Product } from "../store/product/types";
 
 /**
@@ -38,6 +38,8 @@ const Home: FC = () => {
   const [prodList, setProdList] = useState<any[]>([]);
   const [mostRecentProd, setMostRecentProd] = useState<any[]>([]);
   const [mostRecentCards, setMostRecentCards] = useState<any>([]);
+  const [newestCards, setNewestCards] = useState<any>([]);
+  const [popularCards, setPopularCards] = useState<any>([]);
   const [artList, setArtList] = useState<any[]>([
     {
       title: "",
@@ -50,7 +52,7 @@ const Home: FC = () => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
   const mostRecentArticles = useGetArticlesMostRecent();
-  const recentProducts = useGetProductsMostRecent();
+  const getProductsFuncs = useGetProducts();
   const isLoading = useAppSelector(selectIsLoading);
 
   const getArticles = async () => {
@@ -58,7 +60,18 @@ const Home: FC = () => {
   };
 
   const getMostRecentProd = async () => {
-    return recentProducts;
+    const products = await (await getProductsFuncs).getByMostRecent();
+    return products;
+  }
+
+  const getNewestProd = async () => {
+    const products = await (await getProductsFuncs).getByNewest();
+    return products;
+  }
+
+  const getPopularProd = async () => {
+    const products = await (await getProductsFuncs).getByPopular();
+    return products;
   }
 
   const getProducts = async () => {
@@ -139,7 +152,7 @@ const Home: FC = () => {
     return page;
   };
 
-  const addMostRecentItems = (products: Product[]) => {
+  const addItemsToCarousel = (products: Product[], category: string) => {
     const productItems: Array<any> = [];
     let page: any[] = [];
     let cardCount = 0;
@@ -166,7 +179,14 @@ const Home: FC = () => {
       }
       page = [];
     }
-    setMostRecentCards(productItems);
+    if(category == "recent") {
+      setMostRecentCards(productItems);
+    } else if (category == "newest") {
+      setNewestCards(productItems);
+    } else {
+      setPopularCards(productItems);
+    }
+    
   }
 
   const addItems = (products: Product[]) => {
@@ -313,11 +333,15 @@ const Home: FC = () => {
     const getData = async () => {
       const articleData = await getArticles();
       const recentProductsData = await getMostRecentProd();
+      const newestProductsData = await getNewestProd();
+      const popularProductsData = await getPopularProd();
       setArtList(articleData.returnedArticles);
-      setMostRecentProd(recentProductsData.prodArray);
+      //setMostRecentProd(recentProductsData.prodArray);
       const latestNewsArticles = articleData.returnedArticles.slice(1, 12);
       addNewsItems(latestNewsArticles);
-      addMostRecentItems(recentProductsData.prodArray);
+      addItemsToCarousel(recentProductsData.prodArray, "recent");
+      addItemsToCarousel(newestProductsData.prodArray, "newest");
+      addItemsToCarousel(popularProductsData.prodArray, "popular");
     };
     getData();
     getProducts();
@@ -363,13 +387,13 @@ const Home: FC = () => {
             }}
           >
             <Glance
-              createdAt={artList[0].createdAt}
+              createdAt={artList[0].updatedAt}
               content={artList[0].content}
             />
           </Box>
         </Stack>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Typography variant="h3">Most Recent</Typography>
+          <Typography variant="h3">Recently Added</Typography>
         </Box>
         <Box sx={{ height: "275px", width: "auto" }}>
           <Carousel
@@ -389,11 +413,11 @@ const Home: FC = () => {
             animation="slide"
             navButtonsAlwaysVisible={true}
           >
-            {big}
+            {popularCards}
           </Carousel>
         </Box>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Typography variant="h3">What's Hot</Typography>
+          <Typography variant="h3">Newest Releases</Typography>
         </Box>
 
         <Box sx={{ height: "275px", width: "auto" }}>
@@ -403,7 +427,7 @@ const Home: FC = () => {
             animation="slide"
             navButtonsAlwaysVisible={true}
           >
-            {big}
+            {newestCards}
           </Carousel>
         </Box>
         <Typography variant="h3">Latest News</Typography>

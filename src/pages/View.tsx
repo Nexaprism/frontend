@@ -331,7 +331,7 @@ const View: FC = () => {
                 width: "25%",
               }}
             >
-              <Glance createdAt={latestNews.createdAt} content={latestNews.content}/>
+              <Glance createdAt={latestNews.updatedAt} content={latestNews.content}/>
             </Box>
           </Stack>
         </Box>

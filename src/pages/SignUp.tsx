@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertColor,
   alpha,
   Box,
   Button,
@@ -8,6 +10,9 @@ import {
   Input,
   InputAdornment,
   OutlinedInput,
+  Slide,
+  SlideProps,
+  Snackbar,
   Stack,
   styled,
   TextField,
@@ -23,7 +28,7 @@ import { selectTheme } from "../store/theme/themeReducer";
 import generator from "generate-password-ts";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { setToken, setUserId, setUsername, setEmail, setAvatar } from "../store/user/userReducer";
-import { useUserLogin } from "../store/user/hooks";
+import { useUserFunc } from "../store/user/hooks";
 
 const SignUp: FC = () => {
   const theme = useAppSelector(selectTheme);
@@ -33,7 +38,10 @@ const SignUp: FC = () => {
   const [isValid, setIsValid] = useState<boolean>(false);
   const [passError, setPassError] = useState<boolean>(false);
   const [showPass, setShowPass] = useState<boolean>(false);
-  const loginFunc = useUserLogin();
+  const [open, setOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
+  const [alertStatus, setAlertStatus] = useState<AlertColor>("error");
+  const userFuncs = useUserFunc();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -47,6 +55,16 @@ const SignUp: FC = () => {
     "&:disabled": {
       background: "gray",
     },
+  };
+
+  type TransitionProps = Omit<SlideProps, "direction">;
+
+  function TransitionUp(props: TransitionProps) {
+    return <Slide {...props} direction="up" />;
+  }
+
+  const handleSnackClose = () => {
+    setOpen(false);
   };
 
   const handleClickShowPassword = () => {
@@ -95,57 +113,77 @@ const SignUp: FC = () => {
     dispatch(setIsLoggedIn(false));
   };
 
-  const signUpHandler = (e: React.SyntheticEvent) => {
+  const signUpHandler = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    const graphqlQuery = {
-      query: `
-        mutation {
-          createUser(userInput: {
-            email: "${emailLocal}", 
-            username: "${usernameLocal}", 
-            password: "${password}", 
-          }) {
-            _id
-            username
-          }
-        }
-      `,
-    };
-    fetch("http://localhost:3080/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(graphqlQuery),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        //error handling
-        if (resData.errors && resData.errors[0].status === 422) {
-          console.log(resData);
-          throw new Error(
-            "Validation failed. Account already exists with that email address."
-          );
-        }
-        if (resData.errors) {
-          console.log(resData);
-          throw new Error("Account creation failed");
-        }
-        //passed errors, set states & dispatching logic here
-        console.log(resData);
-        logout();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-      alert("Account creation successful! Please login");
-      navigate("/login");
+    const feedback = await userFuncs.signUp(emailLocal, usernameLocal, password);
+    setMessage(feedback.message);
+    if(feedback.success) {
+      setAlertStatus("success");
+      setOpen(true);
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000)
+    } else {
+      setOpen(true);
+    }
+    // const graphqlQuery = {
+    //   query: `
+    //     mutation {
+    //       createUser(userInput: {
+    //         email: "${emailLocal}", 
+    //         username: "${usernameLocal}", 
+    //         password: "${password}", 
+    //       }) {
+    //         _id
+    //         username
+    //       }
+    //     }
+    //   `,
+    // };
+    // fetch("http://localhost:3080/graphql", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(graphqlQuery),
+    // })
+    //   .then((res) => {
+    //     return res.json();
+    //   })
+    //   .then((resData) => {
+    //     //error handling
+    //     if (resData.errors && resData.errors[0].status === 422) {
+    //       console.log(resData);
+    //       throw new Error(
+    //         "Validation failed. Account already exists with that email address."
+    //       );
+    //     }
+    //     if (resData.errors) {
+    //       console.log(resData);
+    //       throw new Error("Account creation failed");
+    //     }
+    //     //passed errors, set states & dispatching logic here
+    //     console.log(resData);
+    //     logout();
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+      
   };
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleSnackClose}
+        TransitionComponent={TransitionUp}
+      >
+        <Alert onClose={handleSnackClose} severity={alertStatus}>
+          {message}
+        </Alert>
+      </Snackbar>
       <Box component="form" noValidate onSubmit={signUpHandler}>
         <Stack
           direction="column"

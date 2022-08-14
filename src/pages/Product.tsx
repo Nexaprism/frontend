@@ -1,4 +1,5 @@
 import {
+  Alert,
   alpha,
   Box,
   Button,
@@ -6,11 +7,14 @@ import {
   Grid,
   Input,
   Slider,
+  Snackbar,
   Stack,
   TextField,
   Typography,
   useMediaQuery,
   useTheme,
+  Slide,
+  AlertColor,
 } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import DescriptionBox from "../components/DescriptionBox";
@@ -19,6 +23,7 @@ import NewsCard from "../components/NewsCard";
 import RatingBig from "../components/RatingBig";
 import ReviewCard from "../components/ReviewCard";
 import Carousel from "react-material-ui-carousel";
+import { SlideProps } from "@mui/material/Slide";
 import RatingSmall from "../components/RatingSmall";
 import RatingMedium from "../components/ReviewMedium";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -27,10 +32,12 @@ import {
   selectIsLoggedIn,
   setIsLoading,
 } from "../store/app/appReducer";
-import { selectToken, selectUsername } from "../store/user/userReducer";
-import { User } from "../store/user/userTypes";
-import image from "../assets/img/largeImage.jpeg";
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  selectToken,
+  selectUserId,
+  selectUsername,
+} from "../store/user/userReducer";
+import { useParams } from "react-router-dom";
 import { Product } from "../store/product/types";
 import { Article } from "../store/article/types";
 import { useGetProductQuery } from "../store/product/hooks";
@@ -60,12 +67,15 @@ import { useReviews } from "../store/review/hooks";
  *
  */
 
-
 const ProductPage: FC = () => {
   const [items, setItems] = useState<any[]>();
   const [sliderValue, setSliderValue] = useState<number | string>(0);
   const [reviewContent, setReviewContent] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [hasReviewed, setHasReviewed] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
+  const [alertStatus, setAlertStatus] = useState<AlertColor>("error");
   const [product, setProduct] = useState<Product | undefined>({
     name: "",
     imgUrl: "",
@@ -88,13 +98,26 @@ const ProductPage: FC = () => {
   });
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+  const userId = useAppSelector(selectUserId);
   const token = useAppSelector(selectToken);
   const isLoading = useAppSelector(selectIsLoading);
   const { id } = useParams();
   const findProducts = useGetProductQuery(id);
   const articles = useGetAllArticlesQuery();
   const reviewFunc = useReviews();
-  const navigate = useNavigate();
+  const acctLink = <a href="/account">My Profile</a>;
+  const editReviewMsg = (
+    <Typography>
+      You have already submitted a review. Edit or delete your review before
+      submitting another. You can find your reviews at the "{acctLink}" page.
+    </Typography>
+  );
+
+  type TransitionProps = Omit<SlideProps, "direction">;
+
+  function TransitionUp(props: TransitionProps) {
+    return <Slide {...props} direction="up" />;
+  }
 
   const multilineStyles = {
     "& input:valid + fieldset": {
@@ -141,6 +164,10 @@ const ProductPage: FC = () => {
     setSliderValue(event.target.value === "" ? "" : Number(event.target.value));
   };
 
+  const handleSnackClose = () => {
+    setOpen(false);
+  };
+
   const getProduct = async () => {
     dispatch(setIsLoading(true));
     return findProducts;
@@ -150,28 +177,42 @@ const ProductPage: FC = () => {
     if (product) {
       let updatedProduct = product;
       product.reviews.map((r, index) => {
+        if (r.user._id == userId) {
+          setHasReviewed(true);
+        }
         let date = new Date(r.createdAt);
         updatedProduct.reviews[index].createdAt = date.toLocaleDateString();
-      })
+      });
       return updatedProduct;
     } else {
       return null;
     }
-    
-    
-  }
+  };
 
   const getArticles = async () => {
     return articles;
   };
 
-  const submitReviewHandler = (e: React.SyntheticEvent) => {
+  const submitReviewHandler = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    reviewFunc.submit(sliderValue, reviewContent, id, token);
+    const feedback = await reviewFunc.submit(
+      sliderValue,
+      reviewContent,
+      id,
+      token
+    );
+    if (feedback.success) {
+      setAlertStatus("success");
+      setMessage(feedback.message);
+      setOpen(true);
       setTimeout(() => {
-        navigate("/product/" + id);
-      }, 1500);
-      
+        window.location.reload();
+      }, 6500);
+    } else {
+      setAlertStatus("error");
+      setMessage(feedback.message);
+      setOpen(true);
+    }
   };
 
   const addItems = (articles: Article[]) => {
@@ -214,7 +255,7 @@ const ProductPage: FC = () => {
   };
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    window.scrollTo(0, 0);
     const getData = async () => {
       const productData: Product | undefined = await getProduct();
       const artData: Article[] | undefined = await getArticles();
@@ -223,7 +264,6 @@ const ProductPage: FC = () => {
         setProduct(dateCorrectedProduct);
       }
       addItems(artData);
-      console.log(productData?.reviews[0])
     };
     getData();
     dispatch(setIsLoading(false));
@@ -277,9 +317,7 @@ const ProductPage: FC = () => {
           >
             {product == undefined ? "temp" : product.name}
           </Typography>
-          
         </Box>
-        
 
         <Box
           sx={{
@@ -298,9 +336,16 @@ const ProductPage: FC = () => {
         </Box>
       </Box>
       {/* description */}
-      <Box position="relative" sx={{top: { lg: -100 }, bottom: {md: 300, sm: 300, xs: 300} }}>
-          {product == undefined ? "" : product.tags.map((t) => <Chip sx={{m: 1, zIndex: 12}} label={t} key={t}/>)}
-        </Box>
+      <Box
+        position="relative"
+        sx={{ top: { lg: -100 }, bottom: { md: 300, sm: 300, xs: 300 } }}
+      >
+        {product == undefined
+          ? ""
+          : product.tags.map((t) => (
+              <Chip sx={{ m: 1, zIndex: 12, boxShadow: 4 }} label={t} key={t} />
+            ))}
+      </Box>
       <Stack direction="column" sx={{ display: "flex", alignItems: "center" }}>
         <Box sx={{ width: { xl: 1500, lg: 1200, md: 900, sm: 600 } }}>
           <Stack
@@ -343,6 +388,16 @@ const ProductPage: FC = () => {
               pb: 5,
             }}
           >
+            <Snackbar
+              open={open}
+              autoHideDuration={6000}
+              onClose={handleSnackClose}
+              TransitionComponent={TransitionUp}
+            >
+              <Alert onClose={handleSnackClose} severity={alertStatus}>
+                {message}
+              </Alert>
+            </Snackbar>
             <Stack direction="row" spacing={8} width="80%" alignItems="center">
               <Box>
                 <RatingMedium value={Number(sliderValue)} />
@@ -361,6 +416,11 @@ const ProductPage: FC = () => {
                 <Typography sx={{ display: isLoggedIn ? "none" : "flex" }}>
                   Log in or sign up to submit your own review
                 </Typography>
+                <Box
+                  sx={{ display: isLoggedIn && hasReviewed ? "flex" : "none" }}
+                >
+                  {editReviewMsg}
+                </Box>
                 <Stack direction="row" spacing={2}>
                   <Slider
                     aria-label="Your Rating:"
@@ -368,13 +428,13 @@ const ProductPage: FC = () => {
                     getAriaValueText={valuetext}
                     color="secondary"
                     onChange={handleSliderChange}
-                    disabled={!isLoggedIn}
+                    disabled={!isLoggedIn || hasReviewed}
                   />
                   <Input
                     value={sliderValue}
                     size="small"
                     onChange={handleInputChange}
-                    disabled={!isLoggedIn}
+                    disabled={!isLoggedIn || hasReviewed}
                     inputProps={{
                       step: 1,
                       min: 0,
@@ -390,7 +450,7 @@ const ProductPage: FC = () => {
                   multiline
                   rows={5}
                   required
-                  disabled={!isLoggedIn}
+                  disabled={!isLoggedIn || hasReviewed}
                   variant="filled"
                   placeholder="What do you think?..."
                   id="validation-outlined-input"
@@ -402,7 +462,7 @@ const ProductPage: FC = () => {
                 />
                 <Button
                   sx={buttonStyles}
-                  disabled={!isValid && !isLoggedIn}
+                  disabled={(!isValid && !isLoggedIn) || hasReviewed}
                   type="submit"
                 >
                   Submit
@@ -420,30 +480,36 @@ const ProductPage: FC = () => {
             }}
           >
             <Grid container spacing={3}>
-              {(product && product.reviews.length > 0) ? product.reviews.map((review, index) => (
-                <Grid
-                  item
-                  xs={12}
-                  md={6}
-                  sx={{ display: "flex", justifyContent: "center" }}
-                  key={index}
+              {product && product.reviews.length > 0 ? (
+                product.reviews.map((review, index) => (
+                  <Grid
+                    item
+                    xs={12}
+                    md={6}
+                    sx={{ display: "flex", justifyContent: "center" }}
+                    key={index}
+                  >
+                    <ReviewCard
+                      id={review._id}
+                      rating={review.rating}
+                      user={review.user}
+                      content={review.content}
+                      date={review.createdAt}
+                      prodId={review.productId}
+                    />
+                  </Grid>
+                ))
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
                 >
-                  <ReviewCard
-                    id={review._id}
-                    rating={review.rating}
-                    user={review.user}
-                    content={review.content}
-                    date={review.createdAt}
-                    prodId={review.productId}
-                  />
-                </Grid>
-              ))
-            : 
-            <Box sx={{display: "flex", justifyContent: "center", width: "100%"}}>
-              <Typography variant="h3">No reviews yet</Typography>
-            </Box>
-            
-            }
+                  <Typography variant="h3">No reviews yet</Typography>
+                </Box>
+              )}
             </Grid>
           </Box>
           <Box

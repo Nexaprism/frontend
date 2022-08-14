@@ -25,6 +25,11 @@ const darkTheme = createTheme({
     primary: {
       main: "#1e1f1f",
     },
+    success: {
+      light: "#388e3c",
+      main: "#388e3c",
+      dark: "#388e3c"
+    }
   },
   typography: {
     fontFamily: "Questrial",
@@ -57,7 +62,7 @@ const darkTheme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          background: 'linear-gradient(to right bottom, #4849b8, #6248b8)'
+          background: 'linear-gradient(to right bottom, #880991, #6248b8)'
         }
       }
     },
@@ -84,6 +89,18 @@ const darkTheme = createTheme({
             opacity: 0.5,
             backgroundColor: "#808080"
           }
+        }
+      }
+    },
+    MuiAlert: {
+      styleOverrides: {
+        standardSuccess: {
+          backgroundColor: "#388e3c",
+          color: "white"
+        },
+        standardError: {
+          backgroundColor: "#bd1e1e",
+          color: "white"
         }
       }
     }

@@ -1,5 +1,7 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
+  Alert,
+  AlertColor,
   Box,
   Button,
   Divider,
@@ -7,6 +9,9 @@ import {
   IconButton,
   InputAdornment,
   OutlinedInput,
+  Slide,
+  SlideProps,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -15,11 +20,10 @@ import { FC, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logoDark from "../assets/img/nexLogo13.png";
 import logoLight from "../assets/img/nexLogoLight.png";
-import { setIsLoggedIn } from "../store/app/appReducer";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { selectTheme } from "../store/theme/themeReducer";
-import { useUserLogin } from "../store/user/hooks";
-import { setAvatar, setEmail, setToken, setUserId, setUsername } from "../store/user/userReducer";
+import { useUserFunc } from "../store/user/hooks";
+
 
 const LogIn: FC = () => {
   const theme = useAppSelector(selectTheme);
@@ -28,7 +32,10 @@ const LogIn: FC = () => {
   const [isValid, setIsValid] = useState<boolean>(false);
   const [passError, setPassError] = useState<boolean>(false);
   const [showPass, setShowPass] = useState<boolean>(false);
-  const loginFunc = useUserLogin();
+  const [open, setOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
+  const [alertStatus, setAlertStatus] = useState<AlertColor>("error");
+  const loginFunc = useUserFunc();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -44,18 +51,33 @@ const LogIn: FC = () => {
     },
   };
 
+  type TransitionProps = Omit<SlideProps, "direction">;
+
+  function TransitionUp(props: TransitionProps) {
+    return <Slide {...props} direction="up" />;
+  }
+
+  const handleSnackClose = () => {
+    setOpen(false);
+  };
+
   const handleClickShowPassword = () => {
     setShowPass(!showPass);
   };
 
   const handleChange = (text: string) => {
     setPassword(text);
-    console.log(password)
+    console.log(password);
     checkValid(text);
-  }
+  };
 
   const checkValid = (text: string) => {
-    if (password === "" || emailField === "" || text === "" || password.length < 6) {
+    if (
+      password === "" ||
+      emailField === "" ||
+      text === "" ||
+      password.length < 6
+    ) {
       setIsValid(false);
     } else {
       setIsValid(true);
@@ -70,78 +92,33 @@ const LogIn: FC = () => {
     }
   };
 
-
   const logInHandler = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    await loginFunc.login(emailField, password);
-    //await userLogin();
-    // const graphqlQuery = {
-    //   query: `
-    //         {
-    //             login(email: "${emailField}", password: "${password}") {
-    //                 token
-    //                 userId
-    //                 username
-    //                 email
-    //                 avatar
-    //             }
-    //         }
-    //     `,
-    // };
-    // fetch("http://localhost:3080/graphql", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(graphqlQuery),
-    // })
-    //   .then((res) => {
-    //     return res.json();
-    //   })
-    //   .then((resData) => {
-    //     //error handling
-    //     if (resData.errors && resData.errors[0].status === 422) {
-    //       console.log(resData);
-    //       throw new Error(
-    //         "Validation failed. Account already exists with that email address."
-    //       );
-    //     }
-    //     if (resData.errors) {
-    //       throw new Error("user login failed");
-    //     }
-    //     //success, dispatches and setStates
-    //     const data = resData.data.login;
-    //     console.log(data);
-        // dispatch(setIsLoggedIn(true));
-        // dispatch(setToken(data.token));
-        // dispatch(setUsername(data.username));
-        // dispatch(setUserId(data.userId));
-        // dispatch(setEmail(data.email));
-        // dispatch(setAvatar(data.avatar));
-      //   localStorage.setItem("token", data.token);
-      //   localStorage.setItem("userId", data.userId);
-      //   localStorage.setItem("email", data.email);
-      //   localStorage.setItem("username", data.username);
-      //   localStorage.setItem("avatar", data.avatar);
-      //   const remainingMilliseconds = 60 * 60 * 1000;
-      //   const expiryDate = new Date(
-      //     new Date().getTime() + remainingMilliseconds
-      //   );
-      //   localStorage.setItem("expiryDate", expiryDate.toISOString());
-      //   //@dev TO DO:
-      //   //set auto logout here
-      //   //setAutoLogout(remainingMilliseconds);
-      // })
-      // .catch((err) => {
-      //   console.log(err);
-      // });
-      navigate("/");
-      
+    const feedback = await loginFunc.login(emailField, password);
+    setMessage(feedback.message);
+    if (feedback.success) {
+      setAlertStatus("success");
+      setOpen(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 2000)
+    } else {
+      setOpen(true);
+    }
   };
-
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleSnackClose}
+        TransitionComponent={TransitionUp}
+      >
+        <Alert onClose={handleSnackClose} severity={alertStatus}>
+          {message}
+        </Alert>
+      </Snackbar>
       <Box component="form" onSubmit={logInHandler}>
         <Stack
           direction="column"

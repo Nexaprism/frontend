@@ -55,10 +55,13 @@ export const useGetUserReviews = async (token: string, userId: string) => {
   return reviews;
 };
 
-
 export const useReviews = () => {
   return {
     delete: async (id: string, token: string) => {
+      let feedback = {
+        success: false,
+        message: "",
+      };
       const graphqlQuery = {
         query: `
                 mutation {
@@ -81,16 +84,23 @@ export const useReviews = () => {
           //error handling
           if (resData.errors && resData.errors[0].status === 422) {
             console.log(resData);
-            throw new Error("Validation failed. Could not authenticate user");
+            //throw new Error("Validation failed. Could not authenticate user");
+            feedback.message = "Validation failed. Could not authenticate user";
+            return feedback;
           }
           if (resData.errors) {
             console.log(resData);
-            throw new Error("Review deletion failed");
+            //throw new Error("Review deletion failed");
+            feedback.message = "Review deletion failed";
+            return feedback;
           }
         })
         .catch((err) => {
           console.log(err);
         });
+      feedback.success = true;
+      feedback.message = "Review deleted successfully!";
+      return feedback;
     },
 
     update: async (
@@ -100,6 +110,10 @@ export const useReviews = () => {
       token: string,
       prodId: string
     ) => {
+      let feedback = {
+        success: false,
+        message: "",
+      };
       const graphqlQuery = {
         query: `
                 mutation {
@@ -128,26 +142,37 @@ export const useReviews = () => {
           //error handling
           if (resData.errors && resData.errors[0].status === 422) {
             console.log(resData);
-            throw new Error("Validation failed. Could not authenticate user");
+            //throw new Error("Validation failed. Could not authenticate user");
+            feedback.message = "Validation failed. Could not authenticate user";
+            return feedback;
           }
           if (resData.errors) {
             console.log(resData);
-            throw new Error("Review deletion failed");
+            //throw new Error("Review update failed");
+            feedback.message = "Review update failed";
+            return feedback;
           }
         })
         .catch((err) => {
           console.log(err);
         });
+      feedback.success = true;
+      feedback.message = "Review updated successfully!";
+      return feedback;
     },
 
     submit: async (
-        sliderValue: string | number,
-        reviewContent: string,
-        id: string | undefined,
-        token: string | null
-      ) => {
-        const graphqlQuery = {
-          query: `
+      sliderValue: string | number,
+      reviewContent: string,
+      id: string | undefined,
+      token: string | null
+    ) => {
+      let feedback = {
+        success: false,
+        message: "",
+      };
+      const graphqlQuery = {
+        query: `
                     mutation {
                       createReview(reviewInput: {
                         rating: "${Number(sliderValue)}", 
@@ -161,32 +186,39 @@ export const useReviews = () => {
                       }
                     }
                   `,
-        };
-        await fetch("http://localhost:3080/graphql", {
-          method: "POST",
-          headers: {
-            Authorization: "Bearer " + token,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(graphqlQuery),
+      };
+      await fetch("http://localhost:3080/graphql", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      })
+        .then((res) => {
+          return res.json();
         })
-          .then((res) => {
-            return res.json();
-          })
-          .then((resData) => {
-            //error handling
-            if (resData.errors && resData.errors[0].status === 422) {
-              console.log(resData);
-              throw new Error("Validation failed. Could not authenticate user");
-            }
-            if (resData.errors) {
-              console.log(resData);
-              throw new Error("Review creation failed");
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      },
+        .then((resData) => {
+          //error handling
+          if (resData.errors && resData.errors[0].status === 422) {
+            console.log(resData);
+            throw new Error("Validation failed. Could not authenticate user");
+            feedback.message = "Validation failed. Could not authenticate user";
+            return feedback;
+          }
+          if (resData.errors) {
+            console.log(resData);
+            throw new Error("Review creation failed");
+            feedback.message = "Review creation failed";
+            return feedback;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      feedback.success = true;
+      feedback.message = "Review submitted successfully!";
+      return feedback;
+    },
   };
 };
