@@ -15,6 +15,7 @@ import {
   useTheme,
   Slide,
   AlertColor,
+  Skeleton,
 } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import DescriptionBox from "../components/DescriptionBox";
@@ -43,6 +44,9 @@ import { Article } from "../store/article/types";
 import { useGetProductQuery } from "../store/product/hooks";
 import { useGetAllArticlesQuery } from "../store/article/hooks";
 import { useReviews } from "../store/review/hooks";
+import SkeletonProduct from "../components/SkeletonProduct";
+import SkeletonJumbo from "../components/SkeletonJumbo";
+import SkeletonGlance from "../components/SkeletonGlance";
 
 /**
  * jumbo image
@@ -76,7 +80,7 @@ const ProductPage: FC = () => {
   const [message, setMessage] = useState<string>("");
   const [alertStatus, setAlertStatus] = useState<AlertColor>("error");
   const [newsItems, setNewsItems] = useState<any[]>();
-  const [product, setProduct] = useState<Product | undefined>({
+  const [product, setProduct] = useState<Product>({
     name: "",
     imgUrl: "",
     description: "",
@@ -268,10 +272,10 @@ const ProductPage: FC = () => {
     }
   };
 
-
   useEffect(() => {
     window.scrollTo(0, 0);
     const getData = async () => {
+      dispatch(setIsLoading(true));
       const productData: Product | undefined = await getProduct();
       const artData: Article[] | undefined = await getArticles();
       const dateCorrectedProduct = correctDates(productData);
@@ -279,77 +283,107 @@ const ProductPage: FC = () => {
         setProduct(dateCorrectedProduct);
       }
       addNewsItems(artData);
+      dispatch(setIsLoading(false));
     };
     getData();
-    dispatch(setIsLoading(false));
-  }, [isLoading]);
+  }, []);
 
   return (
     <Box sx={{ backgroundColor: "inherit" }}>
-      <Box
-        id="jumbo"
-        sx={{
-          zIndex: -1,
-          width: "100%",
-          height: {
-            xl: "50vh",
-            lg: "50vh",
-            md: "80vh",
-            sm: "80vh",
-            xs: "80vh",
-          },
-          backgroundSize: "cover",
-          backgroundImage:
-            product == undefined
-              ? "none"
-              : `url(${"http://localhost:3080/" + product.imgUrl})`,
-          display: "flex",
-          flexDirection: {
-            xl: "row",
-            lg: "row",
-            md: "column",
-            sm: "column",
-            xs: "column",
-          },
-          boxShadow: 6,
-        }}
-      >
+      {isLoading ? (
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
+          <Box sx={{ width: "70%", m: 2 }}>
+            <SkeletonJumbo />
+          </Box>
+          <Box sx={{ width: "30%", m: 2 }}>
+            <SkeletonGlance />
+          </Box>
+        </Box>
+      ) : (
         <Box
-          id="detailBox"
+          id="jumbo"
           sx={{
-            width: { xl: "75%", lg: "75%", md: "100%", sm: "100%", xs: "100%" },
-            backgroundColor: "black",
-            height: { xl: "100%", lg: "100%", md: "75%", sm: "75%", xs: "75%" },
+            zIndex: -1,
+            width: "100%",
+            height: {
+              xl: "50vh",
+              lg: "50vh",
+              md: "80vh",
+              sm: "80vh",
+              xs: "80vh",
+            },
+            backgroundSize: "cover",
+            backgroundImage:
+              product == undefined
+                ? "none"
+                : `url(${"http://localhost:3080/" + product.imgUrl})`,
+            display: "flex",
+            flexDirection: {
+              xl: "row",
+              lg: "row",
+              md: "column",
+              sm: "column",
+              xs: "column",
+            },
+            boxShadow: 6,
           }}
         >
-          <Typography
+          <Box
+            id="detailBox"
             sx={{
-              width: "75%",
-              color: "white",
-              fontSize: { lg: "6.5em", sm: "6em", xs: "5em" },
-              pl: 4,
+              width: {
+                xl: "75%",
+                lg: "75%",
+                md: "100%",
+                sm: "100%",
+                xs: "100%",
+              },
+              backgroundColor: "black",
+              height: {
+                xl: "100%",
+                lg: "100%",
+                md: "75%",
+                sm: "75%",
+                xs: "75%",
+              },
             }}
           >
-            {product == undefined ? "temp" : product.name}
-          </Typography>
-        </Box>
+            <Typography
+              sx={{
+                width: "75%",
+                color: "white",
+                fontSize: { lg: "6.5em", sm: "6em", xs: "5em" },
+                pl: 4,
+              }}
+            >
+              {product == undefined ? "temp" : product.name}
+            </Typography>
+          </Box>
 
-        <Box
-          sx={{
-            width: { xl: "25%", lg: "25%", md: "100%", sm: "100%", xs: "100%" },
-            backgroundColor: alpha("#807e7c", 0.55),
-            minWidth: "250px",
-          }}
-        >
-          <DetailBox
-            token={product == undefined ? "temp" : product.token}
-            blockchain={product == undefined ? "temp" : product.blockchain}
-            governance={product == undefined ? "temp" : product.governance}
-            marketCap={product == undefined ? "temp" : product.marketCap}
-            launchDate={product == undefined ? "temp" : product.launchDate}
-          />
+          <Box
+            sx={{
+              width: {
+                xl: "25%",
+                lg: "25%",
+                md: "100%",
+                sm: "100%",
+                xs: "100%",
+              },
+              backgroundColor: alpha("#807e7c", 0.55),
+              minWidth: "250px",
+            }}
+          >
+            <DetailBox
+              token={product == undefined ? "temp" : product.token}
+              blockchain={product == undefined ? "temp" : product.blockchain}
+              governance={product == undefined ? "temp" : product.governance}
+              marketCap={product == undefined ? "temp" : product.marketCap}
+              launchDate={product == undefined ? "temp" : product.launchDate}
+            />
+          </Box>
         </Box>
-      </Box>
+      )}
+
       {/* description */}
       <Box
         position="relative"
@@ -372,8 +406,17 @@ const ProductPage: FC = () => {
             }}
           >
             <Box>
-              {product == undefined ? (
-                ""
+              {isLoading ? (
+                <Box sx={{ width: 700, m: 3 }}>
+                  <Skeleton
+                    variant="text"
+                    sx={{ fontSize: "1rem", width: "100%" }}
+                  />
+                  <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+                  <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+                  <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+                  <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+                </Box>
               ) : (
                 <DescriptionBox
                   description={product.description}
@@ -385,9 +428,11 @@ const ProductPage: FC = () => {
             </Box>
 
             <Box sx={{ display: "flex", justifyContent: "center" }}>
-              {!isLoading && product && product.rating > 0 ? (
+              {isLoading ? (
+                <Skeleton variant="circular" width={200} height={200} />
+              ) : (
                 <RatingBig value={product.rating} />
-              ) : null}
+              )}
             </Box>
           </Stack>
 
@@ -536,9 +581,18 @@ const ProductPage: FC = () => {
               p: 2,
             }}
           >
-            <Carousel sx={{ width: "100%" }} index={4} animation="slide">
-              {newsItems}
-            </Carousel>
+            {isLoading ? (
+              <Stack direction="row" spacing={3}>
+                <SkeletonProduct />
+                <SkeletonProduct />
+                <SkeletonProduct />
+                <SkeletonProduct />
+              </Stack>
+            ) : (
+              <Carousel sx={{ width: "100%" }} index={4} animation="slide">
+                {newsItems}
+              </Carousel>
+            )}
           </Box>
         </Box>
       </Stack>

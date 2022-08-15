@@ -12,10 +12,13 @@ import Glance from "../components/Glance";
 import JumboNews from "../components/JumboNews";
 import NewsCard from "../components/NewsCard";
 import ProductCard from "../components/ProductCard";
+import SkeletonGlance from "../components/SkeletonGlance";
+import SkeletonJumbo from "../components/SkeletonJumbo";
+import SkeletonProduct from "../components/SkeletonProduct";
 import { selectIsLoading, setIsLoading } from "../store/app/appReducer";
 import { useGetArticlesMostRecent } from "../store/article/hooks";
 import { Article } from "../store/article/types";
-import { useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useGetProducts } from "../store/product/hooks";
 import { Product } from "../store/product/types";
 
@@ -50,26 +53,29 @@ const Home: FC = () => {
   const mostRecentArticles = useGetArticlesMostRecent();
   const getProductsFuncs = useGetProducts();
   const isLoading = useAppSelector(selectIsLoading);
+  const dispatch = useAppDispatch();
 
   const getArticles = async () => {
     return mostRecentArticles;
   };
 
   const getMostRecentProd = async () => {
+    dispatch(setIsLoading(true));
     const products = await (await getProductsFuncs).getByMostRecent();
     return products;
-  }
+  };
 
   const getNewestProd = async () => {
+    dispatch(setIsLoading(true));
     const products = await (await getProductsFuncs).getByNewest();
     return products;
-  }
+  };
 
   const getPopularProd = async () => {
+    dispatch(setIsLoading(true));
     const products = await (await getProductsFuncs).getByPopular();
     return products;
-  }
-
+  };
 
   const makeCarouselPage = (
     index: number,
@@ -124,17 +130,14 @@ const Home: FC = () => {
       }
       page = [];
     }
-    if(category == "recent") {
+    if (category == "recent") {
       setMostRecentCards(productItems);
     } else if (category == "newest") {
       setNewestCards(productItems);
     } else {
       setPopularCards(productItems);
     }
-    
-  }
-
-  
+  };
 
   const addNewsItems = (allArticles: Article[]) => {
     const articles = allArticles.slice(0, 11);
@@ -188,8 +191,9 @@ const Home: FC = () => {
   };
 
   useEffect(() => {
-    setIsLoading(true);
+    
     const getData = async () => {
+      dispatch(setIsLoading(true));
       const articleData = await getArticles();
       const recentProductsData = await getMostRecentProd();
       const newestProductsData = await getNewestProd();
@@ -200,9 +204,9 @@ const Home: FC = () => {
       addItemsToCarousel(recentProductsData.prodArray, "recent");
       addItemsToCarousel(newestProductsData.prodArray, "newest");
       addItemsToCarousel(popularProductsData.prodArray, "popular");
+      dispatch(setIsLoading(false));
     };
     getData();
-    setIsLoading(false);
   }, [matches]);
 
   return (
@@ -228,13 +232,17 @@ const Home: FC = () => {
               width: { sm: "100%", md: "100%", lg: "75%", xl: "75%" },
             }}
           >
-            <JumboNews
-              title={artList[0].title}
-              mainTag={artList[0].mainTag}
-              tags={artList[0].tags}
-              id={artList[0].id}
-              imgUrl={artList[0].imgUrl}
-            />
+            {isLoading ? (
+              <SkeletonJumbo />
+            ) : (
+              <JumboNews
+                title={artList[0].title}
+                mainTag={artList[0].mainTag}
+                tags={artList[0].tags}
+                id={artList[0].id}
+                imgUrl={artList[0].imgUrl}
+              />
+            )}
           </Box>
 
           <Box
@@ -243,54 +251,94 @@ const Home: FC = () => {
               width: "25%",
             }}
           >
-            <Glance
-              createdAt={artList[0].updatedAt}
-              content={artList[0].content}
-            />
+            {isLoading ? (
+              <SkeletonGlance />
+            ) : (
+              <Glance
+                createdAt={artList[0].updatedAt}
+                content={artList[0].content}
+              />
+            )}
           </Box>
         </Stack>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
           <Typography variant="h3">Recently Added</Typography>
         </Box>
         <Box sx={{ height: "275px", width: "auto" }}>
-          <Carousel
-            sx={{ width: "100%" }}
-            index={4}
-            animation="slide"
-            navButtonsAlwaysVisible={true}
-          >
-            {mostRecentCards}
-          </Carousel>
+          {isLoading ? (
+            <Stack direction="row" spacing={3}>
+              <SkeletonProduct />
+              <SkeletonProduct />
+              <SkeletonProduct />
+              <SkeletonProduct />
+            </Stack>
+          ) : (
+            <Carousel
+              sx={{ width: "100%" }}
+              index={4}
+              animation="slide"
+              navButtonsAlwaysVisible={true}
+            >
+              {mostRecentCards}
+            </Carousel>
+          )}
         </Box>
         <Typography variant="h3">Most Popular</Typography>
         <Box sx={{ height: "275px", width: "auto" }}>
-          <Carousel
-            sx={{ width: "100%" }}
-            index={4}
-            animation="slide"
-            navButtonsAlwaysVisible={true}
-          >
-            {popularCards}
-          </Carousel>
+          {isLoading ? (
+            <Stack direction="row" spacing={3}>
+              <SkeletonProduct />
+              <SkeletonProduct />
+              <SkeletonProduct />
+              <SkeletonProduct />
+            </Stack>
+          ) : (
+            <Carousel
+              sx={{ width: "100%" }}
+              index={4}
+              animation="slide"
+              navButtonsAlwaysVisible={true}
+            >
+              {popularCards}
+            </Carousel>
+          )}
         </Box>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
           <Typography variant="h3">Newest Releases</Typography>
         </Box>
 
         <Box sx={{ height: "275px", width: "auto" }}>
-          <Carousel
-            sx={{ width: "100%" }}
-            index={0}
-            animation="slide"
-            navButtonsAlwaysVisible={true}
-          >
-            {newestCards}
-          </Carousel>
+          {isLoading ? (
+            <Stack direction="row" spacing={3}>
+              <SkeletonProduct />
+              <SkeletonProduct />
+              <SkeletonProduct />
+              <SkeletonProduct />
+            </Stack>
+          ) : (
+            <Carousel
+              sx={{ width: "100%" }}
+              index={0}
+              animation="slide"
+              navButtonsAlwaysVisible={true}
+            >
+              {newestCards}
+            </Carousel>
+          )}
         </Box>
         <Typography variant="h3">Latest News</Typography>
-        <Carousel sx={{ width: "100%" }} index={4} animation="slide">
-          {newsItems}
-        </Carousel>
+        {isLoading ? (
+          <Stack direction="row" spacing={3}>
+            <SkeletonProduct />
+            <SkeletonProduct />
+            <SkeletonProduct />
+            <SkeletonProduct />
+          </Stack>
+        ) : (
+          <Carousel sx={{ width: "100%" }} index={4} animation="slide">
+            {newsItems}
+          </Carousel>
+        )}
       </Stack>
     </Box>
   );

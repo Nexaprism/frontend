@@ -27,7 +27,15 @@ import { Article } from "../store/article/types";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useGetProductsMainTag } from "../store/product/hooks";
 import { Product } from "../store/product/types";
-import { metaverseDescription, arDescription, vrDescription } from "../store/app/constants";
+import {
+  metaverseDescription,
+  arDescription,
+  vrDescription,
+} from "../store/app/constants";
+import SkeletonProduct from "../components/SkeletonProduct";
+import SkeletonGlance from "../components/SkeletonGlance";
+import SkeletonJumbo from "../components/SkeletonJumbo";
+import SkeletonMiniProduct from "../components/SkeletonMiniProduct";
 
 const View: FC = () => {
   const dispatch = useAppDispatch();
@@ -73,10 +81,6 @@ const View: FC = () => {
     dispatch(setIsLoading(true));
     return metaverseArticles;
   };
-
-  // const getLatestArticle = async () => {
-  //   return latestMetaArticle;
-  // }
 
   const makeCarouselPage = (
     index: number,
@@ -270,7 +274,7 @@ const View: FC = () => {
       dispatch(setIsLoading(false));
     };
     getData();
-    if(category == "AR") {
+    if (category == "AR") {
       setPageTitle("Augmented Reality (AR)");
       setPageDescription(arDescription);
     } else if (category == "VR") {
@@ -297,9 +301,7 @@ const View: FC = () => {
             <Typography variant="h2">{pageTitle}</Typography>
           </Box>
           <Box sx={{ pb: 2 }}>
-            <Typography>
-              {pageDescription}
-            </Typography>
+            <Typography>{pageDescription}</Typography>
           </Box>
           <Divider sx={{ mb: 2 }} />
           <Stack
@@ -316,13 +318,17 @@ const View: FC = () => {
                 width: { sm: "100%", md: "100%", lg: "75%", xl: "75%" },
               }}
             >
-              <JumboNews
-                title={latestNews.title}
-                mainTag={latestNews.mainTag}
-                tags={latestNews.tags}
-                id={latestNews.id}
-                imgUrl={latestNews.imgUrl}
-              />
+              {isLoading ? (
+                <SkeletonJumbo />
+              ) : (
+                <JumboNews
+                  title={latestNews.title}
+                  mainTag={latestNews.mainTag}
+                  tags={latestNews.tags}
+                  id={latestNews.id}
+                  imgUrl={latestNews.imgUrl}
+                />
+              )}
             </Box>
 
             <Box
@@ -331,7 +337,14 @@ const View: FC = () => {
                 width: "25%",
               }}
             >
-              <Glance createdAt={latestNews.updatedAt} content={latestNews.content}/>
+              {isLoading ? (
+                <SkeletonGlance />
+              ) : (
+                <Glance
+                  createdAt={latestNews.updatedAt}
+                  content={latestNews.content}
+                />
+              )}
             </Box>
           </Stack>
         </Box>
@@ -339,14 +352,23 @@ const View: FC = () => {
           <Typography variant="h3">Most Recent</Typography>
         </Box>
         <Box sx={{ height: "275px", width: "auto" }}>
-          <Carousel
-            sx={{ width: "100%" }}
-            index={4}
-            animation="slide"
-            navButtonsAlwaysVisible={true}
-          >
-            {products}
-          </Carousel>
+          {isLoading ? (
+            <Stack direction="row" spacing={3}>
+              <SkeletonProduct />
+              <SkeletonProduct />
+              <SkeletonProduct />
+              <SkeletonProduct />
+            </Stack>
+          ) : (
+            <Carousel
+              sx={{ width: "100%" }}
+              index={4}
+              animation="slide"
+              navButtonsAlwaysVisible={true}
+            >
+              {products}
+            </Carousel>
+          )}
         </Box>
         <Stack
           direction="row"
@@ -380,19 +402,38 @@ const View: FC = () => {
             </Button>
           </ButtonGroup>
         </Stack>
-        <Grid
-          container
-          direction="row"
-          sx={{ display: "flex", justifyContent: "space-evenly" }}
-        >
-          {firstHalf.map((item: any) => {
-            return item;
-          })}
-        </Grid>
+        {isLoading ? (
+          <Stack direction="column" spacing={3}>
+            <SkeletonMiniProduct />
+            <SkeletonMiniProduct />
+            <SkeletonMiniProduct />
+            <SkeletonMiniProduct />
+            <SkeletonMiniProduct />
+          </Stack>
+        ) : (
+          <Grid
+            container
+            direction="row"
+            sx={{ display: "flex", justifyContent: "space-evenly" }}
+          >
+            {firstHalf.map((item: any) => {
+              return item;
+            })}
+          </Grid>
+        )}
 
-        <Carousel sx={{ width: "100%" }} index={4} animation="slide">
-          {newsItems}
-        </Carousel>
+        {isLoading ? (
+          <Stack direction="row" spacing={3}>
+            <SkeletonProduct />
+            <SkeletonProduct />
+            <SkeletonProduct />
+            <SkeletonProduct />
+          </Stack>
+        ) : (
+          <Carousel sx={{ width: "100%" }} index={4} animation="slide">
+            {newsItems}
+          </Carousel>
+        )}
       </Stack>
     </Box>
   );

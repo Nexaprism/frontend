@@ -1,4 +1,4 @@
-import { Box, Chip, Stack, Typography } from "@mui/material";
+import { Box, Chip, Link, Stack, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import image from "../assets/img/largeImage.jpeg";
 import { useParams } from "react-router-dom";
@@ -6,7 +6,6 @@ import { useArticleQuery } from "../store/article/hooks";
 import { Article } from "../store/article/types";
 import { useAppDispatch } from "../store/hooks";
 import { setIsLoading } from "../store/app/appReducer";
-
 
 const ArticlePage: FC = () => {
   const dispatch = useAppDispatch();
@@ -26,7 +25,6 @@ const ArticlePage: FC = () => {
   });
 
   const getArticle = async () => {
-    dispatch(setIsLoading(true));
     return articleData;
   };
 
@@ -43,16 +41,16 @@ const ArticlePage: FC = () => {
   };
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    window.scrollTo(0, 0);
     const getData = async () => {
+      dispatch(setIsLoading(true));
       const data = await getArticle();
       setArticle(data.returnedArticle);
       const date = findDate(data.createdDate);
       setCreationDate(date);
+      dispatch(setIsLoading(false));
     };
     getData();
-    
-    setIsLoading(false);
   }, []);
 
   return (
@@ -69,9 +67,26 @@ const ArticlePage: FC = () => {
         <Box>
           {article
             ? article.tags.map((tag) => (
-                <Chip key={tag} label={tag} sx={{ maxWidth: 80, maxHeight: 20 }} />
+                <Chip
+                  key={tag}
+                  label={tag}
+                  sx={{ maxWidth: 80, maxHeight: 20 }}
+                />
               ))
             : null}
+        </Box>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            alignItems: "flex-end",
+            flexDirection: "column",
+          }}
+        >
+          <Typography variant="h5">Original article:</Typography>
+          <Link href="#">
+            <Typography>URL</Typography>
+          </Link>
         </Box>
         <Box
           sx={{
@@ -80,15 +95,15 @@ const ArticlePage: FC = () => {
             height: { xs: 350, md: 550, lg: 550 },
             backgroundSize: "cover",
             backgroundImage: `url(${
-              article == undefined ? "none" : "http://localhost:3080/" + article.imgUrl
+              article == undefined
+                ? "none"
+                : "http://localhost:3080/" + article.imgUrl
             })`,
           }}
         />
         <Box>
           <Typography sx={{ whiteSpace: "pre-wrap" }}>
-            {article == undefined
-              ? "temp"
-              : article.content}
+            {article == undefined ? "temp" : article.content}
           </Typography>
         </Box>
       </Stack>
