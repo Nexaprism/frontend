@@ -8,4 +8,5 @@ export type Article = {
     mainTag: string;
     tags: string[];
     imgUrl: string;
+    url: string;
 }

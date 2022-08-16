@@ -42,34 +42,12 @@ import { useParams } from "react-router-dom";
 import { Product } from "../store/product/types";
 import { Article } from "../store/article/types";
 import { useGetProductQuery } from "../store/product/hooks";
-import { useGetAllArticlesQuery } from "../store/article/hooks";
+import { useGetArticle } from "../store/article/hooks";
 import { useReviews } from "../store/review/hooks";
 import SkeletonProduct from "../components/SkeletonProduct";
 import SkeletonJumbo from "../components/SkeletonJumbo";
 import SkeletonGlance from "../components/SkeletonGlance";
 
-/**
- * jumbo image
- *
- * big logo/header
- *
- * url links
- *
- * description
- *
- * list of currencies/cryptos
- *
- * rating
- *
- * company behind production
- *
- * names of developers
- *
- * technologies used (if any)
- *
- * tags/categories
- *
- */
 
 const ProductPage: FC = () => {
   const [sliderValue, setSliderValue] = useState<number | string>(0);
@@ -81,25 +59,8 @@ const ProductPage: FC = () => {
   const [alertStatus, setAlertStatus] = useState<AlertColor>("error");
   const [newsItems, setNewsItems] = useState<any[]>();
   const [product, setProduct] = useState<Product>({
-    name: "",
-    imgUrl: "",
-    description: "",
-    url: "",
-    company: "",
-    developers: [""],
-    launchDate: "",
-    marketCap: "",
-    token: "",
-    governance: "",
-    blockchain: "",
-    createdAt: "",
-    updatedAt: "",
-    id: "",
-    rating: 0,
-    mainTag: "",
-    tags: [""],
-    reviews: [],
-  });
+    
+  } as Product);
   const dispatch = useAppDispatch();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const userId = useAppSelector(selectUserId);
@@ -107,7 +68,7 @@ const ProductPage: FC = () => {
   const isLoading = useAppSelector(selectIsLoading);
   const { id } = useParams();
   const findProducts = useGetProductQuery(id);
-  const articles = useGetAllArticlesQuery();
+  const getArticleFuncs = useGetArticle();
   const reviewFunc = useReviews();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
@@ -143,7 +104,7 @@ const ProductPage: FC = () => {
 
   const buttonStyles = {
     color: "white",
-    background: "linear-gradient(to bottom, #bf1aed, #201438)",
+    background: "linear-gradient(to bottom, #a373f5, #4d2e82)",
     "&:hover": {
       background: "#cc7be3",
       transform: "none",
@@ -196,7 +157,8 @@ const ProductPage: FC = () => {
   };
 
   const getArticles = async () => {
-    return articles;
+    const data = await getArticleFuncs.getByMostRecent();
+    return data;
   };
 
   const makeNewsCarouselPage = (
@@ -246,6 +208,11 @@ const ProductPage: FC = () => {
           })}
         </Stack>
       );
+      cardCount += carouselSize;
+      if (cardCount > articles.length) {
+        break;
+      }
+      page = [];
     }
     setNewsItems(articleItems);
   };
@@ -277,12 +244,12 @@ const ProductPage: FC = () => {
     const getData = async () => {
       dispatch(setIsLoading(true));
       const productData: Product | undefined = await getProduct();
-      const artData: Article[] | undefined = await getArticles();
+      const artData = await getArticles();
       const dateCorrectedProduct = correctDates(productData);
       if (dateCorrectedProduct) {
         setProduct(dateCorrectedProduct);
       }
-      addNewsItems(artData);
+      addNewsItems(artData.returnedArticles);
       dispatch(setIsLoading(false));
     };
     getData();
@@ -313,6 +280,7 @@ const ProductPage: FC = () => {
               xs: "80vh",
             },
             backgroundSize: "cover",
+            backgroundPosition: "center",
             backgroundImage:
               product == undefined
                 ? "none"
@@ -352,7 +320,7 @@ const ProductPage: FC = () => {
               sx={{
                 width: "75%",
                 color: "white",
-                fontSize: { lg: "6.5em", sm: "6em", xs: "5em" },
+                fontSize: { lg: "6em", sm: "5.5em", xs: "5em" },
                 pl: 4,
               }}
             >
@@ -389,14 +357,14 @@ const ProductPage: FC = () => {
         position="relative"
         sx={{ top: { lg: -100 }, bottom: { md: 300, sm: 300, xs: 300 } }}
       >
-        {product == undefined
+        {product.tags == undefined
           ? ""
           : product.tags.map((t) => (
               <Chip sx={{ m: 1, zIndex: 12, boxShadow: 4 }} label={t} key={t} />
             ))}
       </Box>
       <Stack direction="column" sx={{ display: "flex", alignItems: "center" }}>
-        <Box sx={{ width: { xl: 1500, lg: 1200, md: 900, sm: 600 } }}>
+        <Box sx={{ width: { xl: 1500, lg: "75rem", md: "65rem", sm: 600 } }}>
           <Stack
             direction={{ xs: "column", md: "row" }}
             sx={{
@@ -406,7 +374,7 @@ const ProductPage: FC = () => {
             }}
           >
             <Box>
-              {isLoading ? (
+              {isLoading || !product.description ? (
                 <Box sx={{ width: 700, m: 3 }}>
                   <Skeleton
                     variant="text"
@@ -540,7 +508,7 @@ const ProductPage: FC = () => {
             }}
           >
             <Grid container spacing={3}>
-              {product && product.reviews.length > 0 ? (
+              {product.reviews && product.reviews.length > 0 ? (
                 product.reviews.map((review, index) => (
                   <Grid
                     item

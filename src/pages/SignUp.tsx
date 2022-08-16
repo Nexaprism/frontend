@@ -47,7 +47,7 @@ const SignUp: FC = () => {
 
   const buttonStyles = {
     color: "white",
-    background: "linear-gradient(to bottom, #bf1aed, #201438)",
+    background: "linear-gradient(to bottom, #a373f5, #4d2e82)",
     "&:hover": {
       background: "#cc7be3",
       transform: "none",
@@ -55,6 +55,10 @@ const SignUp: FC = () => {
     "&:disabled": {
       background: "gray",
     },
+  };
+
+  const fieldStyles = {
+    backgroundColor: theme == "dark" ? "#424242" : "white"
   };
 
   type TransitionProps = Omit<SlideProps, "direction">;
@@ -126,50 +130,6 @@ const SignUp: FC = () => {
     } else {
       setOpen(true);
     }
-    // const graphqlQuery = {
-    //   query: `
-    //     mutation {
-    //       createUser(userInput: {
-    //         email: "${emailLocal}", 
-    //         username: "${usernameLocal}", 
-    //         password: "${password}", 
-    //       }) {
-    //         _id
-    //         username
-    //       }
-    //     }
-    //   `,
-    // };
-    // fetch("http://localhost:3080/graphql", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(graphqlQuery),
-    // })
-    //   .then((res) => {
-    //     return res.json();
-    //   })
-    //   .then((resData) => {
-    //     //error handling
-    //     if (resData.errors && resData.errors[0].status === 422) {
-    //       console.log(resData);
-    //       throw new Error(
-    //         "Validation failed. Account already exists with that email address."
-    //       );
-    //     }
-    //     if (resData.errors) {
-    //       console.log(resData);
-    //       throw new Error("Account creation failed");
-    //     }
-    //     //passed errors, set states & dispatching logic here
-    //     console.log(resData);
-    //     logout();
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
-      
   };
 
   return (
@@ -207,6 +167,7 @@ const SignUp: FC = () => {
           <FormControl sx={{ display: "flex", width: "100%" }}>
             <Typography>Email:</Typography>
             <TextField
+            sx={fieldStyles}
               onChange={(e) => {
                 setEmailLocal(e.target.value);
                 checkValid(e.target.value);
@@ -214,6 +175,7 @@ const SignUp: FC = () => {
             />
             <Typography>Username:</Typography>
             <TextField
+            sx={fieldStyles}
               onChange={(e) => {
                 setUsernameLocal(e.target.value);
                 checkValid(e.target.value);
@@ -222,6 +184,7 @@ const SignUp: FC = () => {
             <Typography>Password: must be 6 characters or longer</Typography>
             <OutlinedInput
               required
+              sx={fieldStyles}
               error={passError}
               type={showPass ? "text" : "password"}
               value={password}

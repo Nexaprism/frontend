@@ -325,7 +325,7 @@ const Profile: FC = () => {
             <Typography variant="h3">Your reviews:</Typography>
           </Box>
 
-          <Box sx={{ justifyContent: "flex-end", width: "50%" }}>
+          {/* <Box sx={{ justifyContent: "flex-end", width: "50%" }}>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -335,7 +335,7 @@ const Profile: FC = () => {
                 inputProps={{ "aria-label": "search" }}
               />
             </Search>
-          </Box>
+          </Box> */}
         </Stack>
 
         <Divider />

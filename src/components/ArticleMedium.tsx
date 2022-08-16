@@ -2,7 +2,7 @@ import { Box, Chip, Stack, Typography } from "@mui/material";
 import { FC } from "react";
 import { Link } from "react-router-dom";
 
-const JumboNews: FC<{
+const ArticleMedium: FC<{
   title: string;
   mainTag: string;
   tags: string[];
@@ -16,12 +16,11 @@ const JumboNews: FC<{
       sx={{
         position: "relative",
         width: "100%",
-        height: { xs: 350, md: 550, lg: 400 },
+        height: "50vh",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundImage: `url(${"http://localhost:3080/" + imgUrl})`,
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
+        borderRadius: 2,
         boxShadow: 6,
       }}
     >
@@ -30,11 +29,10 @@ const JumboNews: FC<{
         sx={{
           backgroundColor: "black",
           width: "100%",
-          height: "15rem",
+          height: "13rem",
           position: "absolute",
           bottom: 0,
-          borderBottomLeftRadius: 20,
-          borderBottomRightRadius: 20,
+          borderRadius: 2
         }}
       >
         <Stack
@@ -46,16 +44,16 @@ const JumboNews: FC<{
           }}
         >
           <Typography
-            fontSize={{ sm: 30, md: 40, lg: 50 }}
+            fontSize={{ sm: "1.5em", md: "2em", lg: "2em" }}
             sx={{ color: "white" }}
           >
             {title}
           </Typography>
-
-          <Typography variant="subtitle1" sx={{ color: "white" }}>
+          
+          <Typography gutterBottom fontSize={{sm: "1em", md: "1.2em"}} sx={{ color: "white" }}>
             Learn More
           </Typography>
-          <Stack direction="row" spacing={1}>
+          <Stack direction="row" spacing={1} sx={{display: {sm: "none", md: "flex"}}}>
             {tags.map((tag) => (
               <Chip label={tag} key={tag} />
             ))}
@@ -66,4 +64,4 @@ const JumboNews: FC<{
   );
 };
 
-export default JumboNews;
+export default ArticleMedium;

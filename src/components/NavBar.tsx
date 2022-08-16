@@ -223,9 +223,14 @@ const NavBar: FC = () => {
               getOptionLabel={(option: string) => option}
               onChange={(event, newValue) => {
                 if (newValue) {
+                  setInputValue(newValue);
                   navigate("/search/" + newValue);
                 }
               }}
+              onInputChange={(event, newValue) => {
+                setInputValue(newValue);
+              }}
+              onKeyDown={(e) => {if(e.key == 'Enter') {console.log(inputValue); navigate("/search/" + inputValue);}}}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -239,6 +244,7 @@ const NavBar: FC = () => {
                     style: { ...{ color: "white" } },
                     disableUnderline: true,
                   }}
+                  
                   sx={{
                     width: "12em",
                     height: "1em",

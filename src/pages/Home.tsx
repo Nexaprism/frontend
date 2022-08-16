@@ -16,24 +16,12 @@ import SkeletonGlance from "../components/SkeletonGlance";
 import SkeletonJumbo from "../components/SkeletonJumbo";
 import SkeletonProduct from "../components/SkeletonProduct";
 import { selectIsLoading, setIsLoading } from "../store/app/appReducer";
-import { useGetArticlesMostRecent } from "../store/article/hooks";
+import { useGetArticle } from "../store/article/hooks";
 import { Article } from "../store/article/types";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useGetProducts } from "../store/product/hooks";
 import { Product } from "../store/product/types";
 
-/**
- * big jumbo carousel of news w/ featured articles on the side (hidden on mobile)
- *
- * most recently added
- *
- * most popular (best review, and quantity of reviews factored in i.e. high score with more reviews has a higher weight)
- *
- * what's hot (most reviews in a 3 day period)
- *
- * latest news articles
- *
- */
 
 const Home: FC = () => {
   const [mostRecentCards, setMostRecentCards] = useState<any>([]);
@@ -50,13 +38,14 @@ const Home: FC = () => {
   const [newsItems, setNewsItems] = useState<any[]>();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
-  const mostRecentArticles = useGetArticlesMostRecent();
+  const getArticleFuncs = useGetArticle();
   const getProductsFuncs = useGetProducts();
   const isLoading = useAppSelector(selectIsLoading);
   const dispatch = useAppDispatch();
 
   const getArticles = async () => {
-    return mostRecentArticles;
+    const data = await getArticleFuncs.getByMostRecent();
+    return data;
   };
 
   const getMostRecentProd = async () => {
@@ -140,7 +129,7 @@ const Home: FC = () => {
   };
 
   const addNewsItems = (allArticles: Article[]) => {
-    const articles = allArticles.slice(0, 11);
+    const articles = allArticles;
     const articleItems: Array<any> = [];
     let page: any[] = [];
     let cardCount = 0;
@@ -161,6 +150,11 @@ const Home: FC = () => {
           })}
         </Stack>
       );
+      cardCount += carouselSize;
+      if (cardCount > articles.length) {
+        break;
+      }
+      page = [];
     }
     setNewsItems(articleItems);
   };

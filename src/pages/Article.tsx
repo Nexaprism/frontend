@@ -2,52 +2,41 @@ import { Box, Chip, Link, Stack, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import image from "../assets/img/largeImage.jpeg";
 import { useParams } from "react-router-dom";
-import { useArticleQuery } from "../store/article/hooks";
+import { useGetArticle } from "../store/article/hooks";
 import { Article } from "../store/article/types";
 import { useAppDispatch } from "../store/hooks";
 import { setIsLoading } from "../store/app/appReducer";
 
 const ArticlePage: FC = () => {
+  const getArticleFuncs = useGetArticle();
   const dispatch = useAppDispatch();
   const { id } = useParams();
-  const articleData = useArticleQuery(id);
+
   const [creationDate, setCreationDate] = useState<string | undefined>("");
-  const [article, setArticle] = useState<Article | undefined>({
-    id: "",
-    title: "",
-    imgUrl: "",
-    mainTag: "",
-    tags: [""],
-    author: "",
-    content: "",
-    createdAt: "",
-    updatedAt: "",
-  });
+  const [article, setArticle] = useState<Article | undefined>({} as Article);
 
   const getArticle = async () => {
-    return articleData;
-  };
-
-  const findDate = (article: any) => {
-    if (article) {
-      const userDate = new Date(article);
-      const year = userDate.getFullYear();
-      const month = userDate.getMonth() + 1;
-      const day = userDate.getDate();
-      const result =
-        month.toString() + "/" + day.toString() + "/" + year.toString();
-      return result;
+    let articleData;
+    if (id) {
+      articleData = await getArticleFuncs.getById(id);
     }
+    return articleData;
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
     const getData = async () => {
       dispatch(setIsLoading(true));
-      const data = await getArticle();
-      setArticle(data.returnedArticle);
-      const date = findDate(data.createdDate);
-      setCreationDate(date);
+      let articleData;
+      if (id) {
+        articleData = await getArticleFuncs.getById(id);
+      }
+      if (articleData && articleData.createdDate) {
+        setArticle(articleData.returnedArticle);
+        //const date = findDate(data.createdDate);
+        setCreationDate(new Date(articleData.createdDate).toLocaleDateString());
+      }
+
       dispatch(setIsLoading(false));
     };
     getData();
@@ -65,13 +54,9 @@ const ArticlePage: FC = () => {
           sx={{ maxWidth: 100 }}
         />
         <Box>
-          {article
+          {article && article.tags
             ? article.tags.map((tag) => (
-                <Chip
-                  key={tag}
-                  label={tag}
-                  sx={{ maxWidth: 80, maxHeight: 20 }}
-                />
+                <Chip key={tag} label={tag} sx={{ maxHeight: 20, m: 0.5 }} />
               ))
             : null}
         </Box>
@@ -84,9 +69,11 @@ const ArticlePage: FC = () => {
           }}
         >
           <Typography variant="h5">Original article:</Typography>
-          <Link href="#">
-            <Typography>URL</Typography>
-          </Link>
+          {article ? (
+            <Link href={article.url} target="_blank">
+              <Typography>{article.url}</Typography>
+            </Link>
+          ) : null}
         </Box>
         <Box
           sx={{

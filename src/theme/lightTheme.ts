@@ -13,7 +13,7 @@ const lightTheme = createTheme({
     palette: {
         mode: 'light',
         primary: {
-          main: "#201438", //dark purple
+          main: "#4d2e82", //dark purple
         },
         success: {
           light: "#388e3c", //medium green

@@ -12,7 +12,6 @@ import { FC } from "react";
 import { Link } from "react-router-dom";
 import mainLogo from "../assets/img/nexaprismLogoSmall.png";
 
-
 const NewsCard: FC<{
   image: string;
   title: string;
@@ -20,47 +19,41 @@ const NewsCard: FC<{
   date: string;
   id: string;
 }> = ({ image, title, content, date, id }) => {
-  const findDate = () => {
-
-      const userDate = new Date(date);
-      const year = userDate.getFullYear();
-      const month = userDate.getMonth() + 1;
-      const day = userDate.getDate();
-      const convertedDate =
-        month.toString() + "/" + day.toString() + "/" + year.toString();
-      return convertedDate;
-
-  };
+  
 
   return (
-    <Card sx={{ maxWidth: 345, maxHeight: 500, minWidth: 190, textDecoration: "none" }}
-    component={Link}
-        to={"/article/" + id}
+    <Card
+      sx={{
+        width: { lg: "40rem", md: "35rem", sm: "30rem" },
+        maxHeight: 500,
+        textDecoration: "none",
+      }}
+      component={Link}
+      to={"/article/" + id}
     >
-      <CardMedia
-        component="img"
-        height="225"
-        image={image}
-      />
+      <CardMedia component="img" height="225" image={image} />
       <CardContent>
-        <Typography
-          gutterBottom
-          fontSize={{ sm: 20, md: 20, lg: 25 }}
-          component="div"
-        >
-          {title}
-        </Typography>
-        <Divider />
+        <Box sx={{ height: "4rem" }}>
+          <Typography
+            gutterBottom
+            sx={{ wordWrap: "break-word" }}
+            fontSize={{ sm: "1.1em", md: "1.3em", lg: "1.5em" }}
+            component="div"
+          >
+            {title}
+          </Typography>
+        </Box>
+
+        <Divider sx={{m: 2}}/>
         <Box
           component="div"
           sx={{
-            height: { sm: 75, md: 80, lg: 90 },
+            height: "4rem",
             overflow: "hidden",
             textOverflow: "ellipsis",
           }}
         >
           <Typography
-            gutterBottom
             variant="body2"
             color="text.secondary"
             noWrap={true}
@@ -68,9 +61,9 @@ const NewsCard: FC<{
             {content}
           </Typography>
         </Box>
-        <Box sx={{ height: { sm: 10, md: 15, lg: 20 } }}>
+        <Box sx={{ height: "1rem"}}>
           <Typography variant="caption" color="text.secondary">
-            {findDate()}
+            {new Date(date).toLocaleDateString()}
           </Typography>
         </Box>
       </CardContent>

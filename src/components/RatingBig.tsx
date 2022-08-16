@@ -22,12 +22,13 @@ function RatingBig(props: CircularProgressProps & { value: number }) {
 
   useEffect(() => {
     setRatingColor(findRatingColor(props.value));
-  }, []);
+  }, [props.value]);
+
   return (
     <Box sx={{ position: "relative", p: 3 }}>
       <CircularProgress
         variant="determinate"
-        size={250}
+        size={"15rem"}
         sx={{ color: `${ratingColor}` }}
         {...props}
       />
@@ -47,7 +48,7 @@ function RatingBig(props: CircularProgressProps & { value: number }) {
           variant="h1"
           component="div"
           color="text.secondary"
-        >{`${Math.round(props.value)}`}</Typography>
+        >{props.value}</Typography>
       </Box>
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Typography>Average User Score</Typography>

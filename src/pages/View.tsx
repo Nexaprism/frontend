@@ -10,7 +10,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { FC, useEffect, useState } from "react";
+import { ChangeEvent, FC, useEffect, useState } from "react";
 import Carousel from "react-material-ui-carousel";
 import { useParams } from "react-router-dom";
 import Glance from "../components/Glance";
@@ -19,13 +19,10 @@ import MiniProductCard from "../components/MiniProductCard";
 import NewsCard from "../components/NewsCard";
 import ProductCard from "../components/ProductCard";
 import { selectIsLoading, setIsLoading } from "../store/app/appReducer";
-import {
-  useGetArticlesMainTag,
-  useGetLatestArticleByTag,
-} from "../store/article/hooks";
+import { useGetArticle } from "../store/article/hooks";
 import { Article } from "../store/article/types";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { useGetProductsMainTag } from "../store/product/hooks";
+import { useGetProducts } from "../store/product/hooks";
 import { Product } from "../store/product/types";
 import {
   metaverseDescription,
@@ -41,11 +38,14 @@ const View: FC = () => {
   const dispatch = useAppDispatch();
   const { category } = useParams();
   const [pageDescription, setPageDescription] = useState<string>("");
+  const [totalProducts, setTotalProducts] = useState<number>(1);
   const [pageTitle, setPageTitle] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
   const [firstHalf, setFirstHalf] = useState<any>([]);
-  const [products, setProducts] = useState<any[]>();
+  const [products, setProducts] = useState<any[]>([]);
   const [newsItems, setNewsItems] = useState<any[]>();
   const [reload, setReload] = useState<boolean>(true);
+  const [sort, setSort] = useState<string>("recent");
   const [latestNews, setLatestNews] = useState<Article>({
     id: "",
     title: "",
@@ -56,6 +56,7 @@ const View: FC = () => {
     createdAt: "",
     updatedAt: "",
     imgUrl: "",
+    url: "",
   });
   const [enabledButton, setEnabledButton] = useState<boolean[]>([
     false,
@@ -64,8 +65,8 @@ const View: FC = () => {
   ]);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
-  const metaverseProducts = useGetProductsMainTag(category);
-  const metaverseArticles = useGetArticlesMainTag(category);
+  const getProductFuncs = useGetProducts();
+  const getArticleFuncs = useGetArticle();
   const isLoading = useAppSelector(selectIsLoading);
 
   const buttonStyles = {
@@ -74,12 +75,22 @@ const View: FC = () => {
 
   const getProducts = async () => {
     dispatch(setIsLoading(true));
-    return metaverseProducts;
+    return (await getProductFuncs).getByMainTag(category, page, sort);
   };
 
   const getArticles = async () => {
     dispatch(setIsLoading(true));
-    return metaverseArticles;
+    let data;
+    if (category) {
+      data = await getArticleFuncs.getByMainTag(category);
+    }
+    return data;
+  };
+
+  const handlePageChange = (event: ChangeEvent<any>, value: number) => {
+    event.preventDefault();
+    console.log("page is " + value);
+    setPage(value);
   };
 
   const makeCarouselPage = (
@@ -186,6 +197,11 @@ const View: FC = () => {
           })}
         </Stack>
       );
+      cardCount += carouselSize;
+      if (cardCount > articles.length) {
+        break;
+      }
+      page = [];
     }
     setNewsItems(articleItems);
   };
@@ -259,17 +275,26 @@ const View: FC = () => {
     let variantArray = [false, false, false];
     variantArray[index] = true;
     setEnabledButton(variantArray);
+    if(index === 0) {
+      setSort("highest") 
+    } else if (index === 1) {
+      setSort("lowest")
+    } else {
+      setSort("recent")
+    }
   };
 
   useEffect(() => {
     const getData = async () => {
       const metaProdData = await getProducts();
       const metaArtData = await getArticles();
-      //const metaNewsArt = await getLatestArticle();
-      setLatestNews(metaArtData.returnedArticles[0]);
-      addItems(metaProdData.prodArray);
-      addNewsItems(metaArtData.returnedArticles);
-      //console.log(metaNewsArt);
+      setTotalProducts(metaProdData.prodNum);
+      if (metaArtData) {
+        setLatestNews(metaArtData.returnedArticles[0]);
+        addItems(metaProdData.prodArray);
+        addNewsItems(metaArtData.returnedArticles);
+      }
+
       separateTheItems(metaProdData.prodArray);
       dispatch(setIsLoading(false));
     };
@@ -287,7 +312,7 @@ const View: FC = () => {
     setTimeout(() => {
       setReload(false);
     }, 1500);
-  }, [reload, matches, category]);
+  }, [reload, matches, category, page, sort]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", pt: 4 }}>
@@ -421,6 +446,13 @@ const View: FC = () => {
             })}
           </Grid>
         )}
+        <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
+          <Pagination
+            count={Math.round(totalProducts / 6)}
+            page={page}
+            onChange={handlePageChange}
+          />
+        </Box>
 
         {isLoading ? (
           <Stack direction="row" spacing={3}>

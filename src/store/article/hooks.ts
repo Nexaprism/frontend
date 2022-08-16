@@ -1,11 +1,13 @@
 import { Article } from "./types";
 
-export const useArticleQuery = async (id?: string) => {
-    let returnedArticle;
-    let createdDate;
-    let updatedDate;
-    const graphqlQuery = {
-      query: `
+export const useGetArticle = () => {
+  return {
+    getById: async (id: string) => {
+      let returnedArticle;
+      let createdDate;
+      let updatedDate;
+      const graphqlQuery = {
+        query: `
         {
           article(id: "${id}") {
             article {
@@ -16,42 +18,43 @@ export const useArticleQuery = async (id?: string) => {
             imgUrl
             mainTag
             tags
+            url
             }
             createdAt
-          updatedAt
+            updatedAt
           }
           
         }
       `,
-    };
-    await fetch("http://localhost:3080/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(graphqlQuery),
-    })
-      .then((res) => {
-        return res.json();
+      };
+      await fetch("http://localhost:3080/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
       })
-      .then((resData) => {
-        if (resData.errors) {
-          console.log(resData);
-          throw new Error("Fetching article failed");
-        }
-        returnedArticle = resData.data.article.article;
-        createdDate = resData.data.article.createdAt;
-        updatedDate = resData.data.article.updatedAt;
-      });
-    return {returnedArticle, createdDate, updatedDate};
-  }
-
-  export const useGetAllArticlesQuery = async () => {
-    let returnedArticles: Article[] = [];
-    const graphqlQuery = {
-      query: `
+        .then((res) => {
+          return res.json();
+        })
+        .then((resData) => {
+          if (resData.errors) {
+            console.log(resData);
+            throw new Error("Fetching article failed");
+          }
+          returnedArticle = resData.data.article.article;
+          createdDate = resData.data.article.createdAt;
+          updatedDate = resData.data.article.updatedAt;
+        });
+      return { returnedArticle, createdDate, updatedDate };
+    },
+    getByPage: async (page: number) => {
+      let returnedArticles: Article[] = [];
+      let totalArticles = 0;
+      const graphqlQuery = {
+        query: `
         {
-          articles {
+          articles(page: ${page}) {
             articles {
             _id
             title
@@ -60,28 +63,30 @@ export const useArticleQuery = async (id?: string) => {
             imgUrl
             mainTag
             tags
+            url
             updatedAt
             }
+            totalArticles
           }
         }
       `,
-    };
-    await fetch("http://localhost:3080/graphql", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(graphqlQuery),
-    })
-      .then((res) => {
-        return res.json();
+      };
+      await fetch("http://localhost:3080/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
       })
-      .then((resData) => {
-        if (resData.errors) {
-          console.log(resData);
-          throw new Error("Fetching articles failed");
-        }
-        resData.data.articles.articles.map((article: any) => {
+        .then((res) => {
+          return res.json();
+        })
+        .then((resData) => {
+          if (resData.errors) {
+            console.log(resData);
+            throw new Error("Fetching articles failed");
+          }
+          resData.data.articles.articles.map((article: any) => {
             let newArt: Article = {
               imgUrl: article.imgUrl,
               title: article.title,
@@ -90,19 +95,20 @@ export const useArticleQuery = async (id?: string) => {
               mainTag: article.mainTag,
               tags: article.tags,
               author: article.author,
+              url: article.url,
               createdAt: article.createdAt,
-              updatedAt: article.updatedAt
+              updatedAt: article.updatedAt,
             };
             returnedArticles.push(newArt);
           });
-      });
-    return returnedArticles;
-  }
-
-  export const useGetArticlesMainTag = async (tag?: string) => {
-    let returnedArticles: Article[] = [];
-    let totArticles: number = 0;
-    const graphqlQuery = {
+          totalArticles = resData.data.articles.totalArticles;
+        });
+      return {articles: returnedArticles, totalArticles: totalArticles};
+    },
+    getByMainTag: async (tag: string) => {
+      let returnedArticles: Article[] = [];
+      let totArticles: number = 0;
+      const graphqlQuery = {
         query: `
           {
             getArticlesMainTag(tag: "${tag}") {
@@ -114,6 +120,7 @@ export const useArticleQuery = async (id?: string) => {
               imgUrl
               mainTag
               tags
+              url
               updatedAt
               }
               totalArticles
@@ -138,64 +145,26 @@ export const useArticleQuery = async (id?: string) => {
           }
           resData.data.getArticlesMainTag.articles.map((a: any) => {
             let newArt: any = {
-                id: a._id,
-                title: a.title,
-                author: a.author,
-                content: a.content,
-                mainTag: a.mainTag,
-                tags: a.tags,
-                updatedAt: a.updatedAt,
-                imgUrl: a.imgUrl,
-            }
+              id: a._id,
+              title: a.title,
+              author: a.author,
+              content: a.content,
+              mainTag: a.mainTag,
+              tags: a.tags,
+              updatedAt: a.updatedAt,
+              imgUrl: a.imgUrl,
+              url: a.url,
+            };
             returnedArticles.push(newArt);
           });
           totArticles = resData.data.getArticlesMainTag.totalArticles;
         });
-        return {returnedArticles, totArticles};
-  }
-
-  export const useGetLatestArticleByTag = async (tag?: string) => {
-    let returnedArticle;
-    const graphqlQuery = {
-        query: `
-          {
-            getLatestArticleByTag(tag: "${tag}") {
-              _id
-              title
-              author
-              content
-              imgUrl
-              mainTag
-              tags
-              updatedAt
-            }
-          }
-        `,
-      };
-      await fetch("http://localhost:3080/graphql", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(graphqlQuery),
-      })
-        .then((res) => {
-          return res.json();
-        })
-        .then((resData) => {
-          if (resData.errors) {
-            console.log(resData);
-            throw new Error("Fetching article failed");
-          }
-          returnedArticle = resData.data.getLatestArticleByTag;
-        });
-      return returnedArticle;
-  }
-
-  export const useGetArticlesMostRecent = async () => {
-    let returnedArticles: Article[] = [];
-    let totArticles: number = 0;
-    const graphqlQuery = {
+      return { returnedArticles, totArticles };
+    },
+    getByMostRecent: async () => {
+      let returnedArticles: Article[] = [];
+      let totArticles: number = 0;
+      const graphqlQuery = {
         query: `
           {
             getArticlesMostRecent {
@@ -207,6 +176,7 @@ export const useArticleQuery = async (id?: string) => {
               imgUrl
               mainTag
               tags
+              url
               updatedAt
               }
               totalArticles
@@ -231,18 +201,22 @@ export const useArticleQuery = async (id?: string) => {
           }
           resData.data.getArticlesMostRecent.articles.map((a: any) => {
             let newArt: any = {
-                id: a._id,
-                title: a.title,
-                author: a.author,
-                content: a.content,
-                mainTag: a.mainTag,
-                tags: a.tags,
-                updatedAt: a.updatedAt,
-                imgUrl: a.imgUrl,
-            }
+              id: a._id,
+              title: a.title,
+              author: a.author,
+              content: a.content,
+              mainTag: a.mainTag,
+              tags: a.tags,
+              updatedAt: a.updatedAt,
+              imgUrl: a.imgUrl,
+              url: a.url,
+            };
             returnedArticles.push(newArt);
           });
           totArticles = resData.data.getArticlesMostRecent.totalArticles;
         });
-        return {returnedArticles, totArticles};
-  }
+      return { returnedArticles, totArticles };
+    },
+    getByLatest: async () => {},
+  };
+};

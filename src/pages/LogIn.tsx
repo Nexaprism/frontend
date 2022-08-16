@@ -41,7 +41,7 @@ const LogIn: FC = () => {
 
   const buttonStyles = {
     color: "white",
-    background: "linear-gradient(to bottom, #bf1aed, #201438)",
+    background: "linear-gradient(to bottom, #a373f5, #4d2e82)",
     "&:hover": {
       background: "#cc7be3",
       transform: "none",
@@ -49,6 +49,10 @@ const LogIn: FC = () => {
     "&:disabled": {
       background: "gray",
     },
+  };
+
+  const fieldStyles = {
+    backgroundColor: theme == "dark" ? "#424242" : "white"
   };
 
   type TransitionProps = Omit<SlideProps, "direction">;
@@ -142,6 +146,7 @@ const LogIn: FC = () => {
           <FormControl sx={{ display: "flex", width: "100%" }}>
             <Typography>Email:</Typography>
             <TextField
+            sx={fieldStyles}
               onChange={(e) => {
                 setEmailField(e.target.value);
                 checkValid(e.target.value);
@@ -149,6 +154,7 @@ const LogIn: FC = () => {
             />
             <Typography>Password:</Typography>
             <OutlinedInput
+            sx={fieldStyles}
               required
               error={passError}
               type={showPass ? "text" : "password"}
