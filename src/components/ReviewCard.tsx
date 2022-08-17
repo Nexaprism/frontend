@@ -149,8 +149,8 @@ const ReviewCard: FC<{
   return (
     <Card
       sx={{
-        minWidth: 400,
-        maxHeight: 200,
+        width: "30rem",
+        height: "15rem",
         display: "flex",
         borderRadius: 5,
         boxShadow: 3,
@@ -247,10 +247,10 @@ const ReviewCard: FC<{
         </Stack>
       </Dialog>
       <CardActionArea sx={{ display: "flex", p: 2 }} component="a">
-        <Box sx={{ width: "50%" }}>
+        <Box sx={{ width: "40%" }}>
           <RatingMedium value={rating} />
         </Box>
-        <CardContent sx={{ width: "50%" }}>
+        <CardContent sx={{ width: "60%", maxHeight: "15rem" }}>
           <Stack
             direction="column"
             sx={{ display: "flex", justifyContent: "flex-start" }}
@@ -258,9 +258,12 @@ const ReviewCard: FC<{
             <Typography gutterBottom variant="h5" component="div">
               {prodName ? prodName : user.username}
             </Typography>
-            <Typography variant="body2" color="text.secondary" component="div">
+            <Box sx={{height: "5rem", overflowY: "auto"}}>
+            <Typography variant="body2" color="text.secondary" component="div" >
               {content}
             </Typography>
+            </Box>
+            
             <Typography color="text.secondary" sx={{ fontSize: 10, pt: 3 }}>
               {date}
             </Typography>

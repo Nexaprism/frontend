@@ -309,9 +309,9 @@ const View: FC = () => {
       setPageTitle("The Metaverse");
       setPageDescription(metaverseDescription);
     }
-    setTimeout(() => {
-      setReload(false);
-    }, 1500);
+    // setTimeout(() => {
+    //   setReload(false);
+    // }, 1500);
   }, [reload, matches, category, page, sort]);
 
   return (

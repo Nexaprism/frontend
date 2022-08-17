@@ -185,11 +185,11 @@ export const useUserFunc = () => {
         .catch((err) => {
           console.log(err);
         });
-        return feedback;
+      return feedback;
     },
     signUp: async (email: string, username: string, password: string) => {
-        const graphqlQuery = {
-            query: `
+      const graphqlQuery = {
+        query: `
               mutation {
                 createUser(userInput: {
                   email: "${email}", 
@@ -201,42 +201,86 @@ export const useUserFunc = () => {
                 }
               }
             `,
-          };
-          await fetch("http://localhost:3080/graphql", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(graphqlQuery),
-          })
-            .then((res) => {
-              return res.json();
-            })
-            .then((resData) => {
-              //error handling
-              if (resData.errors && resData.errors[0].status === 422) {
-                console.log(resData);
-                const msg = resData.errors[0].message;
-                feedback.message = "Validation failed. " + msg;
-                return feedback;
-              }
-              if (resData.errors) {
-                console.log(resData);
-                const msg = resData.errors[0].message;
-                feedback.message = "Account creation failed. " + msg;
-                return feedback;
-              }
-              setUserData(resData.data.createUser);
-              feedback.message = "Account creation successful! Please login."
-              feedback.success = true;
-            })
-            .catch((err) => {
-              console.log(err);
-            });
+      };
+      await fetch("http://localhost:3080/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((resData) => {
+          //error handling
+          if (resData.errors && resData.errors[0].status === 422) {
+            console.log(resData);
+            const msg = resData.errors[0].message;
+            feedback.message = "Validation failed. " + msg;
             return feedback;
+          }
+          if (resData.errors) {
+            console.log(resData);
+            const msg = resData.errors[0].message;
+            feedback.message = "Account creation failed. " + msg;
+            return feedback;
+          }
+          setUserData(resData.data.createUser);
+          feedback.message = "Account creation successful! Please login.";
+          feedback.success = true;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      return feedback;
+    },
+    update: async (
+      userId: string,
+      email: string,
+      username: string,
+      password: string,
+      avatar: string,
+      token: string, 
+    ) => {
+      const graphqlQuery = {
+        query: `
+                mutation {
+                updateUser(id: "${userId}", userInput: {
+                    email: "${email}",
+                    avatar: "${avatar}",
+                    username: "${username}",
+                    password: "${password}",
+                }) {
+                    _id
+                    avatar
+                }
+            }
+            `,
+      };
+      await fetch("http://localhost:3080/graphql", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((resData) => {
+          //error handling
+          if (resData.errors && resData.errors[0].status === 422) {
+            console.log(resData);
+            throw new Error("Validation failed. Could not authenticate user");
+          }
+          if (resData.errors) {
+            console.log(resData);
+            throw new Error("Review creation failed");
+          }
+        });
     },
     data: userData,
   };
-
-
 };

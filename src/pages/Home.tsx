@@ -329,7 +329,7 @@ const Home: FC = () => {
             <SkeletonProduct />
           </Stack>
         ) : (
-          <Carousel sx={{ width: "100%" }} index={4} animation="slide">
+          <Carousel sx={{ width: "100%", pb: 2 }} index={4} animation="slide">
             {newsItems}
           </Carousel>
         )}
