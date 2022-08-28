@@ -108,47 +108,6 @@ const Profile: FC = () => {
     mr: 4,
   };
 
-  // const Search = styled("div")(({ theme }) => ({
-  //   position: "relative",
-  //   marginLeft: 1,
-  //   width: "100%",
-  //   borderRadius: theme.shape.borderRadius,
-  //   backgroundColor: alpha(theme.palette.common.black, 0.15),
-  //   "&:hover": {
-  //     backgroundColor: alpha(theme.palette.common.black, 0.25),
-  //   },
-  //   [theme.breakpoints.up("sm")]: {
-  //     marginLeft: theme.spacing(1),
-  //     width: "auto",
-  //   },
-  // }));
-
-  // const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  //   color: "inherit",
-  //   "& .MuiInputBase-input": {
-  //     padding: theme.spacing(1, 1, 1, 0),
-  //     // vertical padding + font size from searchIcon
-  //     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-  //     transition: theme.transitions.create("width"),
-  //     width: "100%",
-  //     [theme.breakpoints.up("sm")]: {
-  //       width: "12ch",
-  //       "&:focus": {
-  //         width: "20ch",
-  //       },
-  //     },
-  //   },
-  // }));
-
-  // const SearchIconWrapper = styled("div")(({ theme }) => ({
-  //   padding: theme.spacing(0, 2),
-  //   height: "100%",
-  //   position: "absolute",
-  //   pointerEvents: "none",
-  //   display: "flex",
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  // }));
 
   const findUserSince = () => {
     if (creationDate) {
@@ -239,6 +198,7 @@ const Profile: FC = () => {
     if (reviews.length === 0) {
       reviewArray.push(
         <Grid
+          key={"no_reviews"}
           item
           xs={12}
           md={6}
@@ -258,6 +218,7 @@ const Profile: FC = () => {
             sx={{ display: "flex", justifyContent: "center" }}
           >
             <ReviewCard
+              key={review.id}
               id={review.id}
               rating={review.rating}
               content={review.content}
@@ -295,7 +256,6 @@ const Profile: FC = () => {
       if (data.user) {
         const reviewData = await getUserReviewData();
         if (reviewData) {
-          //setReviewItems(reviewData.reviews);
           addReviews(reviewData.reviews);
           setReviewCount(reviewData.totReviews);
         }
@@ -421,17 +381,6 @@ const Profile: FC = () => {
             <Typography variant="h3">Your reviews:</Typography>
           </Box>
 
-          {/* <Box sx={{ justifyContent: "flex-end", width: "50%" }}>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Search>
-          </Box> */}
         </Stack>
 
         <Divider />

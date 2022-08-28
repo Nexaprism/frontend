@@ -52,7 +52,7 @@ const LogIn: FC = () => {
   };
 
   const fieldStyles = {
-    backgroundColor: theme == "dark" ? "#424242" : "white"
+    backgroundColor: theme == "dark" ? "#424242" : "white",
   };
 
   type TransitionProps = Omit<SlideProps, "direction">;

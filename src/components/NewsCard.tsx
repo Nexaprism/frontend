@@ -24,7 +24,8 @@ const NewsCard: FC<{
   return (
     <Card
       sx={{
-        width: { lg: "40rem", md: "35rem", sm: "30rem" },
+        width: { lg: "40rem", md: "35rem", sm: "30rem", xs: "28rem" },
+        minWidth: {xs: "10rem"},
         maxHeight: 500,
         textDecoration: "none",
       }}

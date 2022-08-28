@@ -37,6 +37,10 @@ import SkeletonMiniProduct from "../components/SkeletonMiniProduct";
 const View: FC = () => {
   const dispatch = useAppDispatch();
   const { category } = useParams();
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("md"));
+  const isXS = useMediaQuery(theme.breakpoints.between("xs", "sm"));
+  const isSM = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const [pageDescription, setPageDescription] = useState<string>("");
   const [totalProducts, setTotalProducts] = useState<number>(1);
   const [pageTitle, setPageTitle] = useState<string>("");
@@ -63,8 +67,6 @@ const View: FC = () => {
     false,
     true,
   ]);
-  const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up("md"));
   const getProductFuncs = useGetProducts();
   const getArticleFuncs = useGetArticle();
   const isLoading = useAppSelector(selectIsLoading);
@@ -149,8 +151,15 @@ const View: FC = () => {
     const productItems: Array<any> = [];
     let page: any[] = [];
     let cardCount = 0;
-    let carouselSize = matches ? 4 : 3;
-    let carouselPageCount = matches ? 2 : 3;
+    let carouselSize = 2;
+    let carouselPageCount = 4;
+    if(isXS) {
+      carouselSize = 2;
+      carouselPageCount = 4;
+    } else if (isSM || matches) {
+      carouselSize = 4;
+      carouselPageCount = 2;
+    }
     for (let i = 0; i < carouselPageCount; i++) {
       page = makeCarouselPage(cardCount, products, carouselSize);
       productItems.push(
@@ -180,8 +189,15 @@ const View: FC = () => {
     const articleItems: Array<any> = [];
     let page: any[] = [];
     let cardCount = 0;
-    let carouselSize = matches ? 4 : 3;
-    let carouselPageCount = matches ? 2 : 3;
+    let carouselSize = 2;
+    let carouselPageCount = 4;
+    if(isXS) {
+      carouselSize = 2;
+      carouselPageCount = 4;
+    } else if (isSM || matches) {
+      carouselSize = 4;
+      carouselPageCount = 2;
+    }
     for (let i = 0; i < carouselPageCount; i++) {
       page = makeNewsCarouselPage(cardCount, articles, carouselSize);
       articleItems.push(
@@ -309,17 +325,15 @@ const View: FC = () => {
       setPageTitle("The Metaverse");
       setPageDescription(metaverseDescription);
     }
-    // setTimeout(() => {
-    //   setReload(false);
-    // }, 1500);
+
   }, [reload, matches, category, page, sort]);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", pt: 4 }}>
       <Stack
         direction="column"
-        spacing={4}
-        sx={{ width: { xl: 1500, lg: 1200, md: 800, sm: 600 } }}
+        spacing={6}
+        sx={{ width: { xl: 1500, lg: 1200, md: 800, sm: 600, xs: 370 } }}
       >
         <Box>
           <Box>
@@ -340,7 +354,7 @@ const View: FC = () => {
               sx={{
                 display: "flex",
                 height: "100%",
-                width: { sm: "100%", md: "100%", lg: "75%", xl: "75%" },
+                width: { xs: "100%", sm: "100%", md: "100%", lg: "75%", xl: "75%" },
               }}
             >
               {isLoading ? (
@@ -358,7 +372,7 @@ const View: FC = () => {
 
             <Box
               sx={{
-                display: { md: "none", sm: "none", lg: "flex", xl: "flex" },
+                display: { xs: "none", md: "none", sm: "none", lg: "flex", xl: "flex" },
                 width: "25%",
               }}
             >

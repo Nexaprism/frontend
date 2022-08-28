@@ -30,7 +30,7 @@ function ProductCard(props: {
       sx={{
         maxHeight: 275,
         maxWidth: 250,
-        width: { sm: 150, md: 250, lg: 275 },
+        width: { xs: 150, sm: 150, md: 250, lg: 275 },
       }}
     >
       <CardActionArea

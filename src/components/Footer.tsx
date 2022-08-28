@@ -23,10 +23,10 @@ const Footer: FC = () => {
         color: "inherit",
         backgroundColor: themeFromStore == "light" ? "#4d2e82" : "#242424",
       }}
-      sx={{ pl: 5, pt: 2.5, display: "flex", justifyContent: "center", boxShadow: 6 }}
+      sx={{ pt: 2.5, display: "flex", justifyContent: "center", boxShadow: 6 }}
     >
       <Stack direction="column" justifyContent="center" spacing={5}>
-        <Stack direction="row" spacing={5} justifyContent="center">
+        <Stack direction="row" spacing={5} justifyContent="center" alignItems="center">
           <Link href="https://www.facebook.com/nexaprism" rel="noopener" target="_blank" sx={{color: 'white'}}>
             <FacebookIcon />
           </Link>

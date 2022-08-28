@@ -38,6 +38,8 @@ const Home: FC = () => {
   const [newsItems, setNewsItems] = useState<any[]>();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
+  const isXS = useMediaQuery(theme.breakpoints.between("xs", "sm"));
+  const isSM = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const getArticleFuncs = useGetArticle();
   const getProductsFuncs = useGetProducts();
   const isLoading = useAppSelector(selectIsLoading);
@@ -96,8 +98,15 @@ const Home: FC = () => {
     const productItems: Array<any> = [];
     let page: any[] = [];
     let cardCount = 0;
-    let carouselSize = matches ? 4 : 3;
-    let carouselPageCount = matches ? 2 : 3;
+    let carouselSize = 2;
+    let carouselPageCount = 4;
+    if(isXS) {
+      carouselSize = 2;
+      carouselPageCount = 4;
+    } else if (isSM || matches) {
+      carouselSize = 4;
+      carouselPageCount = 2;
+    }
     for (let i = 0; i < carouselPageCount; i++) {
       page = makeCarouselPage(cardCount, products, carouselSize);
       productItems.push(
@@ -133,8 +142,15 @@ const Home: FC = () => {
     const articleItems: Array<any> = [];
     let page: any[] = [];
     let cardCount = 0;
-    let carouselSize = matches ? 4 : 3;
-    let carouselPageCount = matches ? 2 : 3;
+    let carouselSize = 2;
+    let carouselPageCount = 4;
+    if(isXS) {
+      carouselSize = 2;
+      carouselPageCount = 4;
+    } else if (isSM || matches) {
+      carouselSize = 4;
+      carouselPageCount = 2;
+    }
     for (let i = 0; i < carouselPageCount; i++) {
       page = makeNewsCarouselPage(cardCount, articles, carouselSize);
       articleItems.push(
@@ -207,13 +223,13 @@ const Home: FC = () => {
     <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Stack
         direction="column"
-        spacing={3}
-        sx={{ width: { xl: 1500, lg: 1200, md: 800, sm: 600 } }}
+        spacing={6}
+        sx={{ width: { xl: 1500, lg: 1200, md: 800, sm: 600, xs: 370 } }}
       >
         <Stack
           direction="row"
           sx={{
-            maxHeight: { xs: 350, md: 550, lg: 400 },
+            maxHeight: { xs: 350, sm: 450, md: 550, lg: 400 },
             width: "100%",
             borderBottomRightRadius: 20,
             borderBottomLeftRadius: 20,
@@ -223,7 +239,7 @@ const Home: FC = () => {
             sx={{
               display: "flex",
               height: "100%",
-              width: { sm: "100%", md: "100%", lg: "75%", xl: "75%" },
+              width: { xs: "100%", sm: "100%", md: "100%", lg: "75%", xl: "75%" },
             }}
           >
             {isLoading ? (
@@ -241,7 +257,7 @@ const Home: FC = () => {
 
           <Box
             sx={{
-              display: { md: "none", sm: "none", lg: "flex", xl: "flex" },
+              display: { xs: "none", md: "none", sm: "none", lg: "flex", xl: "flex" },
               width: "25%",
             }}
           >
@@ -255,7 +271,7 @@ const Home: FC = () => {
             )}
           </Box>
         </Stack>
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end"}}>
           <Typography variant="h3">Recently Added</Typography>
         </Box>
         <Box sx={{ height: "275px", width: "auto" }}>
