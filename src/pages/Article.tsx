@@ -33,7 +33,6 @@ const ArticlePage: FC = () => {
       }
       if (articleData && articleData.createdDate) {
         setArticle(articleData.returnedArticle);
-        //const date = findDate(data.createdDate);
         setCreationDate(new Date(articleData.createdDate).toLocaleDateString());
       }
 
