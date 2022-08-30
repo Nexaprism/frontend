@@ -272,7 +272,7 @@ const Home: FC = () => {
           </Box>
         </Stack>
         <Box sx={{ display: "flex", justifyContent: "flex-end"}}>
-          <Typography variant="h3">Recently Added</Typography>
+          <Typography sx={{fontSize: {xs: "2em", sm: "3em"}}}>Recently Added</Typography>
         </Box>
         <Box sx={{ height: "275px", width: "auto" }}>
           {isLoading ? (
@@ -293,7 +293,7 @@ const Home: FC = () => {
             </Carousel>
           )}
         </Box>
-        <Typography variant="h3">Most Popular</Typography>
+        <Typography sx={{fontSize: {xs: "2em", sm: "3em"}}}>Most Popular</Typography>
         <Box sx={{ height: "275px", width: "auto" }}>
           {isLoading ? (
             <Stack direction="row" spacing={3}>
@@ -314,7 +314,7 @@ const Home: FC = () => {
           )}
         </Box>
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Typography variant="h3">Newest Releases</Typography>
+          <Typography sx={{fontSize: {xs: "2em", sm: "3em"}}}>Newest Releases</Typography>
         </Box>
 
         <Box sx={{ height: "275px", width: "auto" }}>
@@ -336,16 +336,16 @@ const Home: FC = () => {
             </Carousel>
           )}
         </Box>
-        <Typography variant="h3">Latest News</Typography>
+        <Typography sx={{fontSize: {xs: "2em", sm: "3em"}}}>Latest News</Typography>
         {isLoading ? (
-          <Stack direction="row" spacing={3}>
+          <Stack direction="row" spacing={3} sx={{width: "100%"}}>
             <SkeletonProduct />
             <SkeletonProduct />
             <SkeletonProduct />
             <SkeletonProduct />
           </Stack>
         ) : (
-          <Carousel sx={{ width: "100%", pb: 2 }} index={4} animation="slide">
+          <Carousel sx={{ width: "100%", pb: 2 }} index={4} animation="slide" navButtonsAlwaysVisible={true}>
             {newsItems}
           </Carousel>
         )}

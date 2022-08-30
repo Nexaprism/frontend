@@ -5,7 +5,10 @@ import {
   Button,
   Divider,
   Grid,
+  IconButton,
+  InputAdornment,
   InputBase,
+  OutlinedInput,
   Pagination,
   Stack,
   styled,
@@ -15,6 +18,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { ChangeEvent, FC, useEffect, useState } from "react";
+import bcrypt from "bcryptjs";
 import ReviewCard from "../components/ReviewCard";
 import SkeletonReview from "../components/SkeletonReview";
 import SearchIcon from "@mui/icons-material/Search";
@@ -46,12 +50,16 @@ import {
 } from "../store/user/hooks";
 import { useReviews } from "../store/review/hooks";
 import { selectTheme } from "../store/theme/themeReducer";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Profile: FC = () => {
   const [reviewItems, setReviewItems] = useState<any[]>([]);
   const [creationDate, setCreationDate] = useState<string | undefined>("");
   const [page, setPage] = useState<number>(1);
   const [chosenAvatar, setChosenAvatar] = useState<number>(0);
+  const [checkedPassword, setCheckedPassword] = useState<string>("");
+  const [passError, setPassError] = useState<boolean>(false);
+  const [showPass, setShowPass] = useState<boolean>(false);
   const [newUsername, setNewUsername] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [isEdit, setIsEdit] = useState<boolean>(false);
@@ -76,6 +84,8 @@ const Profile: FC = () => {
   const userFuncs = useUserFunc();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const theme = useAppSelector(selectTheme);
+  const avatar = useAppSelector(selectAvatar);
+
 
   const buttonStyles = {
     display: isEdit ? "none" : "flex",
@@ -108,6 +118,9 @@ const Profile: FC = () => {
     mr: 4,
   };
 
+  const visibilityStyles = {
+    color: theme == "light" ? "gray" : "white"
+  }
 
   const findUserSince = () => {
     if (creationDate) {
@@ -131,15 +144,29 @@ const Profile: FC = () => {
     navigate("/");
   };
 
+  const handleClickShowPassword = () => {
+    setShowPass(!showPass);
+  };
+
   const handlePageChange = (event: ChangeEvent<any>, value: number) => {
     event.preventDefault();
     console.log("page is " + value);
     setPage(value);
   };
 
-  const handleEditUser = () => {
+  const handleEditUser = async () => {
     setReload(!reload);
     dispatch(setIsLoading(true));
+    if(user) {
+      const result = await bcrypt.compare(checkedPassword, user.password);
+      if (!result) {
+        console.log("incorrect password entered");
+        return
+      }
+      if(newPassword === "") {
+        setNewPassword(checkedPassword);
+      } 
+    }
     console.log(email);
     let image;
     if (user && chosenAvatar === 0) {
@@ -152,11 +179,16 @@ const Profile: FC = () => {
       image = triangle3;
     }
     if (userId && email && token && newUsername) {
-      userFuncs.update( userId, email, newUsername, newPassword, image, token);
-      console.log("update submitted: " + newUsername)
+      userFuncs.update(userId, email, newUsername, newPassword, image, token);
+      console.log("update submitted: " + newUsername);
     }
-    dispatch(setAvatar(image));
+    localStorage.setItem("avatar", image);
+    await dispatch(setAvatar(image));
     setIsEdit(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1100)
+    
   };
 
   const getUser = async () => {
@@ -204,7 +236,7 @@ const Profile: FC = () => {
           md={6}
           sx={{ display: "flex", justifyContent: "center" }}
         >
-          <Typography variant="h2">No reviews yet.</Typography>
+          <Typography sx={{display: "flex", justifyContent: "center", fontSize: {xs: "2em", sm: "3em"}}}>No reviews yet.</Typography>
         </Grid>
       );
     } else {
@@ -254,6 +286,8 @@ const Profile: FC = () => {
       setUser(data.user);
       setCreationDate(data.createdAt);
       if (data.user) {
+        setNewUsername(data.user.username);
+        setNewPassword(data.user.password);
         const reviewData = await getUserReviewData();
         if (reviewData) {
           addReviews(reviewData.reviews);
@@ -264,14 +298,14 @@ const Profile: FC = () => {
     getData();
     findUserSince();
     dispatch(setIsLoading(false));
-  }, [reload, page]);
+  }, [reload, page, avatar]);
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", m: 10 }}>
+    <Box sx={{ display: "flex", justifyContent: "center", m: {xs:4, sm: 8} }}>
       <Stack direction="column" width="100%" spacing={2}>
-        <Typography variant="h2">Account details</Typography>
+        <Typography sx={{fontSize: {xs: "2em", sm: "3em", display: "flex", justifyContent: "center"}}}>Account details</Typography>
         <Divider />
-        <Stack direction="row" spacing={4} sx={{ alignItems: "center" }}>
+        <Stack direction={{xs: "column", sm: "row"}} spacing={4} sx={{ alignItems: "center" }}>
           <Avatar
             sx={{ height: 115, width: 115 }}
             src={user == undefined ? "none" : user.avatar}
@@ -288,13 +322,57 @@ const Profile: FC = () => {
             />
           </Box>
           <Box sx={{ display: isEdit ? "flex" : "none", flexDirection: "row" }}>
-            <Typography>Choose password: </Typography>
-            <TextField
-              onChange={(e) => setNewPassword(e.target.value)}
-              sx={{
-                ml: 2,
-                backgroundColor: theme == "dark" ? "#424242" : "white",
-              }}
+            <Typography>Enter previous password: </Typography>
+            <OutlinedInput
+            sx={{
+              ml: 2,
+              backgroundColor: theme == "dark" ? "#424242" : "white",
+            }}
+            required
+            error={passError}
+            type={showPass ? "text" : "password"}
+            onChange={(e) => setCheckedPassword(e.target.value)}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={(e: React.SyntheticEvent) =>
+                    e.preventDefault()
+                  }
+                  edge="end"
+                >
+                  {showPass ? <VisibilityOff sx={visibilityStyles} /> : <Visibility sx={visibilityStyles} />}
+                </IconButton>
+              </InputAdornment>
+            }
+            />
+          </Box>
+          <Box sx={{ display: isEdit ? "flex" : "none", flexDirection: "row" }}>
+            <Typography>Enter new password: </Typography>
+            <OutlinedInput
+            sx={{
+              ml: 2,
+              backgroundColor: theme == "dark" ? "#424242" : "white",
+            }}
+            required
+            error={passError}
+            type={showPass ? "text" : "password"}
+            onChange={(e) => setNewPassword(e.target.value)}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={(e: React.SyntheticEvent) =>
+                    e.preventDefault()
+                  }
+                  edge="end"
+                >
+                  {showPass ? <VisibilityOff  sx={visibilityStyles} /> : <Visibility sx={visibilityStyles} />}
+                </IconButton>
+              </InputAdornment>
+            }
             />
           </Box>
 
@@ -305,17 +383,17 @@ const Profile: FC = () => {
             {user == undefined ? "none" : user.username}
           </Typography>
         </Stack>
-        <Box sx={{ display: isEdit ? "flex" : "none", width: "100%" }}>
-          <Typography>Choose an avatar</Typography>
-          <Stack direction="row" spacing={3} sx={{ml: 3}}>
+        <Box sx={{ display: isEdit ? "flex" : "none", width: "100%", flexDirection: {xs: "column", sm: "row"} }}>
+          <Typography sx={{width: {xs: "100%", sm: "auto"}}}>Choose an avatar</Typography>
+          <Stack direction="row" spacing={3} sx={{ ml:{xs: 0, sm: 3}, width: {xs: "100%", sm: "auto"}}}>
             <Box
               sx={{
                 border: chosenAvatar === 1 ? "1px dashed red" : "none",
                 backgroundImage: `url(${triangle1})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                height: 100,
-                width: 100,
+                height: {xs: 50, sm: 100},
+                width: {xs: 50, sm: 100},
               }}
               onClick={() => setChosenAvatar(1)}
             />
@@ -325,8 +403,8 @@ const Profile: FC = () => {
                 backgroundImage: `url(${triangle2})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                height: 100,
-                width: 100,
+                height: {xs: 50, sm: 100},
+                width: {xs: 50, sm: 100},
               }}
               onClick={() => setChosenAvatar(2)}
             />
@@ -336,8 +414,8 @@ const Profile: FC = () => {
                 backgroundImage: `url(${triangle3})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                height: 100,
-                width: 100,
+                height: {xs: 50, sm: 100},
+                width: {xs: 50, sm: 100},
               }}
               onClick={() => setChosenAvatar(3)}
             />
@@ -380,7 +458,6 @@ const Profile: FC = () => {
           >
             <Typography variant="h3">Your reviews:</Typography>
           </Box>
-
         </Stack>
 
         <Divider />

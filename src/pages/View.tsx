@@ -73,6 +73,7 @@ const View: FC = () => {
 
   const buttonStyles = {
     "&:hover": { transform: "none" },
+    fontSize: {xs: "0.8em", sm: "1em"}
   };
 
   const getProducts = async () => {
@@ -337,9 +338,9 @@ const View: FC = () => {
       >
         <Box>
           <Box>
-            <Typography variant="h2">{pageTitle}</Typography>
+            <Typography sx={{fontSize: {xs: "3em", sm: "4em"}, p: 2}}>{pageTitle}</Typography>
           </Box>
-          <Box sx={{ pb: 2 }}>
+          <Box sx={{ p: 2 }}>
             <Typography>{pageDescription}</Typography>
           </Box>
           <Divider sx={{ mb: 2 }} />
@@ -387,7 +388,7 @@ const View: FC = () => {
             </Box>
           </Stack>
         </Box>
-        <Box>
+        <Box sx={{p: 2}}>
           <Typography variant="h3">Most Recent</Typography>
         </Box>
         <Box sx={{ height: "275px", width: "auto" }}>
@@ -411,7 +412,7 @@ const View: FC = () => {
         </Box>
         <Stack
           direction="row"
-          sx={{ display: "flex", justifyContent: "space-evenly", pt: 2 }}
+          sx={{ display: "flex", justifyContent: "space-evenly", p: 2 }}
         >
           <Typography variant="h5">Sort By:</Typography>
           <ButtonGroup
@@ -476,7 +477,7 @@ const View: FC = () => {
             <SkeletonProduct />
           </Stack>
         ) : (
-          <Carousel sx={{ width: "100%" }} index={4} animation="slide">
+          <Carousel sx={{ width: "100%" }} index={4} animation="slide" navButtonsAlwaysVisible={true}>
             {newsItems}
           </Carousel>
         )}

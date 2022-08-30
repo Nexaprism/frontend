@@ -18,7 +18,7 @@ const UserUpdater: FC = (): null => {
       dispatch(setIsLoggedIn(true));
       dispatch(setToken(token));
       dispatch(setUserId(userId));
-      if(avatar) {
+      if(avatar !== "" && avatar !== null) {
         dispatch(setAvatar(avatar));
       }
       

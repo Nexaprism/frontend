@@ -34,6 +34,8 @@ import {
 } from "../store/user/userReducer";
 import { selectIsLoggedIn, setIsLoggedIn } from "../store/app/appReducer";
 import { selectAllTags, selectProducts } from "../store/product/productReducer";
+import { RootState } from "../store";
+import { connect } from "react-redux";
 
 /**
  *
@@ -41,6 +43,9 @@ import { selectAllTags, selectProducts } from "../store/product/productReducer";
  *
  *
  */
+ const mapStateToProps = (state: RootState) => ({
+  avatar: state.user.avatar
+});
 
 const NavBar: FC = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -66,6 +71,8 @@ const NavBar: FC = () => {
       color: "primary",
     },
   }));
+
+  
 
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -118,9 +125,6 @@ const NavBar: FC = () => {
       productNames.push(p.name);
     })
     setOptions(productNames);
-    setTimeout(() => {
-      setReload(false);
-    }, 1600);
   }, [reload]);
 
   return (
@@ -351,4 +355,4 @@ const NavBar: FC = () => {
   );
 };
 
-export default NavBar;
+export default connect(mapStateToProps)(NavBar);

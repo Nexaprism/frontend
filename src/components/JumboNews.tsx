@@ -20,8 +20,8 @@ const JumboNews: FC<{
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundImage: `url(${"http://localhost:3080/" + imgUrl})`,
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
+        borderBottomLeftRadius: {xs: 0, sm: 20},
+        borderBottomRightRadius: {xs: 0, sm: 20},
         boxShadow: 6,
       }}
     >
@@ -33,8 +33,8 @@ const JumboNews: FC<{
           height: "15rem",
           position: "absolute",
           bottom: 0,
-          borderBottomLeftRadius: 20,
-          borderBottomRightRadius: 20,
+          borderBottomLeftRadius: {xs: 0, sm: 20},
+          borderBottomRightRadius: {xs: 0, sm: 20},
         }}
       >
         <Stack
