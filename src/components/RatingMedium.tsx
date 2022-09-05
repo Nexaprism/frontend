@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 import CircularProgress, {
     CircularProgressProps,
   } from '@mui/material/CircularProgress';
@@ -8,6 +8,8 @@ import {FC, useEffect, useState} from 'react';
 
 function RatingMedium(props: CircularProgressProps & { value: number; }) {
     const [ratingColor, setRatingColor] = useState<string>("#02a5db"); //blue
+    const theme = useTheme();
+  const isXS = useMediaQuery(theme.breakpoints.between("xs", "sm"));
 
     const findRatingColor = (value: number): string => {
         let color = "";
@@ -27,7 +29,12 @@ function RatingMedium(props: CircularProgressProps & { value: number; }) {
     }, [props.value])
     return (
         <Box sx={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress variant="determinate" size={150} sx={{color: `${ratingColor}`}} {...props} />
+            {isXS ? (
+                <CircularProgress variant="determinate" size={100} sx={{color: `${ratingColor}`}} {...props} />
+            ) : (
+                <CircularProgress variant="determinate" size={150} sx={{color: `${ratingColor}`}} {...props} />
+            )}
+            
             <Box
                 sx={{
                     top: 0,
@@ -41,7 +48,7 @@ function RatingMedium(props: CircularProgressProps & { value: number; }) {
                 }}
             >
                 <Typography
-                    variant="h2"
+                    sx={{fontSize: {xs: "3em", sm: "4em"}}}
                     component="div"
                     color="text.secondary"
                 >{`${Math.round(props.value)}`}</Typography>

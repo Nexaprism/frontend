@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { FC } from "react";
 import { Link } from "react-router-dom";
-import mainLogo from "../assets/img/nexaprismLogoSmall.png";
+
 
 const NewsCard: FC<{
   image: string;

@@ -1,5 +1,7 @@
 import { Article } from "./types";
 
+const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
+
 export const useGetArticle = () => {
   return {
     getById: async (id: string) => {
@@ -27,7 +29,7 @@ export const useGetArticle = () => {
         }
       `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,7 +73,7 @@ export const useGetArticle = () => {
         }
       `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -128,7 +130,7 @@ export const useGetArticle = () => {
           }
         `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -184,7 +186,7 @@ export const useGetArticle = () => {
           }
         `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

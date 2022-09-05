@@ -18,6 +18,7 @@ const SmallNewsCard: FC<{
   id: string;
 }> = ({ mainTag, date, title, imgUrl, id }) => {
   const navigate = useNavigate();
+  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
 
   return (
     <Card sx={{ maxWidth: 800, maxHeight: 225, width: "100%" }}>
@@ -60,7 +61,7 @@ const SmallNewsCard: FC<{
                 height: "15rem",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                backgroundImage: `url(${"http://localhost:3080/" + imgUrl})`,
+                backgroundImage: `url(${`${API_ENDPOINT}` + imgUrl})`,
               }}
             />
           </Box>

@@ -5,6 +5,8 @@ interface ProductData {
   totalProducts: number;
 }
 
+const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
+
 export const useGetProducts = async () => {
   let feedback = {
     success: false,
@@ -46,7 +48,7 @@ export const useGetProducts = async () => {
         }
       `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +96,7 @@ export const useGetProducts = async () => {
           }
         `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -162,7 +164,7 @@ export const useGetProducts = async () => {
           }
         `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -230,7 +232,7 @@ export const useGetProducts = async () => {
           }
         `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -298,7 +300,7 @@ export const useGetProducts = async () => {
             }
           `,
         };
-        await fetch("http://localhost:3080/graphql", {
+        await fetch(`${API_ENDPOINT}graphql`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -375,7 +377,7 @@ export const useGetProductQuery = async (id?: string) => {
         }
       `,
   };
-  await fetch("http://localhost:3080/graphql", {
+  await fetch(`${API_ENDPOINT}graphql`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -425,7 +427,7 @@ export const useGetProductsMostRecent = async () => {
           }
         `,
   };
-  await fetch("http://localhost:3080/graphql", {
+  await fetch(`${API_ENDPOINT}graphql`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

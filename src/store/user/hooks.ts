@@ -10,6 +10,8 @@ import {
 import { setIsLoggedIn } from "../app/appReducer";
 import { useState } from "react";
 
+const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
+
 export const useGetUserQuery = async (
   userId: string | null,
   token: string | null
@@ -35,7 +37,7 @@ export const useGetUserQuery = async (
         }
           `,
   };
-  await fetch("http://localhost:3080/graphql", {
+  await fetch(`${API_ENDPOINT}graphql`, {
     method: "POST",
     headers: {
       Authorization: "Bearer " + token,
@@ -87,7 +89,7 @@ export const useAvatarUpdate = () => {
                 }
                 `,
     };
-    await fetch("http://localhost:3080/graphql", {
+    await fetch(`${API_ENDPOINT}graphql`, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + token,
@@ -137,7 +139,7 @@ export const useUserFunc = () => {
                               }
                           `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -202,7 +204,7 @@ export const useUserFunc = () => {
               }
             `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -258,7 +260,7 @@ export const useUserFunc = () => {
             }
             `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           Authorization: "Bearer " + token,

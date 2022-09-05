@@ -234,7 +234,7 @@ const NavBar: FC = () => {
               onInputChange={(event, newValue) => {
                 setInputValue(newValue);
               }}
-              onKeyDown={(e) => {if(e.key == 'Enter') {console.log(inputValue); navigate("/search/" + inputValue);}}}
+              onKeyDown={(e) => {if(e.key == 'Enter') {navigate("/search/" + inputValue);}}}
               renderInput={(params) => (
                 <TextField
                   {...params}

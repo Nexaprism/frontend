@@ -17,16 +17,19 @@ import {
   Stack,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { useAppSelector } from "../store/hooks";
 import { selectToken, selectUserId } from "../store/user/userReducer";
 import { SlideProps } from "@mui/material/Slide";
 import RatingBig from "./RatingBig";
-import RatingMedium from "./ReviewMedium";
+import RatingMedium from "./RatingMedium";
 import { User } from "../store/user/userTypes";
 import { useReviews } from "../store/review/hooks";
 import { selectIsLoggedIn } from "../store/app/appReducer";
+import RatingSmall from "./RatingSmall";
 
 const ReviewCard: FC<{
   id: string;
@@ -49,6 +52,8 @@ const ReviewCard: FC<{
   const reviewFuncs = useReviews();
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const token = useAppSelector(selectToken);
+  const theme = useTheme();
+  const isXS = useMediaQuery(theme.breakpoints.between("xs", "sm"));
 
   type TransitionProps = Omit<SlideProps, "direction">;
 
@@ -248,7 +253,8 @@ const ReviewCard: FC<{
       </Dialog>
       <CardActionArea sx={{ display: "flex", p: 2 }} component="a">
         <Box sx={{ width: "40%" }}>
-          <RatingMedium value={rating} />
+            <RatingMedium value={rating} />
+        
         </Box>
         <CardContent sx={{ width: "60%", maxHeight: "15rem" }}>
           <Stack

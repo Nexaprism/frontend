@@ -8,6 +8,7 @@ const SearchResults: FC = () => {
   const { tags } = useParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [grid, setGrid] = useState<any>();
+  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
 
   const doSearch = async (value: string) => {
     let foundProducts: any[] = [];
@@ -28,7 +29,7 @@ const SearchResults: FC = () => {
           }
           `,
     };
-    await fetch("http://localhost:3080/graphql", {
+    await fetch(`${API_ENDPOINT}graphql`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,7 +61,7 @@ const SearchResults: FC = () => {
   };
 
   const createGrid = (products: Product[]) => {
-    const url = "http://localhost:3080/";
+    const url = `${API_ENDPOINT}`;
     const productCardGrid = (
       <Grid
         container

@@ -1,3 +1,5 @@
+const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
+
 export const useReviews = () => {
   return {
     delete: async (id: string, token: string) => {
@@ -12,7 +14,7 @@ export const useReviews = () => {
                 }
                 `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           Authorization: "Bearer " + token,
@@ -70,7 +72,7 @@ export const useReviews = () => {
                 }
             `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           Authorization: "Bearer " + token,
@@ -130,7 +132,7 @@ export const useReviews = () => {
                     }
                   `,
       };
-      await fetch("http://localhost:3080/graphql", {
+      await fetch(`${API_ENDPOINT}graphql`, {
         method: "POST",
         headers: {
           Authorization: "Bearer " + token,
@@ -187,7 +189,7 @@ export const useReviews = () => {
               }
                 `,
         };
-        await fetch("http://localhost:3080/graphql", {
+        await fetch(`${API_ENDPOINT}graphql`, {
           method: "POST",
           headers: {
             Authorization: "Bearer " + token,

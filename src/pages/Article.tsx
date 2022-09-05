@@ -15,6 +15,8 @@ const ArticlePage: FC = () => {
   const [creationDate, setCreationDate] = useState<string | undefined>("");
   const [article, setArticle] = useState<Article | undefined>({} as Article);
 
+  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
+
   const getArticle = async () => {
     let articleData;
     if (id) {
@@ -83,7 +85,7 @@ const ArticlePage: FC = () => {
             backgroundImage: `url(${
               article == undefined
                 ? "none"
-                : "http://localhost:3080/" + article.imgUrl
+                : `${API_ENDPOINT}` + article.imgUrl
             })`,
           }}
         />

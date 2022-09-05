@@ -26,7 +26,7 @@ import ReviewCard from "../components/ReviewCard";
 import Carousel from "react-material-ui-carousel";
 import { SlideProps } from "@mui/material/Slide";
 import RatingSmall from "../components/RatingSmall";
-import RatingMedium from "../components/ReviewMedium";
+import RatingMedium from "../components/RatingMedium";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   selectIsLoading,
@@ -72,6 +72,8 @@ const ProductPage: FC = () => {
   const reviewFunc = useReviews();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
+  const isXS = useMediaQuery(theme.breakpoints.between("xs", "sm"));
+  const isSM = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const acctLink = <a href="/account">My Profile</a>;
   const editReviewMsg = (
     <Typography>
@@ -79,6 +81,9 @@ const ProductPage: FC = () => {
       submitting another. You can find your reviews at the "{acctLink}" page.
     </Typography>
   );
+  
+
+  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
 
   type TransitionProps = Omit<SlideProps, "direction">;
 
@@ -99,7 +104,7 @@ const ProductPage: FC = () => {
       borderLeftWidth: 6,
       padding: "4px !important", // override inline-style
     },
-    minWidth: 350,
+    minWidth: {xs: 270, sm: 350},
   };
 
   const buttonStyles = {
@@ -175,7 +180,7 @@ const ProductPage: FC = () => {
         <NewsCard
           key={index}
           title={articles[index].title}
-          image={"http://localhost:3080/" + articles[index].imgUrl}
+          image={`${API_ENDPOINT}` + articles[index].imgUrl}
           id={articles[index].id}
           content={articles[index].content}
           date={articles[index].updatedAt}
@@ -191,8 +196,15 @@ const ProductPage: FC = () => {
     const articleItems: Array<any> = [];
     let page: any[] = [];
     let cardCount = 0;
-    let carouselSize = matches ? 4 : 3;
-    let carouselPageCount = matches ? 2 : 3;
+    let carouselSize = 2;
+    let carouselPageCount = 4;
+    if(isXS) {
+      carouselSize = 2;
+      carouselPageCount = 4;
+    } else if (matches) {
+      carouselSize = 4;
+      carouselPageCount = 2;
+    }
     for (let i = 0; i < carouselPageCount; i++) {
       page = makeNewsCarouselPage(cardCount, articles, carouselSize);
       articleItems.push(
@@ -284,7 +296,7 @@ const ProductPage: FC = () => {
             backgroundImage:
               product == undefined
                 ? "none"
-                : `url(${"http://localhost:3080/" + product.imgUrl})`,
+                : `url(${`${API_ENDPOINT}` + product.imgUrl})`,
             display: "flex",
             flexDirection: {
               xl: "row",
@@ -364,7 +376,7 @@ const ProductPage: FC = () => {
             ))}
       </Box>
       <Stack direction="column" sx={{ display: "flex", alignItems: "center" }}>
-        <Box sx={{ width: { xl: 1500, lg: "75rem", md: "65rem", sm: 600 } }}>
+        <Box sx={{ width: { xl: 1500, lg: "75rem", md: "65rem", sm: 600, xs: 340 } }}>
           <Stack
             direction={{ xs: "column", md: "row" }}
             sx={{
@@ -375,7 +387,7 @@ const ProductPage: FC = () => {
           >
             <Box>
               {isLoading || !product.description ? (
-                <Box sx={{ width: 700, m: 3 }}>
+                <Box sx={{ width: "100%", m: 3 }}>
                   <Skeleton
                     variant="text"
                     sx={{ fontSize: "1rem", width: "100%" }}
@@ -426,7 +438,7 @@ const ProductPage: FC = () => {
                 {message}
               </Alert>
             </Snackbar>
-            <Stack direction="row" spacing={8} width="80%" alignItems="center">
+            <Stack direction={{xs: "column", sm: "row"}} spacing={8} width="80%" alignItems="center">
               <Box>
                 <RatingMedium value={Number(sliderValue)} />
                 <Box
@@ -449,7 +461,7 @@ const ProductPage: FC = () => {
                 >
                   {editReviewMsg}
                 </Box>
-                <Stack direction="row" spacing={2}>
+                <Stack direction={{xs: "column", sm: "row"}} spacing={2}>
                   <Slider
                     aria-label="Your Rating:"
                     value={Number(sliderValue)}
@@ -557,7 +569,7 @@ const ProductPage: FC = () => {
                 <SkeletonProduct />
               </Stack>
             ) : (
-              <Carousel sx={{ width: "100%" }} index={4} animation="slide">
+              <Carousel sx={{ width: "100%" }} index={4} animation="slide" navButtonsAlwaysVisible={true}>
                 {newsItems}
               </Carousel>
             )}

@@ -5,6 +5,7 @@ import { Product } from "./types";
 
 const ProductUpdater: FC = (): null => {
     const dispatch = useAppDispatch();
+    const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
 
   const getProducts = async () => {
     let foundProducts: Product[] = [];
@@ -24,7 +25,7 @@ const ProductUpdater: FC = (): null => {
     }
       `,
     };
-    await fetch("http://localhost:3080/graphql", {
+    await fetch(`${API_ENDPOINT}graphql`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

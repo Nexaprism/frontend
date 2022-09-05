@@ -60,7 +60,7 @@ const DescriptionBox: FC<{
           >
             URL:
           </Typography>
-          <Link href={url} target="_blank">
+          <Link sx={{fontSize: {xs: "0.9em", sm: "1em"}}} href={url} target="_blank">
             {url}
           </Link>
         </Item>

@@ -1,5 +1,5 @@
 import { Box, Chip, Stack, Typography } from "@mui/material";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const JumboNews: FC<{
@@ -9,6 +9,12 @@ const JumboNews: FC<{
   imgUrl: string;
   id: string;
 }> = ({ title, mainTag, tags, imgUrl, id }) => {
+  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
+
+  useEffect(() => {
+    console.log(imgUrl);
+  })
+
   return (
     <Box
       component={Link}
@@ -19,7 +25,7 @@ const JumboNews: FC<{
         height: { xs: 350, md: 550, lg: 400 },
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundImage: `url(${"http://localhost:3080/" + imgUrl})`,
+        backgroundImage: `url(${`${API_ENDPOINT}` + imgUrl})`,
         borderBottomLeftRadius: {xs: 0, sm: 20},
         borderBottomRightRadius: {xs: 0, sm: 20},
         boxShadow: 6,

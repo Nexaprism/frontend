@@ -10,10 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { FC, useEffect } from "react";
-import image from "../assets/img/nexaprismLogoSmall.png";
-import RatingBig from "./RatingBig";
 import RatingSmall from "./RatingSmall";
-import ReviewMedium from "./ReviewMedium";
 import { Link } from "react-router-dom";
 
 

@@ -70,6 +70,7 @@ const View: FC = () => {
   const getProductFuncs = useGetProducts();
   const getArticleFuncs = useGetArticle();
   const isLoading = useAppSelector(selectIsLoading);
+  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
 
   const buttonStyles = {
     "&:hover": { transform: "none" },
@@ -110,7 +111,7 @@ const View: FC = () => {
         <ProductCard
           key={index}
           name={products[index].name}
-          img={"http://localhost:3080/" + products[index].imgUrl}
+          img={`${API_ENDPOINT}` + products[index].imgUrl}
           id={products[index].id}
           rating={products[index].rating}
           mainTag={products[index].mainTag}
@@ -136,7 +137,7 @@ const View: FC = () => {
         <NewsCard
           key={index}
           title={articles[index].title}
-          image={"http://localhost:3080/" + articles[index].imgUrl}
+          image={`${API_ENDPOINT}` + articles[index].imgUrl}
           id={articles[index].id}
           content={articles[index].content}
           date={articles[index].updatedAt}
@@ -195,7 +196,7 @@ const View: FC = () => {
     if(isXS) {
       carouselSize = 2;
       carouselPageCount = 4;
-    } else if (isSM || matches) {
+    } else if (matches) {
       carouselSize = 4;
       carouselPageCount = 2;
     }

@@ -9,6 +9,7 @@ const ArticleSmall: FC<{
   imgUrl: string;
   id: string;
 }> = ({ title, mainTag, tags, imgUrl, id }) => {
+  const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT
   return (
     <Box
       component={Link}
@@ -19,7 +20,7 @@ const ArticleSmall: FC<{
         height: "24vh",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundImage: `url(${"http://localhost:3080/" + imgUrl})`,
+        backgroundImage: `url(${`${API_ENDPOINT}` + imgUrl})`,
         borderRadius: 2,
         boxShadow: 6
       }}
@@ -53,9 +54,9 @@ const ArticleSmall: FC<{
           <Typography fontSize={{ sm: "0.7em", md: "0.8em", lg: "0.9em" }} sx={{ color: "white" }}>
             Learn More
           </Typography>
-          <Stack direction="row" spacing={1} sx={{display: {sm: "none", md: "flex"}}}>
+          <Stack direction="row" spacing={1} sx={{display: {xs: "none", md: "flex"}}}>
             {tags.map((tag, index) => {
-                return (index < 3 ? (<Chip label={tag} key={tag} />) : null)
+                return (index < 3 ? (<Chip label={tag} key={tag}/>) : null)
                 }
               
             )}
